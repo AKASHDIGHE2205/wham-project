@@ -1,0 +1,100 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import axios from "axios";
+import { BASE_URL } from "../../constant/Baseurl";
+import toast from "react-hot-toast";
+
+export const newTeam = async (data: any) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/master/add-team`, data);
+    if (response.status === 201) {
+      toast.success(response.data.message || "New team added successfully");
+      return response.data;
+    }
+  } catch (error: string | any) {
+    toast.error(error.response?.data?.message || "Failed to add team");
+    console.log(error);
+  }
+};
+
+export const getAllTeams = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/master/getAllteams`);
+    return response.data;
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || "Failed to fetch teams");
+    console.log(error);
+  }
+};
+
+export const updateTeam = async (data: any) => {
+  try {
+    const response = await axios.put(`${BASE_URL}/master/edit-team`, data);
+    if (response.status === 200) {
+      toast.success(response.data.message || "team updated successfully");
+      return response.data;
+    }
+  } catch (error: string | any) {
+    toast.error(error.response?.data?.message || "Failed to update team");
+    console.log(error);
+  }
+};
+
+export const getAllMembers = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/master/getAllmembers`);
+    return response.data;
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || "Failed to fetch teams");
+    console.log(error);
+  }
+};
+
+export const addMember = async (data: any) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/master/addMember`, data);
+    if (response.status === 201) {
+      toast.success(response.data.message || "New member added successfully");
+      return response.data;
+    }
+  } catch (error: string | any) {
+    toast.error(error.response?.data?.message || "Failed to add team");
+    console.log(error);
+  }
+};
+
+export const getMemberDetails = async (id: number | string) => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/master/getmemberDetails/${id}`
+    );
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || "Failed to fetch member");
+    console.error(error);
+  }
+};
+
+export const getUsers = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/master/getUsers`);
+    return response.data;
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || "Failed to fetch users");
+    console.log(error);
+  }
+};
+
+export const updateMember = async (data: any) => {
+  try {
+    const response = await axios.put(`${BASE_URL}/master/update-member`, data);
+    if (response.status === 200) {
+      toast.success(response.data.message || "Member updated successfully");
+      return response.data;
+    }
+  } catch (error: string | any) {
+    toast.error(error.response?.data?.message || "Failed to update Member");
+    console.log(error);
+  }
+};
