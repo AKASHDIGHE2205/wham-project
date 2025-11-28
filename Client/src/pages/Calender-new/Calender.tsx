@@ -34,6 +34,7 @@ const Calendar: React.FC<CalendarProps> = () => {
   const [selectedData, setSelectedDate] = useState<Date | null>(null);
   const [data, setData] = useState<any>(null);
   const [editData, setEditData] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const navigate = (direction: "prev" | "next") => {
     const multiplier = direction === "prev" ? -1 : 1;
@@ -60,6 +61,7 @@ const Calendar: React.FC<CalendarProps> = () => {
             setIsEditShowModal={setIsEditShowModal}
             setEditData={setEditData}
             setSelectedDate={setSelectedDate}
+            Loading={loading}
           />
         );
       case "weekly":
@@ -73,6 +75,7 @@ const Calendar: React.FC<CalendarProps> = () => {
             Data={data}
             setIsEditShowModal={setIsEditShowModal}
             setEditData={setEditData}
+            Loading={loading}
           />
         );
       case "monthly":
@@ -86,6 +89,7 @@ const Calendar: React.FC<CalendarProps> = () => {
             Data={data}
             setIsEditShowModal={setIsEditShowModal}
             setEditData={setEditData}
+            Loading={loading}
           />
         );
       case "yearly":
@@ -108,6 +112,7 @@ const Calendar: React.FC<CalendarProps> = () => {
             Data={data}
             setIsEditShowModal={setIsEditShowModal}
             setEditData={setEditData}
+            Loading={loading}
           />
         );
     }
@@ -127,12 +132,18 @@ const Calendar: React.FC<CalendarProps> = () => {
   const user = decryptUser(encryptedUser);
 
   const fetchData = async () => {
+    setLoading(true);
     try {
-      const body = { userId: user?.id || 0 };
+      const body = {
+        userId: user?.id || 0,
+        role: user?.role || 'User'
+      };
       const response = await getEvent(body);
       setData(response.events);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -144,6 +155,7 @@ const Calendar: React.FC<CalendarProps> = () => {
     fetchData();
     setCurrentDate(new Date());
   };
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* HEADER — NO CHANGES */}
@@ -230,10 +242,22 @@ const Calendar: React.FC<CalendarProps> = () => {
       <div className="flex-1 overflow-hidden">{renderCurrentView()}</div>
 
       {isShowModal && (
-        <EventModal isShow={isShowModal} setIsShow={setIsShowModal} selectedDate={selectedData} fetchData={fetchData} />
+        <EventModal
+          isShow={isShowModal}
+          setIsShow={setIsShowModal}
+          selectedDate={selectedData}
+          fetchData={fetchData}
+          Role={user?.role}
+        />
       )}
       {isEditShowModal && (
-        <UpdateEvent isShow={isEditShowModal} setIsShow={setIsEditShowModal} fetchData={fetchData} Event={editData} />
+        <UpdateEvent
+          isShow={isEditShowModal}
+          setIsShow={setIsEditShowModal}
+          fetchData={fetchData}
+          Event={editData}
+          Role={user?.role}
+        />
       )}
     </div>
   );

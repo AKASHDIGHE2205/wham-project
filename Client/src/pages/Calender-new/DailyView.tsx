@@ -13,6 +13,7 @@ interface DailyViewProps {
   setIsEditShowModal: (show: boolean) => void;
   setEditData: (data: any) => void;
   setSelectedDate: (date: Date | null) => void;
+  Loading: boolean;
 }
 
 const DailyView: React.FC<DailyViewProps> = ({
@@ -21,7 +22,8 @@ const DailyView: React.FC<DailyViewProps> = ({
   Data,
   setIsEditShowModal,
   setEditData,
-  setSelectedDate
+  setSelectedDate,
+  Loading
 }) => {
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
@@ -37,8 +39,8 @@ const DailyView: React.FC<DailyViewProps> = ({
     const targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
     return Data.filter((event: CalendarEvent) => {
-      const start = safeParseDate(event.from_date);
-      const end = safeParseDate(event.to_date);
+      const start = safeParseDate(event?.from_date);
+      const end = safeParseDate(event?.to_date);
       if (!start || !end) return false;
 
       return targetDate >= start && targetDate <= end;
@@ -50,7 +52,7 @@ const DailyView: React.FC<DailyViewProps> = ({
 
     return dayEvents.filter((event: CalendarEvent) => {
       try {
-        const eventStartHour = event.from_time ? parseInt(event.from_time.split(':')[0]) : 0;
+        const eventStartHour = event?.from_time ? parseInt(event?.from_time.split(':')[0]) : 0;
         return eventStartHour === hour;
       } catch (error) {
         console.error('Error processing event:', error);
@@ -82,6 +84,17 @@ const DailyView: React.FC<DailyViewProps> = ({
     }
   };
 
+  // Loading state
+  if (Loading) {
+    return (
+      <div className="h-full bg-white sm:mx-4 my-2 rounded-xl shadow-md overflow-hidden flex items-center justify-center min-h-[500px]">
+        <div className="flex flex-col items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+          <p className="text-gray-600 text-lg">Loading calendar...</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="h-full overflow-y-auto bg-gray-50/30">
       <div className="text-center py-5 bg-linear-to-br from-blue-50 to-indigo-50 border-b shadow-sm">
@@ -94,7 +107,7 @@ const DailyView: React.FC<DailyViewProps> = ({
       </div>
 
       <div className="relative max-w-5xl mx-auto p-2 sm:p-4">
-        {hours.map(hour => {
+        {hours?.map(hour => {
           const hourEvents = getEventsForHour(hour);
 
           return (
@@ -113,43 +126,43 @@ const DailyView: React.FC<DailyViewProps> = ({
                 className="flex-1 p-2 sm:p-3 relative"
                 onClick={() => handleHourClick(hour)}
               >
-                {hourEvents.map((event) => (
+                {hourEvents?.map((event) => (
                   <div
-                    key={event.id}
+                    key={event?.id}
                     className={`text-xs px-2 py-1 rounded border cursor-pointer hover:shadow-md transition-all duration-200 truncate
-                      ${event.isapproved === "P"
+                      ${event?.isapproved === "P"
                         ? "bg-yellow-100 border-yellow-300 text-yellow-800"
-                        : event.isapproved === "R"
+                        : event?.isapproved === "R"
                           ? "bg-red-100 border-red-300 text-red-800"
-                          : event.isapproved === "A"
+                          : event?.isapproved === "A"
                             ? "bg-green-100 border-green-300 text-green-800"
-                            : event.isapproved === "C"
+                            : event?.isapproved === "C"
                               ? "bg-blue-100 border-blue-300 text-blue-800"
                               : "bg-gray-100 border-gray-300 text-gray-800"
                       }`}
                     onClick={(e) => handleEditEvent(event, e)}
-                    title={`Click to edit: ${event.title}`}
+                    title={`Click to edit: ${event?.title}`}
                   >
                     <span className="truncate flex-1 font-semibold flex items-center gap-2">
-                      {event.type === 'task' ?
+                      {event?.type === 'task' ?
                         (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-circle-check-big-icon lucide-circle-check-big"><path d="M21.801 10A10 10 0 1 1 17 3.335" /><path d="m9 11 3 3L22 4" /></svg>) : (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar-icon lucide-calendar"><path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" /></svg>)}
-                      {event.title}
+                      {event?.title}
                     </span>
 
                     <div className="flex justify-between text-[10px] mt-1">
                       <span className="text-gray-600">
-                        {moment(event.from_date).format('DD/MMM')}
-                        {event.from_date !== event.to_date &&
-                          ` to ${moment(event.to_date).format('DD/MMM')}`}
+                        {moment(event?.from_date).format('DD/MMM')}
+                        {event?.from_date !== event?.to_date &&
+                          ` to ${moment(event?.to_date).format('DD/MMM')}`}
                       </span>
                       <span>
-                        {formatTimeFromDate(event.from_date)} - {formatTimeFromDate(event.to_date)}
+                        {formatTimeFromDate(event?.from_date)} - {formatTimeFromDate(event?.to_date)}
                       </span>
                     </div>
                   </div>
                 ))}
 
-                {hourEvents.length === 0 && (
+                {hourEvents?.length === 0 && (
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
                     <span className="text-xs text-gray-400 bg-white/80 px-2 py-1 rounded border">
                       Click to add event

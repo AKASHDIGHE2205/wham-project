@@ -177,7 +177,7 @@ const Login: React.FC = () => {
 
               {/* Remember Me & Forgot Password */}
               <div className="flex items-center justify-between" data-aos="fade-up" data-aos-delay="600">
-                <div className="flex items-center">
+                <div className="flex items-center hidden">
                   <input
                     type="checkbox"
                     className="h-4 w-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"

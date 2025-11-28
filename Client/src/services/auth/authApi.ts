@@ -50,6 +50,67 @@ export const loginApi = async (data: loginData) => {
   }
 };
 
+export const sendOtp = async (data: any) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/auth/sendotp`, data);
+    if (response.status === 200) {
+      toast.success(response.data.message || "OTP send successfully!");
+      return response;
+    }
+  } catch (error: any) {
+    toast.error(
+      error.response?.data?.message || "failed to send OTP. Please try again."
+    );
+    throw error;
+  }
+};
+
+export const getTeamMembers = async (data: any) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/auth/getTeamMembers`, data);
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error: any) {
+    toast.error(
+      error.response?.data?.message ||
+        "failed to fetch team member. Please try again."
+    );
+    throw error;
+  }
+};
+
+export const ValidateOtp = async (data: any) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/auth/validateotp`, data);
+    if (response.status === 200) {
+      toast.success(response.data.message || "OTP send successfully!");
+      return response;
+    }
+  } catch (error: any) {
+    toast.error(
+      error.response?.data?.message || "failed to send OTP. Please try again."
+    );
+    throw error;
+  }
+};
+
+export const UpdateOtp = async (data: any) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/auth/updateotp`, data);
+    if (response.status === 200) {
+      toast.success(response.data.message || "Password reset successfully!");
+      return response;
+    }
+  } catch (error: any) {
+    toast.error(
+      error.response?.data?.message ||
+        "failed to reset password. Please try again."
+    );
+    throw error;
+  }
+};
+
 const api = axios.create({
   baseURL: BASE_URL,
 });

@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes.js';
 import calenderRoutes from './routes/calenderRoutes.js';
 import masterRoutes from './routes/masterRoutes.js';
+import DashboardController from './routes/DashboardRoutes.js';
 
 dotenv.config();
 const app = express();
@@ -23,6 +24,7 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/calendar', calenderRoutes);
 app.use('/api/master', masterRoutes);
+app.use('/api/dashboard', DashboardController);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

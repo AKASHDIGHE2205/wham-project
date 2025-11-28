@@ -14,17 +14,19 @@ import CryptoJS from "crypto-js";
 import Loadings from './components/Loadings';
 import DefaultLayout from './layout/DefaultLayout';
 import Logout from './pages/auth/Logout';
-import TeamView from './pages/Master/team-master/TeamView';
-import MemberView from './pages/Master/member-master/MemberView';
-import NewMember from './pages/Master/member-master/NewMember';
-import EditMember from './pages/Master/member-master/EditMember';
+import StepView from './pages/Master/steps/StepView';
+import TaskView from './pages/Master/task/TaskView';
 
 const Login = lazy(() => import('./pages/auth/Login'));
 const Register = lazy(() => import('./pages/auth/Register'));
 const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'));
 const Profile = lazy(() => import('./pages/auth/Profile'));
 const Home = lazy(() => import('./pages/home/Home'));
-
+const TeamView = lazy(() => import('./pages/Master/team-master/TeamView'));
+const MemberView = lazy(() => import('./pages/Master/member-master/MemberView'));
+const NewMember = lazy(() => import('./pages/Master/member-master/NewMember'));
+const EditMember = lazy(() => import('./pages/Master/member-master/EditMember'));
+const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'));
 
 function App() {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -79,11 +81,24 @@ function App() {
           <Routes>
             <Route path="/" element={<DefaultLayout />}>
               <Route index element={<Home />} />
+
+              {/*Dashboard Routes */}
+              <Route path="/dashboard" element={<Dashboard />} />
+
+              {/*Calender Routes */}
               <Route path="/calender" element={<Calender />} />
+
+              {/*Master Routes */}
               <Route path="/master/team-view" element={<TeamView />} />
               <Route path="/master/view-members" element={<MemberView />} />
               <Route path="/master/add-member" element={<NewMember />} />
               <Route path="/master/edit-member/:id" element={<EditMember />} />
+
+              <Route path="/master/view-steps" element={<StepView />} />
+              <Route path="/master/view-tasks" element={<TaskView />} />
+
+
+              {/*Profile Routes */}
               <Route path="/auth/profile" element={<Profile />} />
             </Route>
 

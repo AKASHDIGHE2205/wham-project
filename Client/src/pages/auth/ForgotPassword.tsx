@@ -1,35 +1,129 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from 'react';
-import { Lock, ArrowRight, Shield, Zap, Sparkles, ArrowLeft, Key, Phone } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Lock, ArrowRight, Shield, Zap, Sparkles, ArrowLeft, Key, Phone, EyeOff, Eye } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { sendOtp, UpdateOtp, ValidateOtp } from '../../services/auth/authApi';
 
 const ForgotPassword: React.FC = () => {
   const [step, setStep] = useState(1);
   const [mobile, setMobile] = useState([]);
-  const maskedMobile = mobile
-    ? mobile.toString().slice(0, -3).replace(/./g, "X") + mobile.toString().slice(-3)
-    : "";
+  const [password, setPassword] = useState('');
+  const [cPassword, setCPassword] = useState('');
+  const [showPass, setShowPass] = useState(false)
+  const [otp, setOtp] = useState(0)
+  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds (10 * 60 = 600)
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const navigate = useNavigate();
+  const maskedMobile = mobile ? mobile.toString().slice(0, -3).replace(/./g, "X") + mobile.toString().slice(-3) : "";
 
+  // Countdown timer effect
+  useEffect(() => {
+    let interval: number;
 
+    if (isTimerRunning && timeLeft > 0) {
+      interval = window.setInterval(() => {
+        setTimeLeft((prevTime) => prevTime - 1);
+      }, 1000);
+    } else if (timeLeft === 0) {
+      setIsTimerRunning(false);
+      toast.error('OTP has expired. Please request a new one.');
+    }
 
-  const handleSendOtp = () => {
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isTimerRunning, timeLeft]);
 
+  // Format time to MM:SS
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  const handleSendOtp = async () => {
     if (!mobile || mobile.length !== 10) {
       toast.error("Please enter a valid mobile number.");
       return;
     }
-    console.log(mobile);
-    setStep(2);
+    const body = { mobile }
+    const response = await sendOtp(body);
+    if (response?.status === 200) {
+      setStep(2);
+      setTimeLeft(600);
+      setIsTimerRunning(true);
+    }
   };
 
-  const handleVerifyOtp = () => {
-    // verify OTP API call
-    setStep(3);
+  const handleVerifyOtp = async () => {
+    if (!otp) {
+      toast.error('Please fill otp.');
+      return;
+    }
+
+    // Check if OTP has expired
+    if (timeLeft === 0) {
+      toast.error('OTP has expired. Please request a new one.');
+      return;
+    }
+
+    const body = {
+      mobile,
+      otp
+    }
+    const response = await ValidateOtp(body);
+    if (response?.status === 200) {
+      setIsTimerRunning(false); // Stop the timer
+      setStep(3);
+    }
   };
 
-  const handleResetPassword = () => {
-    // reset password API
+  const handleResetPassword = async () => {
+    if (!password || !cPassword || !mobile) {
+      toast.error('Please fill all required fields.')
+      return;
+    }
+    if (password !== cPassword) {
+      toast.error('Password & confirm password should be match.');
+      return;
+    }
+
+    const body = {
+      mobile,
+      password
+    }
+
+    const response = await UpdateOtp(body);
+    if (response?.status === 200) {
+      setCPassword('');
+      setMobile([]);
+      setOtp(0);
+      setPassword('');
+      setTimeLeft(600);
+      setIsTimerRunning(false);
+      setStep(1)
+      navigate('/auth/login')
+    }
+  };
+
+  // Resend OTP functionality
+  const handleResendOtp = async () => {
+    if (timeLeft > 0 && isTimerRunning) {
+      toast.error(`Please wait ${formatTime(timeLeft)} before requesting a new OTP`);
+      return;
+    }
+
+    const body = {
+      mobile
+    }
+    const response = await sendOtp(body);
+    if (response?.status === 200) {
+      setTimeLeft(600); // Reset to 10 minutes
+      setIsTimerRunning(true); // Start the countdown
+      setOtp(0); // Clear previous OTP
+      // toast.success('New OTP sent successfully!');
+    }
   };
 
   return (
@@ -137,7 +231,6 @@ const ForgotPassword: React.FC = () => {
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">Mobile Number</label>
 
-                    {/* Remove nested form */}
                     <div className="flex space-x-2">
                       <div className="relative group flex-1">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -153,8 +246,6 @@ const ForgotPassword: React.FC = () => {
                           placeholder="Enter your mobile number"
                         />
                       </div>
-
-                      {/* Use button type="button" so the parent form does not submit */}
                       <button
                         type="button"
                         onClick={handleSendOtp}
@@ -177,6 +268,7 @@ const ForgotPassword: React.FC = () => {
                       <div className="relative group flex-1">
                         <input
                           type="number"
+                          onChange={(e: any) => setOtp(e.target.value)}
                           className="block w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
                           placeholder="Enter OTP"
                         />
@@ -189,9 +281,28 @@ const ForgotPassword: React.FC = () => {
                         Verify OTP
                       </button>
                     </div>
-                    <span className="flex justify-center text-sm text-gray-500 mt-2">
-                      OTP sent to your mobile number {maskedMobile}
-                    </span>
+
+                    {/* Timer and Resend OTP */}
+                    <div className="flex justify-between items-center mt-2">
+                      <span className="text-sm text-gray-500">
+                        OTP sent to your mobile number {maskedMobile}
+                      </span>
+                      <div className="flex items-center space-x-2">
+                        {isTimerRunning ? (
+                          <span className={`text-sm font-medium ${timeLeft < 60 ? 'text-red-600' : 'text-orange-600'}`}>
+                            {formatTime(timeLeft)}
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={handleResendOtp}
+                            className="text-sm text-orange-600 hover:text-orange-700 font-medium underline"
+                          >
+                            Resend OTP
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -201,16 +312,26 @@ const ForgotPassword: React.FC = () => {
                 <>
                   <div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">New Password</label>
+                      <label className="text-sm font-medium text-gray-700">Password <span className='text-red-600'>*</span></label>
                       <div className="relative group">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                           <Lock className="h-5 w-5 text-gray-400" />
                         </div>
                         <input
-                          type="password"
-                          className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
-                          placeholder="Enter new password"
+                          type={showPass ? "text" : "password"}
+                          name='password'
+                          onChange={(e: any) => setPassword(e.target.value)}
+                          required
+                          className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
+                          placeholder="Enter your password"
                         />
+                        <button
+                          type="button"
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-orange-600 hover:text-gray-600"
+                          onClick={() => setShowPass(!showPass)}
+                        >
+                          {showPass ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -224,12 +345,14 @@ const ForgotPassword: React.FC = () => {
                         </div>
                         <input
                           type="password"
+                          onChange={(e: any) => setCPassword(e.target.value)}
                           className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
                           placeholder="Confirm new password"
                         />
                       </div>
                     </div>
                   </div>
+
 
                   <div>
                     <button

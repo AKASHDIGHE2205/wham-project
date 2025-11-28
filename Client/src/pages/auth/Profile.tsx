@@ -1,19 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react';
-import {
-  User,
-  Mail,
-  CheckCircle,
-  IdCard,
-  Phone,
-  Shield,
-  Zap,
-  Sparkles
-} from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { User, Mail, CheckCircle, IdCard, Phone, Shield, Zap, Sparkles, ChevronDown, ChevronUp, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
+import { getTeamMembers } from '../../services/auth/authApi';
+
 const Profile: React.FC = () => {
+  const [data, setData] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const secretKey = `Malpani@2025`;
+  const [showTeams, setShowTeams] = useState(false);
 
   const decryptUser = (encrypted: string | null) => {
     if (!encrypted) return null;
@@ -28,20 +24,46 @@ const Profile: React.FC = () => {
 
   const encryptedUser = localStorage.getItem("user");
   const userData = decryptUser(encryptedUser);
-  console.log(userData);
+
+  useEffect(() => {
+    const fetchTeamData = async () => {
+      if (showTeams) {
+        setIsLoading(true);
+        try {
+          const body = {
+            userId: userData?.id || 0
+          };
+          const response: any = await getTeamMembers(body);
+          if (response) {
+            setData(response.teams);
+          }
+        } catch (error) {
+          console.error("Failed to fetch team data", error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchTeamData();
+  }, [showTeams, userData?.id]);
+
+  const toggleTeamsView = () => {
+    setShowTeams(!showTeams);
+  };
 
   if (!userData) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-purple-50 to-orange-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 text-center border border-gray-100 max-w-md w-full" data-aos="zoom-in">
-          <div className="w-16 h-16 bg-linear-to-br from-gray-500 to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <User className="w-8 h-8 text-white" />
+          <div className="w-20 h-20 bg-linear-to-br from-gray-500 to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <User className="w-10 h-10 text-white" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">User Not Found</h2>
           <p className="text-gray-600 mb-6">Please log in to continue</p>
           <Link
             to="/auth/login"
-            className="inline-flex items-center justify-center px-6 py-3 bg-linear-to-r from-orange-500 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg transition-shadow duration-300"
+            className="inline-flex items-center justify-center px-6 py-3 bg-linear-to-r from-orange-500 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
           >
             Go to Login
           </Link>
@@ -51,10 +73,10 @@ const Profile: React.FC = () => {
   }
 
   const InfoCard = ({ icon: Icon, title, children, className = "" }: any) => (
-    <div className={`bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-300 ${className}`} >
+    <div className={`bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-300 ${className}`}>
       <div className="flex items-center mb-4">
-        <div className="w-10 h-10 bg-linear-to-br from-orange-500 to-purple-600 rounded-xl flex items-center justify-center mr-3">
-          <Icon className="w-5 h-5 text-white" />
+        <div className="w-12 h-12 bg-linear-to-br from-orange-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 shadow-md">
+          <Icon className="w-6 h-6 text-white" />
         </div>
         <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
       </div>
@@ -63,57 +85,74 @@ const Profile: React.FC = () => {
   );
 
   const InfoItem = ({ label, value, icon: Icon }: any) => (
-    <div className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+    <div className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0 group hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors duration-200">
       <div className="flex items-center">
-        {Icon && <Icon className="w-4 h-4 text-gray-400 mr-3" />}
+        {Icon && <Icon className="w-4 h-4 text-gray-400 mr-3 group-hover:text-gray-600 transition-colors" />}
         <span className="text-gray-600 font-medium">{label}</span>
       </div>
-      <span className="text-gray-900 font-semibold">{value || "N/A"}</span>
+      <span className="text-gray-900 font-semibold text-right">{value || "N/A"}</span>
     </div>
   );
 
+  const formatName = (name: string) => {
+    if (!name) return '';
+    return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+  };
+
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-50 to-orange-50 py-8">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
         {/* Header Section */}
-        <div className="text-center mb-8" >
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">
-            Profile <span className="text-orange-600">Details</span>
+        <div className="text-center mb-2">
+          <h1 className="text-4xl font-bold text-gray-900 mb-3 bg-linear-to-r from-orange-600 to-purple-600 bg-clip-text ">
+            Profile Details
           </h1>
-          <p className="text-gray-600 text-lg">
-            Manage your account information and preferences
+          <p className="text-gray-600 text-lg max-w-md mx-auto hidden">
+            Manage your account information and team preferences
           </p>
         </div>
 
-        <div className="max-w-2xl mx-auto space-y-6">
+        <div className="max-w-2xl mx-auto space-y-4">
           {/* Profile Card */}
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6" >
-            <div className="text-center">
-              <div className="w-24 h-24 bg-linear-to-br from-orange-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-4 text-center relative overflow-hidden">
+            {/* Background decoration */}
+            <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-orange-500 to-purple-600"></div>
+
+            <div className="relative z-10">
+              <div className="w-22 h-22 bg-linear-to-br from-orange-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl border-4 border-white">
                 <span className="text-2xl font-bold text-white">
                   {userData.firstName?.[0]}{userData.lastName?.[0]}
                 </span>
               </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-1">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 {userData.firstName} {userData.lastName}
               </h2>
-              <div className="inline-flex items-center px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium mb-3">
-                <CheckCircle className="w-4 h-4 mr-1" />
+              <div className="inline-flex items-center px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-medium mb-4 border border-green-200">
+                <CheckCircle className="w-4 h-4 mr-2" />
                 Verified Account
               </div>
             </div>
 
             {/* Feature Icons */}
-            <div className="mt-8 pt-6 border-t border-gray-100">
-              <div className="flex justify-center space-x-4">
-                <div className="p-3 bg-purple-50 rounded-xl">
-                  <Shield className="w-5 h-5 text-purple-600" />
+            <div className="mt-2 pt-6 border-t border-gray-100">
+              <div className="flex justify-center space-x-6">
+                <div className="text-center group">
+                  <div className="p-4 bg-purple-50 rounded-2xl inline-flex group-hover:bg-purple-100 group-hover:scale-110 transition-all duration-300">
+                    <Shield className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <p className="text-xs text-gray-600 mt-2">Secure</p>
                 </div>
-                <div className="p-3 bg-orange-50 rounded-xl">
-                  <Zap className="w-5 h-5 text-orange-600" />
+                <div className="text-center group">
+                  <div className="p-4 bg-orange-50 rounded-2xl inline-flex group-hover:bg-orange-100 group-hover:scale-110 transition-all duration-300">
+                    <Zap className="w-6 h-6 text-orange-600" />
+                  </div>
+                  <p className="text-xs text-gray-600 mt-2">Fast</p>
                 </div>
-                <div className="p-3 bg-yellow-50 rounded-xl">
-                  <Sparkles className="w-5 h-5 text-yellow-600" />
+                <div className="text-center group">
+                  <div className="p-4 bg-yellow-50 rounded-2xl inline-flex group-hover:bg-yellow-100 group-hover:scale-110 transition-all duration-300">
+                    <Sparkles className="w-6 h-6 text-yellow-600" />
+                  </div>
+                  <p className="text-xs text-gray-600 mt-2">Premium</p>
                 </div>
               </div>
             </div>
@@ -125,16 +164,111 @@ const Profile: React.FC = () => {
             <InfoItem label="Last Name" value={userData.lastName} icon={User} />
           </InfoCard>
 
-          <InfoCard icon={Mail} title="Contact Information" >
+          <InfoCard icon={Mail} title="Contact Information">
             <InfoItem label="Email Address" value={userData.email} icon={Mail} />
             <InfoItem label="Phone Number" value={userData.phone} icon={Phone} />
           </InfoCard>
 
-          <InfoCard icon={IdCard} title="Account Information" >
+          <InfoCard icon={IdCard} title="Account Information">
             <InfoItem label="User ID" value={userData.id} icon={IdCard} />
             <InfoItem label="Account Role" value={userData.role} icon={Shield} />
-            <InfoItem label="Member Since" value={userData.createdAt ? new Date(userData.createdAt).toLocaleDateString() : "N/A"} icon={CheckCircle} />
+            <InfoItem
+              label="Member Since"
+              value={userData.createdAt ? new Date(userData.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              }) : "N/A"}
+              icon={CheckCircle}
+            />
           </InfoCard>
+
+          {/* Teams Card */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-300">
+            <div
+              className="flex items-center justify-between mb-6 cursor-pointer group"
+              onClick={toggleTeamsView}
+            >
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-linear-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 shadow-md">
+                  <Users className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Team Members</h3>
+                </div>
+              </div>
+              <button className="flex items-center space-x-2 px-4 py-2 text-orange-600 cursor-pointer">
+                <span className="">
+                  {showTeams ? 'Hide' : 'View'}
+                </span>
+                {showTeams ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+
+            {/* Teams Content */}
+            {showTeams && (
+              <div className="border-t border-gray-100 pt-6">
+                {isLoading ? (
+                  <div className="text-center py-12">
+                    <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading team members...</p>
+                  </div>
+                ) : data.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto pr-2">
+                    {data.map((team: any) =>
+                      team.members.map((member: any) => {
+                        const firstName = formatName(member.full_name?.split(' ')[0] || '');
+                        const lastName = formatName(member.full_name?.split(' ').slice(1).join(' ') || '');
+                        const fullName = `${firstName} ${lastName}`.trim();
+                        const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`;
+
+                        return (
+                          <div
+                            key={`${team.team_id}-${member.mem_id}`}
+                            className="bg-linear-to-br from-white to-gray-50 border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-all duration-300 hover:border-purple-300 group"
+                          >
+                            <div className="flex items-center mb-3">
+                              <div className="w-8 h-8 bg-linear-to-br from-orange-500 to-purple-600 rounded-full flex items-center justify-center mr-3 shadow-md group-hover:scale-105 transition-transform duration-300">
+                                <span className="text-white font-bold text-sm">
+                                  {initials}
+                                </span>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-base font-semibold text-gray-900 truncate">
+                                  {fullName}
+                                </h4>
+                              </div>
+                            </div>
+
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-medium text-gray-600">Team:</span>
+                                <span className="text-xs font-semibold text-purple-600 bg-purple-50 px-2 py-1 rounded-full">
+                                  {team.team_name}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Users className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <p className="text-gray-500 mb-2">No team members found</p>
+                    <p className="text-sm text-gray-400">You're not part of any teams yet</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

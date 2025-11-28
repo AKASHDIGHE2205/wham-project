@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../../store/store";
 import { handleSelectUser } from "../../../feature/masterSlice";
 
-interface Member {
+export interface Member {
   mem_id: number;
   first_name: string;
   middle_name: string;
@@ -33,7 +33,7 @@ interface TeamModalTeam {
 }
 
 // Interface for our internal team format (from API)
-interface ApiTeam {
+export interface ApiTeam {
   team_id: number;
   name: string;
 }

@@ -25,10 +25,10 @@ export const getActiveMembers = (req, res) => {
 };
 
 export const addEvent = (req, res) => {
-
   try {
     const { title, description, fromDate, toDate, type, userId, teamsId = [], members = [], locations = [] } = req.body;
     const createdAt = new Date();
+    const eventDate = new Date();
     const isapproved = "P";
     const isdeleted = "N";
     const approvedBy = null;
@@ -37,115 +37,178 @@ export const addEvent = (req, res) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // Insert into event_hd
-    const hdSQL = `
-      INSERT INTO event_hd
-      (title, description, from_date, to_date, team_id, isapproved, type, isdeleted, created_by, approved_by, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
+    // First, get the MAX(id) from event_hd
+    const getMaxIdSQL = `SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM event_hd`;
 
-    const primaryTeam = teamsId.length > 0 ? teamsId[0] : null;
+    db.query(getMaxIdSQL, (err, result) => {
+      if (err) {
+        console.error("❌ Error getting next event ID:", err);
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
 
-    db.query(
-      hdSQL,
-      [title, description, fromDate, toDate, primaryTeam, isapproved, type, isdeleted, userId, approvedBy, createdAt],
-      (err, result) => {
-        if (err) {
-          console.error("❌ event_hd insert error:", err);
-          return res.status(500).json({ message: "Internal Server Error" });
-        }
+      const eventId = result[0].next_id;
+      const primaryTeam = teamsId.length > 0 ? teamsId[0] : null;
 
-        const eventId = result.insertId;
+      // Insert into event_hd with explicit ID
+      const hdSQL = `
+        INSERT INTO event_hd
+        (id, title, description, from_date, to_date, team_id, isapproved, type, isdeleted, created_by, approved_by, created_at, event_date)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
 
-        // 1️⃣ Insert event_team
-        if (teamsId.length > 0) {
-          const teamValues = teamsId.map(id => [eventId, id]);
-          const teamSQL = `INSERT INTO event_team (event_id, team_id) VALUES ?`;
-
-          db.query(teamSQL, [teamValues], err => {
-            if (err) {
-              console.error("❌ event_team insert error:", err);
-              return res.status(500).json({ message: "Failed inserting teams" });
-            }
-            insertMembers();
-          });
-        } else {
-          insertMembers();
-        }
-
-        // 2️⃣ Insert event_member
-        const insertMembers = () => {
-          const memberIds = members.map(m => m.id);
-
-          if (memberIds.length === 0) {
-            return insertLocations();
+      db.query(
+        hdSQL,
+        [
+          eventId,
+          title,
+          description,
+          fromDate,
+          toDate,
+          primaryTeam,
+          isapproved,
+          type,
+          isdeleted,
+          userId,
+          approvedBy,
+          createdAt,
+          eventDate
+        ],
+        (err, result) => {
+          if (err) {
+            console.error("❌ event_hd insert error:", err);
+            return res.status(500).json({ message: "Internal Server Error" });
           }
 
-          const memberValues = memberIds.map(id => [eventId, id]);
-          const memberSQL = `INSERT INTO event_member (event_id, member_id) VALUES ?`;
-
-          db.query(memberSQL, [memberValues], err => {
-            if (err) {
-              console.error("❌ event_member insert error:", err);
-              return res.status(500).json({ message: "Failed inserting members" });
-            }
-            insertLocations();
-          });
-        };
-
-        // 3️⃣ Insert event_loc
-        const insertLocations = () => {
-          if (locations.length === 0) {
-            return res.status(201).json({ message: "Event created successfully!", eventId });
-          }
-
-          // Helper to extract city + postal code
-          const parseAddress = (fullAddress) => {
-            let parts = fullAddress.split(",");
-            let postal = null;
-            let city = null;
-
-            // Try to extract pin code (Indian-style)
-            const pinMatch = fullAddress.match(/\b\d{6}\b/);
-            if (pinMatch) postal = pinMatch[0];
-
-            // City is usually the item before "India"
-            if (parts.length >= 3) {
-              city = parts[parts.length - 2]?.trim();
+          // Define functions in correct order to avoid hoisting issues
+          const insertTeams = (callback) => {
+            if (teamsId.length === 0) {
+              return callback();
             }
 
-            return { city, postal };
+            const getTeamMaxIdSQL = `SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM event_team`;
+
+            db.query(getTeamMaxIdSQL, (err, teamResult) => {
+              if (err) {
+                console.error("❌ Error getting next event_team ID:", err);
+                return res.status(500).json({ message: "Internal Server Error" });
+              }
+
+              let teamNextId = teamResult[0].next_id;
+              const teamValues = teamsId.map((id, index) => [teamNextId + index, eventId, id, eventDate]);
+              const teamSQL = `INSERT INTO event_team (id, event_id, team_id, event_date) VALUES ?`;
+
+              db.query(teamSQL, [teamValues], err => {
+                if (err) {
+                  console.error("❌ event_team insert error:", err);
+                  return res.status(500).json({ message: "Failed inserting teams" });
+                }
+                callback();
+              });
+            });
           };
 
-          const locationValues = locations.map(loc => {
-            const { city, postal } = parseAddress(loc.address);
-            return [
-              eventId,
-              loc.address,
-              loc.lng,
-              loc.lat,
-              city,
-              postal
-            ];
-          });
+          const insertMembers = (callback) => {
+            const memberIds = members.map(m => m.id);
 
-          const locSQL = `
-            INSERT INTO event_loc
-            (event_id, address, lng, lat, city, postal_code)
-            VALUES ?
-          `;
-
-          db.query(locSQL, [locationValues], err => {
-            if (err) {
-              console.error("❌ event_loc insert error:", err);
-              return res.status(500).json({ message: "Failed inserting locations" });
+            if (memberIds.length === 0) {
+              return callback();
             }
 
-            res.status(201).json({ message: "Event created successfully!", eventId });
+            const getMemberMaxIdSQL = `SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM event_member`;
+
+            db.query(getMemberMaxIdSQL, (err, memberResult) => {
+              if (err) {
+                console.error("❌ Error getting next event_member ID:", err);
+                return res.status(500).json({ message: "Internal Server Error" });
+              }
+
+              let memberNextId = memberResult[0].next_id;
+              const memberValues = memberIds.map((id, index) => [memberNextId + index, eventId, id, eventDate]);
+              const memberSQL = `INSERT INTO event_member (id, event_id, member_id, event_date) VALUES ?`;
+
+              db.query(memberSQL, [memberValues], err => {
+                if (err) {
+                  console.error("❌ event_member insert error:", err);
+                  return res.status(500).json({ message: "Failed inserting members" });
+                }
+                callback();
+              });
+            });
+          };
+
+          const insertLocations = (callback) => {
+            if (locations.length === 0) {
+              return callback();
+            }
+
+            const getLocMaxIdSQL = `SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM event_loc`;
+
+            db.query(getLocMaxIdSQL, (err, locResult) => {
+              if (err) {
+                console.error("❌ Error getting next event_loc ID:", err);
+                return res.status(500).json({ message: "Internal Server Error" });
+              }
+
+              // Helper to extract city + postal code
+              const parseAddress = (fullAddress) => {
+                let parts = fullAddress.split(",");
+                let postal = null;
+                let city = null;
+
+                // Try to extract pin code (Indian-style)
+                const pinMatch = fullAddress.match(/\b\d{6}\b/);
+                if (pinMatch) postal = pinMatch[0];
+
+                // City is usually the item before "India"
+                if (parts.length >= 3) {
+                  city = parts[parts.length - 2]?.trim();
+                }
+
+                return { city, postal };
+              };
+
+              let locNextId = locResult[0].next_id;
+              const locationValues = locations.map((loc, index) => {
+                const { city, postal } = parseAddress(loc.address);
+                return [
+                  locNextId + index,
+                  eventId,
+                  loc.address,
+                  loc.lng,
+                  loc.lat,
+                  city,
+                  postal,
+                  eventDate
+                ];
+              });
+
+              const locSQL = `
+                INSERT INTO event_loc
+                (id, event_id, address, lng, lat, city, postal_code, event_date)
+                VALUES ?
+              `;
+
+              db.query(locSQL, [locationValues], err => {
+                if (err) {
+                  console.error("❌ event_loc insert error:", err);
+                  return res.status(500).json({ message: "Failed inserting locations" });
+                }
+                callback();
+              });
+            });
+          };
+
+          // Execute in sequence: teams → members → locations → final response
+          insertTeams(() => {
+            insertMembers(() => {
+              insertLocations(() => {
+                res.status(201).json({ message: "Event created successfully!", eventId });
+              });
+            });
           });
-        };
-      }
-    );
+        }
+      );
+    });
   } catch (err) {
     console.error("🔥 Exception:", err);
     return res.status(500).json({ message: "Server Error" });
@@ -153,13 +216,17 @@ export const addEvent = (req, res) => {
 };
 
 export const getEvents = (req, res) => {
-  const { userId } = req.body;
+  const { userId, role } = req.body;
 
   if (!userId) {
     return res.status(400).json({ message: "Missing userId" });
   }
 
-  // STEP 1: Get member_id from mst_members
+  // Define admin roles that can see all events
+  const adminRoles = ['Master', 'Manager', 'Admin'];
+  const isAdmin = adminRoles.includes(role);
+
+  // STEP 1: Get member_id from mst_members (needed for both admin and user flows)
   const getMemberQuery = `SELECT mem_id FROM mst_members WHERE user_id = ? LIMIT 1`;
 
   db.query(getMemberQuery, [userId], (err, memberData) => {
@@ -171,301 +238,368 @@ export const getEvents = (req, res) => {
 
     const memberId = memberData[0].mem_id;
 
-    // STEP 2: Get all team_ids the user belongs to
-    const getTeamsQuery = `
-      SELECT team_id 
-      FROM team_members 
-      WHERE member_id = ?
-    `;
-
-    db.query(getTeamsQuery, [memberId], (err, teamsData) => {
-      if (err) return res.status(500).json({ message: "Internal server error", err });
-
-      const userTeamIds = teamsData.map(t => t.team_id);
-
-      // STEP 3: Build Dynamic Conditions
-      let conditions = `
-        eh.id IN (SELECT event_id FROM event_member WHERE member_id = ?)
+    if (isAdmin) {
+      // ADMIN FLOW: Get all events without restrictions
+      const getAllEventsQuery = `
+        SELECT DISTINCT
+          eh.id AS event_id,
+          eh.event_date,
+          eh.title,
+          eh.description,
+          eh.from_date,
+          eh.to_date,
+          eh.isapproved,
+          eh.type,
+          eh.isdeleted,
+          eh.approved_by,
+          eh.created_by,
+          eh.created_at,
+          eh.updated_by,
+          eh.updated_at
+        FROM event_hd eh
+        WHERE 
+          eh.isdeleted = 'N'          
+        ORDER BY eh.from_date DESC, eh.created_at DESC
       `;
-      let params = [memberId];
+      // AND isapproved != 'C'
 
-      if (userTeamIds.length > 0) {
-        conditions += `
-          OR eh.id IN (
-            SELECT event_id FROM event_team WHERE team_id IN (?)
-          )
-        `;
-        params.push(userTeamIds);
-      }
-
-      // FINAL SQL (Including event_loc)
-      const sql = `
-                SELECT 
-                  eh.id AS event_id,
-                  eh.title,
-                  eh.description,
-                  eh.from_date,
-                  eh.to_date,
-                  eh.isapproved,
-                  eh.type,
-                  eh.isdeleted,
-                  eh.approved_by,
-                  eh.created_by,
-                  eh.created_at,
-                  eh.updated_by,
-                  eh.updated_at,
-
-                  -- members
-                  mm.mem_id AS member_id,
-                  mm.first_name,
-                  mm.middle_name,
-                  mm.last_name,
-                  mm.designation,
-
-                  -- teams
-                  t.id AS team_id,
-                  t.name AS team_name,
-
-                  -- locations
-                  el.id AS loc_id,
-                  el.address,
-                  el.lng,
-                  el.lat,
-                  el.city,
-                  el.postal_code
-
-                FROM event_hd eh
-
-                LEFT JOIN (SELECT DISTINCT event_id, member_id FROM event_member) em ON eh.id = em.event_id
-
-                LEFT JOIN (
-                  SELECT DISTINCT mem_id, first_name, middle_name, last_name, designation 
-                  FROM mst_members) mm ON em.member_id = mm.mem_id
-
-                LEFT JOIN (SELECT DISTINCT event_id, team_id FROM event_team) et ON eh.id = et.event_id
-
-                LEFT JOIN mst_team t ON et.team_id = t.id
-
-                LEFT JOIN event_loc el ON eh.id = el.event_id
-
-                WHERE eh.isdeleted = 'N'
-                  AND (
-                      eh.id IN (SELECT event_id FROM event_member WHERE member_id = ?)
-                      OR eh.id IN (SELECT event_id FROM event_team WHERE team_id IN (?))
-                  )
-
-                ORDER BY eh.from_date DESC, eh.created_at DESC
-
-      `;
-
-      // STEP 4: Run Query
-      db.query(sql, params, (err, rows) => {
+      db.query(getAllEventsQuery, (err, eventsData) => {
         if (err) return res.status(500).json({ message: "Internal server error", err });
 
-        // STEP 5: Format results
-        const eventsMap = {};
-        rows.forEach(row => {
-          const event = eventsMap[row.event_id] ??= {
-            event_id: row.event_id,
-            title: row.title,
-            description: row.description,
-            from_date: row.from_date,
-            to_date: row.to_date,
-            isapproved: row.isapproved,
-            type: row.type,
-            isdeleted: row.isdeleted,
-            approved_by: row.approved_by,
-            created_by: row.created_by,
-            created_at: row.created_at,
-            updated_by: row.updated_by,
-            updated_at: row.updated_at,
-            members: [],
-            teams: [],
-            locations: []
-          };
+        if (eventsData.length === 0) {
+          return res.status(200).json({
+            message: "No events found",
+            events: []
+          });
+        }
 
-          // MEMBER FIX
-          if (row.member_id && !event.members.some(m => m.id === row.member_id)) {
-            event.members.push({
-              id: row.member_id,
-              first_name: row.first_name,
-              middle_name: row.middle_name,
-              last_name: row.last_name,
-              designation: row.designation,
-              full_name: `${row.first_name} ${row.last_name}`.trim()
+        fetchEventDetails(eventsData, res);
+      });
+
+    } else {
+      // USER FLOW: Get only events assigned to the user or their teams
+      const getTeamsQuery = `SELECT team_id FROM team_members WHERE member_id = ?`;
+
+      db.query(getTeamsQuery, [memberId], (err, teamsData) => {
+        if (err) return res.status(500).json({ message: "Internal server error", err });
+
+        const userTeamIds = teamsData.map(t => t.team_id);
+
+        const getUserEventsQuery = `
+          SELECT DISTINCT
+            eh.id AS event_id,
+            eh.event_date,
+            eh.title,
+            eh.description,
+            eh.from_date,
+            eh.to_date,
+            eh.isapproved,
+            eh.type,
+            eh.isdeleted,
+            eh.approved_by,
+            eh.created_by,
+            eh.created_at,
+            eh.updated_by,
+            eh.updated_at
+          FROM event_hd eh
+          LEFT JOIN event_member em ON eh.id = em.event_id AND eh.event_date = em.event_date
+          LEFT JOIN event_team et ON eh.id = et.event_id AND eh.event_date = et.event_date
+          WHERE eh.isdeleted = 'N'
+            AND (
+              em.member_id = ?
+              OR et.team_id IN (?)
+            )
+          ORDER BY eh.from_date DESC, eh.created_at DESC
+        `;
+
+        const eventParams = userTeamIds.length > 0 ? [memberId, userTeamIds] : [memberId, [null]];
+
+        db.query(getUserEventsQuery, eventParams, (err, eventsData) => {
+          if (err) return res.status(500).json({ message: "Internal server error", err });
+
+          if (eventsData.length === 0) {
+            return res.status(200).json({
+              message: "No events found",
+              events: []
             });
           }
 
-          // TEAM FIX
-          if (row.team_id && !event.teams.some(t => t.id === row.team_id)) {
-            event.teams.push({
-              id: row.team_id,
-              name: row.team_name
-            });
-          }
-
-          // LOCATION FIX (Already correct)
-          if (row.loc_id && !event.locations.some(l => l.loc_id === row.loc_id)) {
-            event.locations.push({
-              id: row.loc_id,
-              address: row.address,
-              lng: row.lng,
-              lat: row.lat,
-              city: row.city,
-              postal_code: row.postal_code
-            });
-          }
-        });
-
-
-        const formattedEvents = Object.values(eventsMap);
-
-        return res.status(200).json({
-          message: "Events fetched successfully",
-          events: formattedEvents
+          fetchEventDetails(eventsData, res);
         });
       });
-    });
+    }
   });
 };
+function fetchEventDetails(eventsData, res) {
+  // Create arrays for event_id and event_date pairs for the IN clause
+  const eventIdDatePairs = eventsData.map(e => [e.event_id, e.event_date]);
+
+  // For MySQL IN clause with multiple columns, we need to use OR conditions
+  const eventConditions = eventIdDatePairs.map(pair => `(event_id = ? AND event_date = ?)`).join(' OR ');
+  const eventParamsFlat = eventIdDatePairs.flat();
+
+  // Get members for these events
+  const getMembersQuery = `
+    SELECT 
+      em.event_id,
+      em.event_date,
+      mm.mem_id AS id,
+      mm.first_name,
+      mm.middle_name,
+      mm.last_name,
+      mm.designation,
+      CONCAT(mm.first_name, ' ', mm.last_name) AS full_name
+    FROM event_member em
+    JOIN mst_members mm ON em.member_id = mm.mem_id
+    WHERE ${eventConditions}
+  `;
+
+  // Get teams for these events
+  const getTeamsQuery = `
+    SELECT 
+      et.event_id,
+      et.event_date,
+      t.id AS id,
+      t.name AS name
+    FROM event_team et
+    JOIN mst_team t ON et.team_id = t.id
+    WHERE ${eventConditions}
+  `;
+
+  // Get locations for these events
+  const getLocationsQuery = `
+    SELECT 
+      event_id,
+      event_date,
+      id,
+      address,
+      lng,
+      lat,
+      city,
+      postal_code
+    FROM event_loc
+    WHERE ${eventConditions}
+  `;
+
+  // Execute all queries in parallel
+  Promise.all([
+    new Promise((resolve, reject) => {
+      db.query(getMembersQuery, [...eventParamsFlat], (err, result) => {
+        if (err) reject(err);
+        else resolve(result);
+      });
+    }),
+    new Promise((resolve, reject) => {
+      db.query(getTeamsQuery, [...eventParamsFlat], (err, result) => {
+        if (err) reject(err);
+        else resolve(result);
+      });
+    }),
+    new Promise((resolve, reject) => {
+      db.query(getLocationsQuery, [...eventParamsFlat], (err, result) => {
+        if (err) reject(err);
+        else resolve(result);
+      });
+    })
+  ]).then(([membersData, teamsData, locationsData]) => {
+
+    // Combine all data
+    const eventsMap = {};
+
+    // Initialize events - use composite key of event_id + event_date
+    eventsData.forEach(event => {
+      const eventKey = `${event.event_id}_${event.event_date}`;
+      eventsMap[eventKey] = {
+        ...event,
+        members: [],
+        teams: [],
+        locations: []
+      };
+    });
+
+    // Add members
+    membersData.forEach(member => {
+      const eventKey = `${member.event_id}_${member.event_date}`;
+      if (eventsMap[eventKey]) {
+        eventsMap[eventKey].members.push(member);
+      }
+    });
+
+    // Add teams
+    teamsData.forEach(team => {
+      const eventKey = `${team.event_id}_${team.event_date}`;
+      if (eventsMap[eventKey]) {
+        eventsMap[eventKey].teams.push(team);
+      }
+    });
+
+    // Add locations
+    locationsData.forEach(location => {
+      const eventKey = `${location.event_id}_${location.event_date}`;
+      if (eventsMap[eventKey]) {
+        eventsMap[eventKey].locations.push(location);
+      }
+    });
+
+    const formattedEvents = Object.values(eventsMap);
+
+    return res.status(200).json({
+      message: "Events fetched successfully",
+      events: formattedEvents
+    });
+
+  }).catch(error => {
+    return res.status(500).json({ message: "Internal server error", error });
+  });
+}
 
 export const updateEvent = (req, res) => {
-  const { id, title, description, fromDate, toDate, type, isapproved, isdeleted, userId, teams = [], members = [], locations = [] } = req.body;
+  const { id, event_date, title, description, fromDate, toDate, type, isapproved, isdeleted, userId, teams = [], members = [], locations = [] } = req.body;
 
   try {
-    if (!id || !title || !fromDate || !toDate || !userId) {
+    if (!id || !event_date || !title || !fromDate || !toDate || !userId) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // Extract only IDs
+    const approvedBy = isapproved === 'A' ? userId : null;
     const teamIds = teams.map(t => t.id);
     const memberIds = members.map(m => m.id);
 
     // 1️⃣ Update event_hd
     const sqlUpdateHd = `
-      UPDATE event_hd 
-      SET title=?, description=?, from_date=?, to_date=?, type=?, isapproved=?, isdeleted=?, updated_by=? 
-      WHERE id=?
-    `;
+                          UPDATE event_hd 
+                          SET title=?, description=?, from_date=?, to_date=?, type=?, isapproved=?, isdeleted=?, updated_by=?, approved_by=? 
+                          WHERE id=? AND event_date=?
+                        `;
 
-    db.query(sqlUpdateHd, [title, description, fromDate, toDate, type, isapproved, isdeleted, userId, id],
-      (err) => {
-        if (err) {
-          console.error("❌ event_hd update error:", err);
-          return res.status(500).json({ message: "Failed updating event header" });
-        }
-
-        // Step 2 → Update Teams
-        updateTeams();
+    db.query(sqlUpdateHd, [title, description, fromDate, toDate, type, isapproved, isdeleted, userId, approvedBy, id, event_date], (err) => {
+      if (err) {
+        console.error("event_hd update error:", err);
+        return res.status(500).json({ message: "Failed updating event header" });
       }
+      updateTeams();
+    }
     );
 
-    // 2️⃣ Delete + Insert event_team
+    // 2️⃣ Delete + Insert event_team WITH MAX(id)+1
     const updateTeams = () => {
-      const delTeamSQL = `DELETE FROM event_team WHERE event_id = ?`;
+      const delTeamSQL = `DELETE FROM event_team WHERE event_id = ? AND event_date = ?`;
 
-      db.query(delTeamSQL, [id], (err) => {
-        if (err) {
-          console.error("❌ delete event_team error:", err);
-          return res.status(500).json({ message: "Failed deleting teams" });
-        }
+      db.query(delTeamSQL, [id, event_date], (err) => {
+        if (err) return res.status(500).json({ message: "Failed deleting teams" });
 
         if (teamIds.length === 0) return updateMembers();
 
-        const teamValues = teamIds.map(tid => [id, tid]);
-        const insertTeamSQL = `INSERT INTO event_team (event_id, team_id) VALUES ?`;
+        const nextIdSQL = `SELECT COALESCE(MAX(id), 0) + 1 AS next_id FROM event_team`;
 
-        db.query(insertTeamSQL, [teamValues], (err) => {
-          if (err) {
-            console.error("❌ insert event_team error:", err);
-            return res.status(500).json({ message: "Failed inserting teams" });
-          }
-          updateMembers();
+        db.query(nextIdSQL, (err, result) => {
+          if (err) return res.status(500).json({ message: "Failed fetching next team id" });
+
+          let nextId = result[0].next_id;
+
+          const teamValues = teamIds.map(tid => {
+            const row = [nextId, id, tid, event_date]; nextId++;
+            return row;
+          });
+
+          const insertTeamSQL = `
+                                  INSERT INTO event_team (id, event_id, team_id, event_date)
+                                  VALUES ?
+                                `;
+
+          db.query(insertTeamSQL, [teamValues], (err) => {
+            if (err) return res.status(500).json({ message: "Failed inserting teams" });
+            updateMembers();
+          });
         });
       });
     };
 
-    // 3️⃣ Delete + Insert event_member
+    // 3️⃣ Delete + Insert event_member WITH MAX(id)+1
     const updateMembers = () => {
-      const delMemSQL = `DELETE FROM event_member WHERE event_id = ?`;
+      const delMemSQL = `DELETE FROM event_member WHERE event_id = ? AND event_date = ?`;
 
-      db.query(delMemSQL, [id], (err) => {
-        if (err) {
-          console.error("❌ delete event_member error:", err);
-          return res.status(500).json({ message: "Failed deleting members" });
-        }
+      db.query(delMemSQL, [id, event_date], (err) => {
+        if (err) return res.status(500).json({ message: "Failed deleting members" });
 
         if (memberIds.length === 0) return updateLocations();
 
-        const memberValues = memberIds.map(mid => [id, mid]);
-        const insertMemSQL = `INSERT INTO event_member (event_id, member_id) VALUES ?`;
+        const nextIdSQL = `SELECT COALESCE(MAX(id), 0) + 1 AS next_id FROM event_member`;
 
-        db.query(insertMemSQL, [memberValues], (err) => {
-          if (err) {
-            console.error("❌ insert event_member error:", err);
-            return res.status(500).json({ message: "Failed inserting members" });
-          }
-          updateLocations();
+        db.query(nextIdSQL, (err, result) => {
+          if (err) return res.status(500).json({ message: "Failed fetching next member id" });
+
+          let nextId = result[0].next_id;
+
+          const memberValues = memberIds.map(mid => {
+            const row = [nextId, id, mid, event_date];
+            nextId++;
+            return row;
+          });
+
+          const insertMemSQL = `
+                                  INSERT INTO event_member (id, event_id, member_id, event_date)
+                                  VALUES ?
+                                `;
+
+          db.query(insertMemSQL, [memberValues], (err) => {
+            if (err) return res.status(500).json({ message: "Failed inserting members" });
+            updateLocations();
+          });
         });
       });
     };
 
-    // 4️⃣ Delete + Insert event_loc
+    // 4️⃣ Delete + Insert event_loc WITH MAX(id)+1
     const updateLocations = () => {
-      const delLocSQL = `DELETE FROM event_loc WHERE event_id = ?`;
+      const delLocSQL = `DELETE FROM event_loc WHERE event_id = ? AND event_date = ?`;
 
-      db.query(delLocSQL, [id], (err) => {
-        if (err) {
-          console.error("❌ delete event_loc error:", err);
-          return res.status(500).json({ message: "Failed deleting locations" });
-        }
+      db.query(delLocSQL, [id, event_date], (err) => {
+        if (err) return res.status(500).json({ message: "Failed deleting locations" });
 
         if (locations.length === 0) {
           return res.status(200).json({ message: "Event updated successfully!", eventId: id });
         }
 
-        // Same parser as addEvent
-        const parseAddress = (fullAddress) => {
-          let parts = fullAddress.split(",");
-          let postal = fullAddress.match(/\b\d{6}\b/);
-          postal = postal ? postal[0] : null;
+        const nextIdSQL = `SELECT COALESCE(MAX(id), 0) + 1 AS next_id FROM event_loc`;
 
-          let city = parts.length >= 2 ? parts[parts.length - 2].trim() : null;
+        db.query(nextIdSQL, (err, result) => {
+          if (err) return res.status(500).json({ message: "Failed fetching next location id" });
 
-          return { city, postal };
-        };
+          let nextId = result[0].next_id;
 
-        const locationValues = locations.map(loc => {
-          const { city, postal } = parseAddress(loc.address);
-          return [
-            id,
-            loc.address,
-            loc.lng,
-            loc.lat,
-            city,
-            postal
-          ];
-        });
+          const parseAddress = (fullAddress) => {
+            let parts = fullAddress.split(",");
+            let postal = fullAddress.match(/\b\d{6}\b/);
+            postal = postal ? postal[0] : null;
+            let city = parts.length >= 2 ? parts[parts.length - 2].trim() : null;
+            return { city, postal };
+          };
 
-        const insertLocSQL = `
-          INSERT INTO event_loc 
-          (event_id, address, lng, lat, city, postal_code)
-          VALUES ?
-        `;
+          const locationValues = locations.map(loc => {
+            const { city, postal } = parseAddress(loc.address);
+            const row = [nextId, id, loc.address, loc.lng, loc.lat, city, postal, event_date];
+            nextId++;
+            return row;
+          });
 
-        db.query(insertLocSQL, [locationValues], (err) => {
-          if (err) {
-            console.error("❌ insert event_loc error:", err);
-            return res.status(500).json({ message: "Failed inserting locations" });
-          }
+          const insertLocSQL = `
+                                  INSERT INTO event_loc 
+                                  (id, event_id, address, lng, lat, city, postal_code, event_date)
+                                  VALUES ?
+                                `;
 
-          res.status(200).json({ message: "Event updated successfully!", eventId: id });
+          db.query(insertLocSQL, [locationValues], (err) => {
+            if (err) return res.status(500).json({ message: "Failed inserting locations" });
+
+            res.status(200).json({ message: "Event updated successfully!", eventId: id });
+          });
         });
       });
     };
 
   } catch (err) {
-    console.error("🔥 updateEvent Exception:", err);
+    console.error("updateEvent Exception:", err);
     return res.status(500).json({ message: "Server Error" });
   }
 };

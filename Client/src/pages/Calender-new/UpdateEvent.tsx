@@ -13,10 +13,12 @@ export interface EventModalProps {
   setIsShow: (show: boolean) => void;
   fetchData: () => void;
   Event: any;
+  Role: string;
 }
 
 export interface EventInterface {
   event_id: number;
+  event_date: string;
   title: string;
   description: string;
   from_date: string;
@@ -34,7 +36,7 @@ export interface EventInterface {
   locations: SelectedLocation[];
 }
 
-const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event }) => {
+const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event, Role }) => {
   const [inputs, setInputs] = useState({
     title: '',
     fromDate: '',
@@ -140,6 +142,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event 
     }
     const body = {
       id: Event.event_id,
+      event_date: Event.event_date,
       title,
       fromDate,
       toDate,
@@ -158,16 +161,16 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event 
     }
   }
 
-  const disabled = Event.isapproved === 'C' || Event.isapproved === 'A';
+  const disabled = Event.isapproved === 'C' || Event.isapproved === 'A' || !['Master', 'Admin', 'Manager'].includes(Role);
+
 
   if (!isShow) return null;
-
   return (
     <>
       <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200  bg-white rounded-t-2xl">
+          <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white rounded-t-2xl">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-linear-to-br from-orange-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
                 <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -175,46 +178,69 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event 
                 </svg>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900">Update Event</h3><p>{inputs.title}</p>
+                <h3 className="text-xl font-bold text-gray-900">Update Event</h3>
+                <p>{inputs.title}</p>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() => setIsShow(false)}
-              className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all duration-200 cursor-pointer"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            <div className="flex items-center space-x-2">
+              {/* Approve Toggle Button */}
+              <div className="flex items-center space-x-2 mr-4">
+                <span className="text-sm font-medium text-gray-700">Approve</span>
+                <button
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => setInputs({ ...inputs, isapproved: inputs.isapproved === 'A' ? '' : 'A' })}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:cursor-not-allowed focus:ring-offset-2 ${inputs.isapproved === 'A' ? 'bg-green-500' : 'bg-gray-200'
+                    }`}
+                  role="switch"
+                  aria-checked={inputs.isapproved === 'A'}
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${inputs.isapproved === 'A' ? 'translate-x-5' : 'translate-x-0'
+                      }`}
+                  />
+                </button>
+              </div>
+
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setIsShow(false)}
+                className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all duration-200 cursor-pointer"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           {/* Form */}
-          <form className="p-6 space-y-6" onSubmit={handleSubmit} >
+          <form className="p-6 space-y-3" onSubmit={handleSubmit} >
             {/* Team & Member Selection */}
             <div>
               {/* Selected Teams Display */}
-              {selectedTeams.length > 0 && (
+              {selectedTeams?.length > 0 && (
                 <div className="mb-4 p-4 bg-blue-50 rounded-xl border border-blue-200">
                   <div className="flex items-center gap-2 mb-3">
                     <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                     <span className="text-sm font-medium text-blue-800">
-                      Selected Teams ({selectedTeams.length})
+                      Selected Teams ({selectedTeams?.length})
                     </span>
                   </div>
 
                   <div className="flex flex-wrap gap-2 max-h-32 overflow-auto pr-1">
-                    {selectedTeams.map((item, index) => (
+                    {selectedTeams?.map((item, index) => (
                       <span
                         key={index}
                         className="inline-flex items-center gap-1 px-3 py-2 bg-blue-100 text-blue-800 rounded-full text-sm border border-blue-200"
                       >
-                        {item.name}
+                        {item?.name}
                         <button
                           type="button"
-                          onClick={() => removeSelectedTeam(item.id)}
+                          onClick={() => removeSelectedTeam(item?.id)}
                           className="text-blue-600 hover:text-blue-800 transition-colors cursor-pointer p-0.5 rounded-full hover:bg-blue-200 disabled:cursor-not-allowed"
                           disabled={disabled}
                         >
@@ -229,27 +255,27 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event 
               )}
 
               {/* Selected Members Display */}
-              {selectedMembers.length > 0 && (
+              {selectedMembers?.length > 0 && (
                 <div className="mb-4 p-4 bg-orange-50 rounded-xl border border-orange-200">
                   <div className="flex items-center gap-2 mb-3">
                     <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                     </svg>
                     <span className="text-sm font-medium text-orange-800">
-                      Selected Members ({selectedMembers.length})
+                      Selected Members ({selectedMembers?.length})
                     </span>
                   </div>
 
                   <div className="flex flex-wrap gap-2 max-h-32 overflow-auto pr-1">
-                    {selectedMembers.map((item, index) => (
+                    {selectedMembers?.map((item, index) => (
                       <span
                         key={index}
                         className="inline-flex items-center gap-1 px-3 py-2 bg-orange-100 text-orange-800 rounded-full text-sm border border-orange-200"
                       >
-                        {item.first_name} {item.last_name}
+                        {item?.first_name} {item?.last_name}
                         <button
                           type="button"
-                          onClick={() => removeSelectedMember(item.id)}
+                          onClick={() => removeSelectedMember(item?.id)}
                           className="text-orange-600 hover:text-orange-800 transition-colors cursor-pointer p-0.5 rounded-full hover:bg-orange-200 disabled:cursor-not-allowed"
                           disabled={disabled}
                         >
@@ -273,7 +299,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event 
                   <input
                     type="text"
                     readOnly
-                    value={`Selected teams ${selectedTeams.length} & members ${selectedMembers.length}`}
+                    value={`Selected teams ${selectedTeams?.length} & members ${selectedMembers?.length}`}
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none disabled:bg-gray-100 text-orange-600 placeholder:text-orange-600 "
                   />
                 </div>
@@ -353,43 +379,45 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event 
             </div>
 
             {/* Status (Conditional) */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Approve Status <span className="text-orange-600">*</span>
-              </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <select
-                  name="isapproved"
-                  disabled={disabled}
-                  className={`
+            {['Master', 'Manager', 'Admin'].includes(user?.role) && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Approve Status <span className="text-orange-600">*</span>
+                </label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <select
+                    name="isapproved"
+                    // disabled={disabled}
+                    className={`
                                w-full pl-10 pr-4 py-2 font-semibold rounded-lg transition-all duration-200
                                focus:outline-none focus:ring-0 border  disabled:cursor-not-allowed
                                ${inputs?.isapproved === "P"
-                      ? "bg-yellow-50 text-yellow-700 border-yellow-300 focus:border-yellow-500"
-                      : inputs?.isapproved === "A"
-                        ? "bg-green-50 text-green-700 border-green-300 focus:border-green-500"
-                        : inputs?.isapproved === "R"
-                          ? "bg-red-50 text-red-700 border-red-300 focus:border-red-500"
-                          : inputs?.isapproved === "C"
-                            ? "bg-blue-50 text-blue-700 border-blue-300 focus:border-blue-500"
-                            : "bg-gray-50 text-gray-700 border-gray-300 focus:border-gray-500"
-                    }`}
-                  value={inputs?.isapproved}
-                  onChange={handleChange}
-                >
-                  <option value="P">Pending</option>
-                  <option value="A">Approved</option>
-                  <option value="R">Rejected</option>
-                  <option value="C">Completed</option>
-                </select>
+                        ? "bg-yellow-50 text-yellow-700 border-yellow-300 focus:border-yellow-500"
+                        : inputs?.isapproved === "A"
+                          ? "bg-green-50 text-green-700 border-green-300 focus:border-green-500"
+                          : inputs?.isapproved === "R"
+                            ? "bg-red-50 text-red-700 border-red-300 focus:border-red-500"
+                            : inputs?.isapproved === "C"
+                              ? "bg-blue-50 text-blue-700 border-blue-300 focus:border-blue-500"
+                              : "bg-gray-50 text-gray-700 border-gray-300 focus:border-gray-500"
+                      }`}
+                    value={inputs?.isapproved}
+                    onChange={handleChange}
+                  >
+                    <option value="P">Pending</option>
+                    <option value="A">Approved</option>
+                    <option value="R">Rejected</option>
+                    <option value="C">Completed</option>
+                  </select>
 
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Location Selection */}
             <div>
@@ -466,7 +494,6 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event 
               </div>
             </div>
 
-
             {/* Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
@@ -499,11 +526,11 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event 
               <button
                 type="submit"
                 className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-orange-500 to-purple-600 rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm flex items-center gap-2 cursor-pointer"
-                disabled={disabled}
               >
                 Update Event
               </button>
             </div>
+
           </form>
         </div>
       </div>

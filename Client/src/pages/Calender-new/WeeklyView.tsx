@@ -20,6 +20,7 @@ interface WeeklyViewProps {
   Data: any;
   setIsEditShowModal: (show: boolean) => void;
   setEditData: (data: any) => void;
+  Loading: boolean;
 }
 
 const WeeklyView: React.FC<WeeklyViewProps> = ({
@@ -30,7 +31,8 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
   onShowModal,
   Data,
   setIsEditShowModal,
-  setEditData
+  setEditData,
+  Loading
 }) => {
   const weekStart = startOfWeek(currentDate);
   const weekEnd = endOfWeek(currentDate);
@@ -115,6 +117,17 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
     );
   };
 
+  // Loading state
+  if (Loading) {
+    return (
+      <div className="h-full bg-white sm:mx-4 my-2 rounded-xl shadow-md overflow-hidden flex items-center justify-center min-h-[500px]">
+        <div className="flex flex-col items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+          <p className="text-gray-600 text-lg">Loading calendar...</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="h-full overflow-auto bg-linear-to-b from-white to-blue-50/30">
       {/* Header with days */}

@@ -67,7 +67,7 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
   // Initialize selected items when modal opens
   useEffect(() => {
     if (show) {
-      const memberItems: SelectedItem[] = selectedMembers.map(member => ({
+      const memberItems: SelectedItem[] = selectedMembers?.map(member => ({
         id: member.id,
         type: 'member',
         name: `${member.first_name} ${member.middle_name ? member.middle_name + ' ' : ''}${member.last_name}`.trim(),
@@ -76,7 +76,7 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
         last_name: member.last_name
       }));
 
-      const teamItems: SelectedItem[] = selectedTeams.map(team => ({
+      const teamItems: SelectedItem[] = selectedTeams?.map(team => ({
         id: team.id,
         type: 'team',
         name: team.name
@@ -95,9 +95,9 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
 
   const toggleSelection = (item: SelectedItem) => {
     setSelectedItems((prev) => {
-      const exists = prev.find(p => p.id === item.id && p.type === item.type);
+      const exists = prev.find(p => p.id === item?.id && p.type === item?.type);
       if (exists) {
-        return prev.filter(p => !(p.id === item.id && p.type === item.type));
+        return prev.filter(p => !(p.id === item?.id && p.type === item?.type));
       } else {
         return [...prev, item];
       }
@@ -105,26 +105,22 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
   };
 
   const isSelected = (id: number, type: 'member' | 'team') => {
-    return selectedItems.some(item => item.id === id && item.type === type);
+    return selectedItems?.some(item => item?.id === id && item?.type === type);
   };
 
   const handleConfirm = () => {
     // Separate members and teams from selected items
-    const selectedMembersData = selectedItems
-      .filter(item => item.type === 'member')
-      .map(item => ({
-        id: item.id,
-        first_name: item.first_name!,
-        middle_name: item.middle_name || '',
-        last_name: item.last_name!
-      }));
+    const selectedMembersData = selectedItems?.filter(item => item?.type === 'member')?.map(item => ({
+      id: item?.id,
+      first_name: item?.first_name || '',
+      middle_name: item?.middle_name || '',
+      last_name: item?.last_name || ''
+    }));
 
-    const selectedTeamsData = selectedItems
-      .filter(item => item.type === 'team')
-      .map(item => ({
-        id: item.id,
-        name: item.name
-      }));
+    const selectedTeamsData = selectedItems?.filter(item => item?.type === 'team')?.map(item => ({
+      id: item?.id,
+      name: item?.name
+    }));
 
     setSelectedMembers(selectedMembersData);
     setSelectedTeams(selectedTeamsData);
@@ -183,12 +179,12 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
         </div>
 
         {/* Selected Items Preview */}
-        {selectedItems.length > 0 && (
+        {selectedItems?.length > 0 && (
           <div className="bg-linear-to-r from-orange-50 to-purple-50 border-b border-orange-200 p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <span className="flex items-center justify-center w-6 h-6 bg-linear-to-br from-orange-500 to-purple-600 text-white text-sm font-bold rounded-full shadow-sm">
-                  {selectedItems.length}
+                  {selectedItems?.length}
                 </span>
                 <span className="text-sm font-semibold text-orange-800">Selected Items</span>
               </div>
@@ -204,23 +200,23 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
             </div>
 
             <div className="flex flex-wrap gap-2 max-h-32 overflow-auto pr-2">
-              {selectedItems.map((item) => (
+              {selectedItems?.map((item) => (
                 <div
-                  key={`${item.type}-${item.id}`}
-                  className={`border rounded-full px-3 py-2 shadow-sm flex items-center gap-2 group hover:shadow-md transition-all duration-200 ${item.type === 'team'
+                  key={`${item?.type}-${item?.id}`}
+                  className={`border rounded-full px-3 py-2 shadow-sm flex items-center gap-2 group hover:shadow-md transition-all duration-200 ${item?.type === 'team'
                     ? 'bg-blue-100 border-blue-200 text-blue-800'
                     : 'bg-orange-100 border-orange-200 text-orange-800'
                     }`}
                 >
                   <span className="text-sm font-medium">
-                    {item.type === 'team' ? '👥' : '👤'} {item.name}
+                    {item?.type === 'team' ? '👥' : '👤'} {item?.name}
                   </span>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleSelection(item);
                     }}
-                    className={`p-0.5 rounded-full transition-colors ${item.type === 'team'
+                    className={`p-0.5 rounded-full transition-colors ${item?.type === 'team'
                       ? 'text-blue-600 hover:text-blue-800 hover:bg-blue-200'
                       : 'text-orange-600 hover:text-orange-800 hover:bg-orange-200'
                       }`}
@@ -253,7 +249,7 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
                   : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                   }`}
               >
-                Teams ({filteredTeams.length})
+                Teams ({filteredTeams?.length})
               </button>
               <button
                 onClick={() => setActiveTab('members')}
@@ -262,7 +258,7 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
                   : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                   }`}
               >
-                Members ({filteredMembers.length})
+                Members ({filteredMembers?.length})
               </button>
             </div>
 
@@ -294,10 +290,10 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
                   <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
-                  Teams ({filteredTeams.length})
+                  Teams ({filteredTeams?.length})
                 </h3>
               </div>
-              {filteredTeams.length > 0 ? (
+              {filteredTeams?.length > 0 ? (
                 <div className="max-h-96 overflow-auto">
                   <table className="w-full">
                     <thead className="bg-blue-100 sticky top-0 z-5">
@@ -314,39 +310,39 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {filteredTeams.map((item) => (
+                      {filteredTeams?.map((item) => (
                         <tr
-                          key={`team-${item.id}`}
-                          className={`hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${isSelected(item.id, 'team')
+                          key={`team-${item?.id}`}
+                          className={`hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${isSelected(item?.id, 'team')
                             ? "bg-blue-50 border-l-4 border-l-blue-500"
                             : ""
                             }`}
                           onClick={() => toggleSelection({
-                            id: item.id,
+                            id: item?.id,
                             type: 'team',
-                            name: item.name
+                            name: item?.name
                           })}
                         >
                           <td className="px-4 py-2">
                             <input
                               type="checkbox"
-                              checked={isSelected(item.id, 'team')}
+                              checked={isSelected(item?.id, 'team')}
                               onClick={(e) => e.stopPropagation()}
                               onChange={() => toggleSelection({
-                                id: item.id,
+                                id: item?.id,
                                 type: 'team',
-                                name: item.name
+                                name: item?.name
                               })}
                               className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 transition-colors duration-200"
                             />
                           </td>
                           <td className="px-4 py-2 text-sm text-gray-900">
-                            {item.id}
+                            {item?.id}
                           </td>
                           <td className="px-4 py-2">
                             <div className="flex items-center space-x-3">
                               <span className="text-sm font-medium text-gray-900">
-                                {item.name}
+                                {item?.name}
                               </span>
                             </div>
                           </td>
@@ -376,10 +372,10 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
                   <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                   </svg>
-                  Members ({filteredMembers.length})
+                  Members ({filteredMembers?.length})
                 </h3>
               </div>
-              {filteredMembers.length > 0 ? (
+              {filteredMembers?.length > 0 ? (
                 <div className="max-h-96 overflow-auto">
                   <table className="w-full">
                     <thead className="bg-orange-100 sticky top-0 z-5">
@@ -396,40 +392,40 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {filteredMembers.map((item) => (
+                      {filteredMembers?.map((item) => (
                         <tr
-                          key={`member-${item.mem_id}`}
-                          className={`hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${isSelected(item.mem_id, 'member')
+                          key={`member-${item?.mem_id}`}
+                          className={`hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${isSelected(item?.mem_id, 'member')
                             ? "bg-orange-50 border-l-4 border-l-orange-500"
                             : ""
                             }`}
                           onClick={() => toggleSelection({
-                            id: item.mem_id,
+                            id: item?.mem_id,
                             type: 'member',
                             name: getFullName(item),
-                            first_name: item.first_name,
-                            middle_name: item.middle_name,
-                            last_name: item.last_name
+                            first_name: item?.first_name,
+                            middle_name: item?.middle_name,
+                            last_name: item?.last_name
                           })}
                         >
                           <td className="px-4 py-2">
                             <input
                               type="checkbox"
-                              checked={isSelected(item.mem_id, 'member')}
+                              checked={isSelected(item?.mem_id, 'member')}
                               onClick={(e) => e.stopPropagation()}
                               onChange={() => toggleSelection({
-                                id: item.mem_id,
+                                id: item?.mem_id,
                                 type: 'member',
                                 name: getFullName(item),
-                                first_name: item.first_name,
-                                middle_name: item.middle_name,
-                                last_name: item.last_name
+                                first_name: item?.first_name,
+                                middle_name: item?.middle_name,
+                                last_name: item?.last_name
                               })}
                               className="h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500 transition-colors duration-200"
                             />
                           </td>
                           <td className="px-4 py-2 text-sm text-gray-900">
-                            {item.mem_id}
+                            {item?.mem_id}
                           </td>
                           <td className="px-4 py-2">
                             <div className="flex items-center space-x-3">
@@ -468,10 +464,10 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
             </button>
             <button
               onClick={handleConfirm}
-              disabled={selectedItems.length === 0}
+              disabled={selectedItems?.length === 0}
               className="px-6 py-3 text-sm font-medium text-white bg-linear-to-r from-orange-500 to-purple-600 rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm flex items-center gap-2 cursor-pointer"
             >
-              Confirm ({selectedItems.length}) Selection
+              Confirm ({selectedItems?.length}) Selection
             </button>
           </div>
         </div>

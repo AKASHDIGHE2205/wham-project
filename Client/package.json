@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host 192.168.179.23",
+    "dev": "vite --host",
     "preview": "vite preview --host",
         "build": "tsc -b && vite build",
     "lint": "eslint ."

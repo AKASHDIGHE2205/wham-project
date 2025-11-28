@@ -12,6 +12,7 @@ interface MonthlyViewProps {
   Data: any;
   setIsEditShowModal: (show: boolean) => void;
   setEditData: (data: any) => void;
+  Loading: boolean;
 }
 
 export interface CalendarEvent {
@@ -31,7 +32,7 @@ export interface CalendarEvent {
 }
 
 const MonthlyView: React.FC<MonthlyViewProps> = ({ setSelectedDate, currentDate, selectedDate,
-  onDateSelect, onShowModal, Data, setIsEditShowModal, setEditData }) => {
+  onDateSelect, onShowModal, Data, setIsEditShowModal, setEditData, Loading }) => {
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
@@ -51,8 +52,8 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ setSelectedDate, currentDate,
     const targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
     return Data.filter((event: CalendarEvent) => {
-      const start = safeParseDate(event.from_date);
-      const end = safeParseDate(event.to_date);
+      const start = safeParseDate(event?.from_date);
+      const end = safeParseDate(event?.to_date);
       if (!start || !end) return false;
 
       return targetDate >= start && targetDate <= end;
@@ -71,19 +72,31 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ setSelectedDate, currentDate,
     setIsEditShowModal(true);
   };
 
+  // Loading state
+  if (Loading) {
+    return (
+      <div className="h-full bg-white sm:mx-4 my-2 rounded-xl shadow-md overflow-hidden flex items-center justify-center min-h-[500px]">
+        <div className="flex flex-col items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+          <p className="text-gray-600 text-lg">Loading calendar...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-full bg-white sm:mx-4 my-2 rounded-xl shadow-md overflow-hidden">
 
       {/* Header */}
       <div className="grid grid-cols-7 bg-linear-to-br from-gray-50 to-blue-50/30 border-b text-xs sm:text-sm font-semibold text-gray-600">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']?.map(day => (
           <div key={day} className="text-center py-3">{day}</div>
         ))}
       </div>
 
       {/* Days Grid */}
       <div className="grid grid-cols-7 gap-1px bg-gray-200">
-        {days.map((day, idx) => {
+        {days?.map((day, idx) => {
           const isCurrentMonth = isSameMonth(day, currentDate);
           const isSelected = selectedDate && isSameDay(day, selectedDate);
           const dayEvents = getEventsForDate(day);
@@ -122,49 +135,49 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ setSelectedDate, currentDate,
 
               {/* Events */}
               <div className="relative z-10 mt-1 space-y-1">
-                {dayEvents.slice(0, 3).map((event, index) => (
+                {dayEvents?.slice(0, 3)?.map((event, index) => (
                   <div
                     key={index}
                     className={`text-xs px-1 py-0.5 rounded border truncate cursor-text
-                      ${event.isapproved === "P"
+                      ${event?.isapproved === "P"
                         ? "bg-yellow-100 border-yellow-300 text-yellow-800"
-                        : event.isapproved === "R"
+                        : event?.isapproved === "R"
                           ? "bg-red-100 border-red-300 text-red-800"
-                          : event.isapproved === "A"
+                          : event?.isapproved === "A"
                             ? "bg-green-100 border-green-300 text-green-800"
-                            : event.isapproved === "C"
+                            : event?.isapproved === "C"
                               ? "bg-blue-100 border-blue-300 text-blue-800"
                               : "bg-gray-100 border-gray-300 text-gray-800"}`}
                     onClick={(e) => handleEditEvent(event, e)}
-                    title={`Click to edit: ${event.title}`}
+                    title={`Click to edit: ${event?.title}`}
                   >
                     <div className='flex justify-between mb-1'>
                       <span className="truncate flex-1 font-semibold flex items-center gap-1">
-                        {event.type === 'task' ? (
+                        {event?.type === 'task' ? (
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-circle-check-big-icon lucide-circle-check-big"><path d="M21.801 10A10 10 0 1 1 17 3.335" /><path d="m9 11 3 3L22 4" /></svg>
                         ) : (
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" /><path d="M8 14h.01" /><path d="M12 14h.01" /><path d="M16 14h.01" /><path d="M8 18h.01" /><path d="M12 18h.01" /><path d="M16 18h.01" /></svg>
                         )}
-                        {event.title}
+                        {event?.title}
                       </span>
                     </div>
 
                     <div className="text-[10px] flex justify-between">
                       <div>
-                        {moment(event.from_date).format('DD/MMM')}
-                        {event.from_date !== event.to_date &&
-                          ` to ${moment(event.to_date).format('DD/MMM')}`}
+                        {moment(event?.from_date).format('DD/MMM')}
+                        {event?.from_date !== event?.to_date &&
+                          ` to ${moment(event?.to_date).format('DD/MMM')}`}
                       </div>
                       <div>
-                        {moment(event.from_date).format("HH:mm")} - {moment(event.to_date).format("HH:mm")}
+                        {moment(event?.from_date).format("HH:mm")} - {moment(event?.to_date).format("HH:mm")}
                       </div>
                     </div>
 
                   </div>
                 ))}
-                {dayEvents.length > 3 && (
+                {dayEvents?.length > 3 && (
                   <div className="text-xs text-gray-500 text-center">
-                    +{dayEvents.length - 3} more
+                    +{dayEvents?.length - 3} more
                   </div>
                 )}
               </div>

@@ -405,3 +405,182 @@ export const updateMember = (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
+
+export const getAllSidebarMembers = (req, res) => {
+  const sql = `
+      SELECT 
+        a.mem_id,
+        CONCAT(a.first_name, ' ', a.middle_name, ' ', a.last_name) AS mem_name,
+        a.mobile,
+        a.email,
+        a.birth_date,
+        a.address,
+        a.designation,
+        a.isorganizer,
+        a.status,
+        b.team_id,
+        c.name AS team_name
+      FROM mst_members AS a
+      LEFT JOIN team_members AS b ON b.member_id = a.mem_id
+      LEFT JOIN mst_team AS c ON b.team_id = c.id
+  `;
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+
+    // Group by member
+    const membersMap = {};
+
+    results.forEach(row => {
+      if (!membersMap[row.mem_id]) {
+        membersMap[row.mem_id] = {
+          mem_id: row.mem_id,
+          mem_name: row.mem_name,
+          mobile: row.mobile,
+          email: row.email,
+          birth_date: row.birth_date,
+          address: row.address,
+          designation: row.designation,
+          isorganizer: row.isorganizer,
+          status: row.status,
+          teams: []
+        };
+      }
+
+      if (row.team_id) {
+        membersMap[row.mem_id].teams.push({
+          id: row.team_id,
+          name: row.team_name
+        });
+      }
+    });
+
+    const finalData = Object.values(membersMap);
+
+    res.status(200).json({ message: "Members fetched successfully", members: finalData });
+  });
+};
+
+export const getAllTasks = (req, res) => {
+  const sql = `
+                SELECT a.id,a.task_name,a.task_desc,a.step_id,b.step_name
+                FROM mst_tasks AS a 
+                LEFT JOIN mst_steps AS b ON a.step_id = b.id
+              `;
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching tasks:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+    return res.status(200).json({
+      message: "Tasks fetched successfully",
+      tasks: results
+    });
+  }
+  );
+}
+
+export const addTask = (req, res) => {
+  const { taskName, description, stepId, status } = req.body;
+  const sql = ` 
+                INSERT INTO mst_tasks (id, task_name, task_desc, step_id,status )
+                SELECT IFNULL(MAX(id), 0) + 1, ?, ?, ?, ?
+                FROM mst_tasks
+              `;
+  db.query(sql, [taskName, description, stepId, status], (err, results) => {
+    if (err) {
+      console.error("Error adding task:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+    return res.status(201).json({
+      message: "Task added successfully",
+      taskId: results.insertId || null
+    });
+  }
+  );
+}
+
+export const updateTask = (req, res) => {
+  const { taskId, taskName, description, stepId, status } = req.body;
+  const sql = `
+                UPDATE mst_tasks SET task_name=?, task_desc = ?, status = ?, step_id = ?
+                WHERE id = ?
+              `;
+  db.query(sql, [taskName, description, status, stepId, taskId], (err, results) => {
+    if (err) {
+      console.error("Error updating task:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+    return res.status(200).json({
+      message: "Task updated successfully",
+      updatedtaskId: id
+    });
+  }
+  )
+}
+
+export const addStep = (req, res) => {
+  const { stepName, description, status } = req.body;
+  const sql = `
+                INSERT INTO mst_steps (id, step_name, step_desc, status)
+                SELECT IFNULL(MAX(id), 0) + 1, ?, ?, ?
+                FROM mst_steps
+              `;
+  db.query(sql, [stepName, description, status], (err, results) => {
+    if (err) {
+      console.error("Error adding step:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+    return res.status(201).json({
+      message: "Step added successfully",
+      stepId: results.insertId || null
+    });
+  });
+}
+
+export const updateStep = (req, res) => {
+  const { id, stepName, description, status } = req.body;
+  const sql = `
+                UPDATE mst_steps  
+                SET step_name = ?, step_desc = ?, status = ?
+                WHERE id = ?
+              `;
+  db.query(sql, [stepName, description, status, id], (err, results) => {
+    if (err) {
+      console.error("Error updating step:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: "Step not found" });
+    }
+    return res.status(200).json({
+      message: "Step updated successfully",
+      updatedStepId: id
+    });
+  }
+  )
+}
+
+export const getAllSteps = (req, res) => {
+  const sql = `
+                SELECT id,step_name,step_desc,status
+                FROM mst_steps
+              `;
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching steps:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+    return res.status(201).json({
+      message: "Steps fetched successfully",
+      steps: results
+    });
+  }
+  );
+}

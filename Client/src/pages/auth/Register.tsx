@@ -150,7 +150,7 @@ const Register: React.FC = () => {
               <div className="space-y-6" data-aos="fade-up" data-aos-delay="600">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-black">First Name</label>
+                    <label className="text-sm font-medium text-black">First Name<span className='text-red-600'>*</span></label>
                     <div className="relative group">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <User className="h-5 w-5 text-gray-400" />
@@ -168,7 +168,7 @@ const Register: React.FC = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-black">Middle Name</label>
+                    <label className="text-sm font-medium text-black">Middle Name<span className='text-red-600'>*</span></label>
                     <input
                       type="text"
                       name="middleName"
@@ -180,7 +180,7 @@ const Register: React.FC = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-black">Last Name</label>
+                    <label className="text-sm font-medium text-black">Last Name<span className='text-red-600'>*</span></label>
                     <input
                       type="text"
                       name="lastName"
@@ -194,7 +194,7 @@ const Register: React.FC = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-black">Email</label>
+                  <label className="text-sm font-medium text-black">Email<span className='text-red-600'>*</span></label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Mail className="h-5 w-5 text-gray-400" />
@@ -212,7 +212,7 @@ const Register: React.FC = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-black">Mobile Number</label>
+                  <label className="text-sm font-medium text-black">Mobile Number<span className='text-red-600'>*</span></label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Phone className="h-5 w-5 text-gray-400" />
@@ -231,7 +231,7 @@ const Register: React.FC = () => {
                 </div>
 
                 <div className="space-y-2 hidden">
-                  <label className="text-sm font-medium text-black">Select Team</label>
+                  <label className="text-sm font-medium text-black">Select Team<span className='text-red-600'>*</span></label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Users className="h-5 w-5 text-gray-400" />
@@ -253,7 +253,7 @@ const Register: React.FC = () => {
               {/* Passwords */}
               <div className="space-y-6" data-aos="fade-up" data-aos-delay="600">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-black">Password</label>
+                  <label className="text-sm font-medium text-black">Password<span className='text-red-600'>*</span></label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Lock className="h-5 w-5 text-gray-400" />
@@ -277,7 +277,7 @@ const Register: React.FC = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-black">Confirm Password</label>
+                  <label className="text-sm font-medium text-black">Confirm Password<span className='text-red-600'>*</span></label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Shield className="h-5 w-5 text-gray-400" />
