@@ -35,13 +35,16 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
     media: "",
     attenddesc: ""
   });
-
+  const [loading, setLoading] = useState(false);
   const getAddressFromCoordinates = async (lat: number, lng: number): Promise<string> => {
     try {
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_MAPS_API_KEY}`
       );
       const data = await response.json();
+      console.log("response", response);
+      console.log("data", data);
+
 
       if (data.status === "OK" && data.results[0]) {
         return data.results[0].formatted_address;
@@ -128,7 +131,7 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
+    setLoading(true);
     if (!location || !inputs.media || !inputs.attenddesc) {
       toast.error('Please Select all required fields!');
       return;
@@ -170,6 +173,7 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
 
     const response = await addAttendence(formData);
     if (response) {
+      setLoading(false);
       handleClose()
     }
   };
@@ -320,9 +324,10 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
                 </button>
                 <button
                   type="submit"
+                  disabled={loading}
                   className="px-6 py-2.5 text-sm font-medium text-white bg-orange-500 border border-orange-500 rounded-lg hover:bg-orange-600 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
                 >
-                  Submit
+                  {loading ? 'Submiting' : 'Submit'}
                 </button>
               </div>
             </div>

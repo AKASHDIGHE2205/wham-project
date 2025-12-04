@@ -11,7 +11,8 @@ const Login: React.FC = () => {
   const [inputs, setInputs] = useState({
     email: '',
     password: ''
-  })
+  });
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,10 +30,13 @@ const Login: React.FC = () => {
       password: inputs.password
     };
     try {
+      setLoading(true);
       const response = await loginApi(body);
       dispatch(login({ data: response }));
     } catch (error) {
       console.error("Login failed:", error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -198,7 +202,8 @@ const Login: React.FC = () => {
                   type="submit"
                   className="w-full bg-linear-to-r from-orange-500 to-purple-600 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center hover:shadow-lg transition-shadow duration-300 cursor-pointer"
                 >
-                  Sign In
+                  {loading ? 'Signing In' : "Sign In"}
+
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </button>
                 <hr className='text-orange-600 mb-4' />

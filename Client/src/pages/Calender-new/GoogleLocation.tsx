@@ -96,7 +96,7 @@ const GoogleLocation: FC<Props> = ({ isShow, setIsShow, onLocationSelect }) => {
 
         {isLoaded ? (
           <>
-            <div className="mb-4" hidden>
+            <div className="mb-4" >
               <Autocomplete
                 onLoad={setAutocomplete}
                 onPlaceChanged={handlePlaceChanged}

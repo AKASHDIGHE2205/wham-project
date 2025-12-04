@@ -18,11 +18,14 @@ interface Users {
 const UserModal: FC<Props> = ({ show, setShow }) => {
   const [search, setSearch] = useState("");
   const [userData, setUserData] = useState<Users[] | []>([])
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       const response = await getUsers();
+      setLoading(false);
       setUserData(response.users || [])
     }
     fetchData();
@@ -42,7 +45,7 @@ const UserModal: FC<Props> = ({ show, setShow }) => {
   };
 
   const handleSelect = (item: any) => {
-    dispatch(handleSelectUser({ id: item.id, name: item.full_name }))
+    dispatch(handleSelectUser({ id: item?.id, name: item?.full_name }))
     setShow(false);
   }
 
@@ -113,24 +116,37 @@ const UserModal: FC<Props> = ({ show, setShow }) => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredUser.map((item) => (
-                  <tr key={item.id} >
-                    <td className="px-4 py-2 whitespace-nowrap">
-                      {item.id}
-                    </td>
-                    <td className="px-4 py-2 whitespace-nowrap">
-                      {item.full_name}
-                    </td>
-                    <td className="px-4 py-2 whitespace-nowrap">
-                      <button
-                        type="button"
-                        className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer text-orange-600 bg-orange-50 border border-orange-200 hover:bg-orange-100"
-                        onClick={() => handleSelect(item)}
-                      >Select</button>
+                {loading ? (
+                  <tr>
+                    <td colSpan={3} className="py-4 text-center text-gray-500">
+                      Loading...
                     </td>
                   </tr>
-                ))}
+                ) : filteredUser?.length === 0 ? (
+                  <tr>
+                    <td colSpan={3} className="py-4 text-center text-gray-500">
+                      No users found.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredUser?.map((item) => (
+                    <tr key={item?.id}>
+                      <td className="px-4 py-2 whitespace-nowrap">{item?.id}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">{item?.full_name}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">
+                        <button
+                          type="button"
+                          className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer text-orange-600 bg-orange-50 border border-orange-200 hover:bg-orange-100"
+                          onClick={() => handleSelect(item)}
+                        >
+                          Select
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
+
             </table>
           </div>
 
@@ -153,3 +169,4 @@ const UserModal: FC<Props> = ({ show, setShow }) => {
 }
 
 export default UserModal
+

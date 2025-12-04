@@ -25,15 +25,18 @@ const TeamModal: FC<Props> = ({ show, setShow, setSelectedTeams, selectedTeams }
   const [teams, setTeams] = useState<Team[]>([]);
   const [search, setSearch] = useState("");
   const [selectedItems, setSelectedItems] = useState<SelectedTeam[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true)
       try {
         const response = await getActiveTeams();
-        setTeams(response.Teams || []);
+        setTeams(response?.Teams || []);
       } catch (error) {
         console.error('Error fetching teams:', error);
-        toast.error('Failed to load teams');
+      } finally {
+        setLoading(false)
       }
     }
     fetchData();
@@ -41,9 +44,9 @@ const TeamModal: FC<Props> = ({ show, setShow, setSelectedTeams, selectedTeams }
 
   useEffect(() => {
     if (show) {
-      setSelectedItems(selectedTeams.map(team => ({
-        id: team.id,
-        name: team.name
+      setSelectedItems(selectedTeams?.map(team => ({
+        id: team?.id,
+        name: team?.name
       })));
     }
   }, [show, selectedTeams]);
@@ -57,28 +60,28 @@ const TeamModal: FC<Props> = ({ show, setShow, setSelectedTeams, selectedTeams }
 
   const toggleSelection = (team: Team) => {
     setSelectedItems((prev) => {
-      const exists = prev.find(p => p.id === team.id);
+      const exists = prev.find(p => p.id === team?.id);
       if (exists) {
-        return prev.filter(p => p.id !== team.id);
+        return prev.filter(p => p.id !== team?.id);
       } else {
-        return [...prev, { id: team.id, name: team.name }];
+        return [...prev, { id: team?.id, name: team?.name }];
       }
     });
   };
 
   const isSelected = (id: number) => {
-    return selectedItems.some(item => item.id === id);
+    return selectedItems?.some(item => item?.id === id);
   };
 
   const handleConfirm = () => {
     setSelectedTeams(selectedItems);
-    toast.success(`Selected ${selectedItems.length} team(s)`);
+    toast.success(`Selected ${selectedItems?.length} team(s)`);
     handleClose();
   };
 
-  const filteredTeams = teams.filter((team) =>
-    team.id.toString().toLowerCase().includes(search.toString().toLowerCase()) ||
-    team.name.toLowerCase().includes(search.toLowerCase())
+  const filteredTeams = teams?.filter((team) =>
+    team?.id.toString().toLowerCase().includes(search.toString().toLowerCase()) ||
+    team?.name.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -116,12 +119,12 @@ const TeamModal: FC<Props> = ({ show, setShow, setSelectedTeams, selectedTeams }
         </div>
 
         {/* Selected Teams Preview */}
-        {selectedItems.length > 0 && (
+        {selectedItems?.length > 0 && (
           <div className="bg-linear-to-r from-orange-50 to-purple-50 border-b border-orange-200 p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <span className="flex items-center justify-center w-6 h-6 bg-linear-to-br from-orange-500 to-purple-600 text-white text-sm font-bold rounded-full shadow-sm">
-                  {selectedItems.length}
+                  {selectedItems?.length}
                 </span>
                 <span className="text-sm font-semibold text-orange-800">Selected Teams</span>
               </div>
@@ -137,13 +140,13 @@ const TeamModal: FC<Props> = ({ show, setShow, setSelectedTeams, selectedTeams }
             </div>
 
             <div className="flex flex-wrap gap-2 max-h-32 overflow-auto pr-2">
-              {selectedItems.map((team) => (
+              {selectedItems?.map((team) => (
                 <div
-                  key={`team-${team.id}`}
+                  key={`team-${team?.id}`}
                   className="bg-orange-100 border border-orange-200 text-orange-800 rounded-full px-3 py-2 shadow-sm flex items-center gap-2 group hover:shadow-md transition-all duration-200"
                 >
                   <span className="text-sm font-medium">
-                    👥 {team.name}
+                    👥 {team?.name}
                   </span>
                   <button
                     onClick={(e) => {
@@ -190,11 +193,11 @@ const TeamModal: FC<Props> = ({ show, setShow, setSelectedTeams, selectedTeams }
               <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
-              Teams ({filteredTeams.length})
+              Teams ({filteredTeams?.length})
             </h3>
           </div>
 
-          {filteredTeams.length > 0 ? (
+          {filteredTeams?.length > 0 ? (
             <div className="max-h-96 overflow-auto">
               <table className="w-full">
                 <thead className="bg-orange-100 sticky top-0 z-5">
@@ -211,39 +214,44 @@ const TeamModal: FC<Props> = ({ show, setShow, setSelectedTeams, selectedTeams }
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredTeams.map((team) => (
-                    <tr
-                      key={team.id}
-                      className={`hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${isSelected(team.id)
-                        ? "bg-orange-50 border-l-4 border-l-orange-500"
-                        : ""
-                        }`}
-                      onClick={() => toggleSelection(team)}
-                    >
-                      <td className="px-6 py-4">
-                        <input
-                          type="checkbox"
-                          checked={isSelected(team.id)}
-                          onClick={(e) => e.stopPropagation()}
-                          onChange={() => toggleSelection(team)}
-                          className="h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500 transition-colors duration-200"
-                        />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-gray-900">
-                          {team.id}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center space-x-3">
-                          <span className="text-sm font-medium text-gray-900">
-                            {team.name}
-                          </span>
-                        </div>
+                  {loading ? (
+                    <tr>
+                      <td colSpan={3} className="py-4 text-center text-gray-500">
+                        Loading...
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    filteredTeams?.map((team) => (
+                      <tr
+                        key={team?.id}
+                        className={`hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${isSelected(team?.id) ? "bg-orange-50 border-l-4 border-l-orange-500" : ""
+                          }`}
+                        onClick={() => toggleSelection(team)}
+                      >
+                        <td className="px-6 py-4">
+                          <input
+                            type="checkbox"
+                            checked={isSelected(team?.id)}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={() => toggleSelection(team)}
+                            className="h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500 transition-colors duration-200"
+                          />
+                        </td>
+
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm text-gray-900">{team?.id}</span>
+                        </td>
+
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center space-x-3">
+                            <span className="text-sm font-medium text-gray-900">{team?.name}</span>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
+
               </table>
             </div>
           ) : (
@@ -269,10 +277,10 @@ const TeamModal: FC<Props> = ({ show, setShow, setSelectedTeams, selectedTeams }
             </button>
             <button
               onClick={handleConfirm}
-              disabled={selectedItems.length === 0}
+              disabled={selectedItems?.length === 0}
               className="px-6 py-3 text-sm font-medium text-white bg-linear-to-r from-orange-500 to-purple-600 rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm flex items-center gap-2 cursor-pointer"
             >
-              Confirm ({selectedItems.length}) Selection
+              Confirm ({selectedItems?.length}) Selection
             </button>
           </div>
         </div>

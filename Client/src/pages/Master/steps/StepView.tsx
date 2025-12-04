@@ -52,13 +52,13 @@ const StepView = () => {
     setCurrentPage(1);
   }
 
-  const filteredItems = data.filter((item: Steps) => {
+  const filteredItems = data?.filter((item: Steps) => {
     return item.step_name.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredItems?.slice(indexOfFirstItem, indexOfLastItem);
 
   const handleEdit = (step: Steps) => {
     setSelectedStep(step);
@@ -165,13 +165,13 @@ const StepView = () => {
                       </div>
                     </td>
                   </tr>
-                ) : currentItems.length > 0 ? (
-                  currentItems.map((step: Steps) => (
-                    <tr key={step.id} className="hover:bg-gray-50 transition-colors duration-150">
-                      <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{step.id}</td>
-                      <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{step.step_name}</td>
-                      <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{step.step_desc}</td>
-                      <td className="px-2 py-2 text-sm text-gray-900">{step.status === 'A' ? "Active" : "Inactive"}</td>
+                ) : currentItems?.length > 0 ? (
+                  currentItems?.map((step: Steps) => (
+                    <tr key={step?.id} className="hover:bg-gray-50 transition-colors duration-150">
+                      <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{step?.id}</td>
+                      <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{step?.step_name}</td>
+                      <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{step?.step_desc}</td>
+                      <td className="px-2 py-2 text-sm text-gray-900">{step?.status === 'A' ? "Active" : "Inactive"}</td>
                       <td className="px-3 py-2 whitespace-nowrap">
                         <button
                           type="button"

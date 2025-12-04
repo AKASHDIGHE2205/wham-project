@@ -7,6 +7,8 @@ interface Master {
   last_name: string;
   user_id: number;
   user_name: string;
+  step_id: number;
+  step_name: string;
 }
 
 const initialState: Master = {
@@ -16,6 +18,8 @@ const initialState: Master = {
   last_name: "",
   user_id: 0,
   user_name: "",
+  step_id: 0,
+  step_name: "",
 };
 
 export const masterSlice = createSlice({
@@ -45,7 +49,16 @@ export const masterSlice = createSlice({
       state.user_id = id;
       state.user_name = name;
     },
+    handleSelectStep: (
+      state,
+      action: PayloadAction<{ id: number; name: string }>
+    ) => {
+      const { id, name } = action.payload;
+      state.step_id = id;
+      state.step_name = name;
+    },
   },
 });
-export const { handleSelectMember, handleSelectUser } = masterSlice.actions;
+export const { handleSelectMember, handleSelectUser, handleSelectStep } =
+  masterSlice.actions;
 export default masterSlice.reducer;

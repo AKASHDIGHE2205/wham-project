@@ -16,6 +16,8 @@ import DefaultLayout from './layout/DefaultLayout';
 import Logout from './pages/auth/Logout';
 import StepView from './pages/Master/steps/StepView';
 import TaskView from './pages/Master/task/TaskView';
+import ReportView from './pages/reports/totalReport/ReportView';
+import toast from 'react-hot-toast';
 
 const Login = lazy(() => import('./pages/auth/Login'));
 const Register = lazy(() => import('./pages/auth/Register'));
@@ -58,6 +60,7 @@ function App() {
           }
         } catch (error: any) {
           console.log(error);
+          toast.error(error?.response?.data?.message || "Invalid token");
           dispatch(logout());
         }
       }
@@ -93,16 +96,18 @@ function App() {
               <Route path="/master/view-members" element={<MemberView />} />
               <Route path="/master/add-member" element={<NewMember />} />
               <Route path="/master/edit-member/:id" element={<EditMember />} />
-
               <Route path="/master/view-steps" element={<StepView />} />
               <Route path="/master/view-tasks" element={<TaskView />} />
+
+              {/*Report Routes */}
+              <Route path='/report/report1' element={<ReportView />} />
 
 
               {/*Profile Routes */}
               <Route path="/auth/profile" element={<Profile />} />
             </Route>
 
-            <Route path="/log-out" element={<Logout />} />
+            <Route path="/auth/log-out" element={<Logout />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </Suspense>

@@ -31,7 +31,7 @@ const MembersModal: FC<Props> = ({ show, setShow }) => {
       setLoading(true);
       try {
         const response = await getAllMembers();
-        setMembers(response.Members || []);
+        setMembers(response?.Members || []);
       } catch (error) {
         console.error('Error fetching members:', error);
         toast.error("Failed to load members");
@@ -43,12 +43,12 @@ const MembersModal: FC<Props> = ({ show, setShow }) => {
     fetchData();
   }, [show]);
 
-  const filteredMembers = members.filter((member) =>
-    `${member.mem_id} ${member.first_name} ${member.middle_name} ${member.last_name}`.toLowerCase().includes(search.toLowerCase())
+  const filteredMembers = members?.filter((member) =>
+    `${member?.mem_id} ${member?.first_name} ${member?.middle_name} ${member?.last_name}`.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleSelect = (member: Member) => {
-    dispatch(handleSelectMember({ id: member.mem_id, first_name: member.first_name, middle_name: member.middle_name, last_name: member.last_name }))
+    dispatch(handleSelectMember({ id: member?.mem_id, first_name: member?.first_name, middle_name: member?.middle_name, last_name: member?.last_name }))
     setShow(false);
     setSearch("");
   };
@@ -113,7 +113,7 @@ const MembersModal: FC<Props> = ({ show, setShow }) => {
             <div className="flex justify-center items-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
             </div>
-          ) : filteredMembers.length === 0 ? (
+          ) : filteredMembers?.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-500 text-lg">No members found</p>
               <p className="text-gray-400 text-sm mt-1">
@@ -138,21 +138,21 @@ const MembersModal: FC<Props> = ({ show, setShow }) => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredMembers.map((member) => {
+                    {filteredMembers?.map((member) => {
                       return (
                         <tr
-                          key={member.mem_id}
+                          key={member?.mem_id}
                           className="hover:bg-gray-50 transition-colors duration-150 "
                         >
                           <td className="px-4 py-2 whitespace-nowrap">
                             <span className="text-sm text-gray-900">
-                              {member.mem_id}
+                              {member?.mem_id}
                             </span>
                           </td>
                           <td className="px-4 py-2 whitespace-nowrap">
                             <div className="flex flex-col">
                               <span className="text-sm text-gray-900">
-                                {member.first_name} {member.middle_name} {member.last_name}
+                                {member?.first_name} {member?.middle_name} {member?.last_name}
                               </span>
                             </div>
                           </td>
@@ -174,9 +174,9 @@ const MembersModal: FC<Props> = ({ show, setShow }) => {
           )}
 
           {/* Results Count */}
-          {!loading && filteredMembers.length > 0 && (
+          {!loading && filteredMembers?.length > 0 && (
             <div className="mt-4 text-sm text-gray-500">
-              Showing {filteredMembers.length} of {members.length} members
+              Showing {filteredMembers?.length} of {members?.length} members
             </div>
           )}
         </div>
@@ -195,4 +195,4 @@ const MembersModal: FC<Props> = ({ show, setShow }) => {
   )
 }
 
-export default MembersModal
+export default MembersModal;

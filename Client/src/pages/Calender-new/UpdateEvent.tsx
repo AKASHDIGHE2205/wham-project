@@ -31,6 +31,7 @@ export interface EventInterface {
   created_at: string;
   updated_by: number | null;
   updated_at: string;
+  organizer_name: string;
   members: SelectedMembers[];
   teams: SelectedTeam[];
   locations: SelectedLocation[];
@@ -170,6 +171,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
       <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100">
           {/* Header */}
+          {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white rounded-t-2xl">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-linear-to-br from-orange-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -178,8 +180,16 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                 </svg>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900">Update Event</h3>
-                <p>{inputs.title}</p>
+                <div className="flex items-center">
+                  <h3 className="text-xl font-semibold text-gray-900 pr-2">Update Event</h3>
+                  <p className="text-sm text-gray-600">{inputs.title}</p>
+                </div>
+                <div className="flex items-center mt-1">
+                  <h3 className="text-sm font-medium text-gray-700 pr-2">Organized by:</h3>
+                  <p className="text-sm text-gray-600">
+                    <span className="text-orange-600">{Event?.organizer_name || ""}</span>
+                  </p>
+                </div>
               </div>
             </div>
             <div className="flex items-center space-x-2">
@@ -414,7 +424,6 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                     <option value="R">Rejected</option>
                     <option value="C">Completed</option>
                   </select>
-
                 </div>
               </div>
             )}
@@ -530,7 +539,6 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                 Update Event
               </button>
             </div>
-
           </form>
         </div>
       </div>

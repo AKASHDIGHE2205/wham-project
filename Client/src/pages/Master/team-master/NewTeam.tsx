@@ -18,11 +18,13 @@ const NewTeam: FC<Props> = ({ show, setShow, fetchData }) => {
     status: "",
     description: ""
   })
+  const [loading, setLoading] = useState(false);
   const [showMemModal, setShowMemModal] = useState(false);
   const dispatch = useDispatch();
   const { mem_id, first_name, middle_name, last_name } = useSelector((state: RootState) => state.master);
 
   if (!show) return null;
+
   const handleClose = () => {
     setInputs({
       name: "",
@@ -34,14 +36,13 @@ const NewTeam: FC<Props> = ({ show, setShow, fetchData }) => {
     setShow(false);
   }
 
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setInputs(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setLoading(true)
     if (!inputs.name || !inputs.description || !inputs.status || !mem_id) {
       toast.error('Please fill all required fields.!')
       return;
@@ -56,6 +57,7 @@ const NewTeam: FC<Props> = ({ show, setShow, fetchData }) => {
 
     const response = await newTeam(body)
     if (response) {
+      setLoading(true)
       handleClose();
     }
 
@@ -218,9 +220,10 @@ const NewTeam: FC<Props> = ({ show, setShow, fetchData }) => {
               </button>
               <button
                 type="submit"
+                disabled={loading}
                 className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-orange-500 to-purple-600 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
               >
-                Create Team
+                {loading ? 'Submitting' : 'Submit'}
               </button>
             </div>
           </form>

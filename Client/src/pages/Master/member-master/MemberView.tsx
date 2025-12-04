@@ -34,7 +34,7 @@ const MemberView = () => {
     setLoading(true);
     try {
       const response = await getAllMembers();
-      setData(response.members || []);
+      setData(response?.members || []);
     } catch (error) {
       console.log(error);
     } finally {
@@ -54,13 +54,13 @@ const MemberView = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
   const filterData = data?.filter((item: Member) =>
-    item.mem_id.toString().toLowerCase().includes(search.toString().toLowerCase()) ||
-    item.mem_name.toLowerCase().includes(search.toLowerCase()) ||
-    item.address.toLowerCase().includes(search.toLowerCase()) ||
-    item.designation.toLowerCase().includes(search.toLowerCase()) ||
-    item.mobile.toLocaleLowerCase().toLowerCase().includes(search.toLocaleLowerCase().toLowerCase()) ||
-    item.email.toLocaleLowerCase().toLowerCase().includes(search.toLocaleLowerCase().toLowerCase()) ||
-    item.teams.some(team => team.name.toLowerCase().includes(search.toLowerCase()))
+    item?.mem_id.toString().toLowerCase().includes(search.toString().toLowerCase()) ||
+    item?.mem_name.toLowerCase().includes(search.toLowerCase()) ||
+    item?.address.toLowerCase().includes(search.toLowerCase()) ||
+    item?.designation.toLowerCase().includes(search.toLowerCase()) ||
+    item?.mobile.toLocaleLowerCase().toLowerCase().includes(search.toLocaleLowerCase().toLowerCase()) ||
+    item?.email.toLocaleLowerCase().toLowerCase().includes(search.toLocaleLowerCase().toLowerCase()) ||
+    item?.teams.some(team => team.name.toLowerCase().includes(search.toLowerCase()))
   ).slice(indexOfFirstItem, indexOfLastItem);
 
   return (
@@ -170,31 +170,31 @@ const MemberView = () => {
                     </td>
                   </tr>
                 ) : filterData?.length > 0 ? (
-                  filterData.map((item) => (
-                    <tr key={item.mem_id} className="hover:bg-gray-50 transition-colors duration-150">
-                      <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{item.mem_id}</td>
-                      <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{item.mem_name}</td>
+                  filterData?.map((item) => (
+                    <tr key={item?.mem_id} className="hover:bg-gray-50 transition-colors duration-150">
+                      <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{item?.mem_id}</td>
+                      <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{item?.mem_name}</td>
                       <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">
-                        {item.mobile || item.email ? [item.mobile, item.email].filter(Boolean).join(" / ") : ""}
+                        {item?.mobile || item?.email ? [item?.mobile, item?.email].filter(Boolean).join(" / ") : ""}
                       </td>
 
-                      <td className="px-2 py-2 text-sm text-gray-900">{item.address}</td>
+                      <td className="px-2 py-2 text-sm text-gray-900">{item?.address}</td>
                       <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">
-                        {item.teams?.map(team => team.name).join(', ') || 'No team assigned'}
+                        {item?.teams?.map(team => team.name).join(', ') || 'No team assigned'}
                       </td>
                       <td className="px-2 py-2 whitespace-nowrap">
                         <span
-                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${item.status === "A"
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${item?.status === "A"
                             ? "bg-green-100 text-green-800 border-green-200"
                             : "bg-red-100 text-red-800 border-red-200"
                             }`}
                         >
-                          {item.status === "A" ? "Active" : "In-active"}
+                          {item?.status === "A" ? "Active" : "In-active"}
                         </span>
                       </td>
                       <td className="px-3 py-2 whitespace-nowrap">
                         <Link
-                          to={`/master/edit-member/${item.mem_id}`}
+                          to={`/master/edit-member/${item?.mem_id}`}
                           className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-orange-600 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-all duration-200 cursor-pointer"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-square-pen-icon lucide-square-pen">

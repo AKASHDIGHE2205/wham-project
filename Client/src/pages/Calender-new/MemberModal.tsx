@@ -36,27 +36,37 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
   const [search, setSearch] = useState("");
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+  const [loadingTeams, setLoadingTeams] = useState(false);
+
   const [activeTab, setActiveTab] = useState<'teams' | 'members'>('teams');
 
   useEffect(() => {
     if (!show) return;
 
     const fetchMembers = async () => {
+      setLoadingMembers(true)
       try {
         const response = await getAllMembers();
         setMembers(response.Members || []);
       } catch {
         toast.error("Failed to load members");
       }
+      finally {
+        setLoadingMembers(false)
+      }
     };
 
     const fetchTeams = async () => {
+      setLoadingTeams(true)
       try {
         const response = await getActiveTeams();
         setTeams(response.Teams || []);
       } catch (error) {
         console.error('Error fetching teams:', error);
         toast.error('Failed to load teams');
+      } finally {
+        setLoadingTeams(false)
       }
     };
 
@@ -310,45 +320,62 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {filteredTeams?.map((item) => (
-                        <tr
-                          key={`team-${item?.id}`}
-                          className={`hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${isSelected(item?.id, 'team')
-                            ? "bg-blue-50 border-l-4 border-l-blue-500"
-                            : ""
-                            }`}
-                          onClick={() => toggleSelection({
-                            id: item?.id,
-                            type: 'team',
-                            name: item?.name
-                          })}
-                        >
-                          <td className="px-4 py-2">
-                            <input
-                              type="checkbox"
-                              checked={isSelected(item?.id, 'team')}
-                              onClick={(e) => e.stopPropagation()}
-                              onChange={() => toggleSelection({
-                                id: item?.id,
-                                type: 'team',
-                                name: item?.name
-                              })}
-                              className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 transition-colors duration-200"
-                            />
-                          </td>
-                          <td className="px-4 py-2 text-sm text-gray-900">
-                            {item?.id}
-                          </td>
-                          <td className="px-4 py-2">
-                            <div className="flex items-center space-x-3">
-                              <span className="text-sm font-medium text-gray-900">
-                                {item?.name}
-                              </span>
-                            </div>
+                      {loadingTeams ? (
+                        <tr>
+                          <td colSpan={3} className="py-4 text-center text-gray-500">
+                            Loading...
                           </td>
                         </tr>
-                      ))}
+                      ) : (
+                        <>
+                          {filteredTeams?.map((item) => (
+                            <tr
+                              key={`team-${item?.id}`}
+                              className={`hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${isSelected(item?.id, 'team')
+                                ? "bg-blue-50 border-l-4 border-l-blue-500"
+                                : ""
+                                }`}
+                              onClick={() =>
+                                toggleSelection({
+                                  id: item?.id,
+                                  type: 'team',
+                                  name: item?.name,
+                                })
+                              }
+                            >
+                              <td className="px-4 py-2">
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected(item?.id, 'team')}
+                                  onClick={(e) => e.stopPropagation()}
+                                  onChange={() =>
+                                    toggleSelection({
+                                      id: item?.id,
+                                      type: 'team',
+                                      name: item?.name,
+                                    })
+                                  }
+                                  className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 transition-colors duration-200"
+                                />
+                              </td>
+
+                              <td className="px-4 py-2 text-sm text-gray-900">
+                                {item?.id}
+                              </td>
+
+                              <td className="px-4 py-2">
+                                <div className="flex items-center space-x-3">
+                                  <span className="text-sm font-medium text-gray-900">
+                                    {item?.name}
+                                  </span>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </>
+                      )}
                     </tbody>
+
                   </table>
                 </div>
               ) : (
@@ -392,51 +419,68 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {filteredMembers?.map((item) => (
-                        <tr
-                          key={`member-${item?.mem_id}`}
-                          className={`hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${isSelected(item?.mem_id, 'member')
-                            ? "bg-orange-50 border-l-4 border-l-orange-500"
-                            : ""
-                            }`}
-                          onClick={() => toggleSelection({
-                            id: item?.mem_id,
-                            type: 'member',
-                            name: getFullName(item),
-                            first_name: item?.first_name,
-                            middle_name: item?.middle_name,
-                            last_name: item?.last_name
-                          })}
-                        >
-                          <td className="px-4 py-2">
-                            <input
-                              type="checkbox"
-                              checked={isSelected(item?.mem_id, 'member')}
-                              onClick={(e) => e.stopPropagation()}
-                              onChange={() => toggleSelection({
-                                id: item?.mem_id,
-                                type: 'member',
-                                name: getFullName(item),
-                                first_name: item?.first_name,
-                                middle_name: item?.middle_name,
-                                last_name: item?.last_name
-                              })}
-                              className="h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500 transition-colors duration-200"
-                            />
-                          </td>
-                          <td className="px-4 py-2 text-sm text-gray-900">
-                            {item?.mem_id}
-                          </td>
-                          <td className="px-4 py-2">
-                            <div className="flex items-center space-x-3">
-                              <span className="text-sm font-medium text-gray-900">
-                                {getFullName(item)}
-                              </span>
-                            </div>
+                      {loadingMembers ? (
+                        <tr>
+                          <td colSpan={3} className="py-4 text-center text-gray-500">
+                            Loading...
                           </td>
                         </tr>
-                      ))}
+                      ) : (
+                        <>
+                          {filteredMembers?.map((item) => (
+                            <tr
+                              key={`member-${item?.mem_id}`}
+                              className={`hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${isSelected(item?.mem_id, 'member')
+                                  ? "bg-orange-50 border-l-4 border-l-orange-500"
+                                  : ""
+                                }`}
+                              onClick={() =>
+                                toggleSelection({
+                                  id: item?.mem_id,
+                                  type: 'member',
+                                  name: getFullName(item),
+                                  first_name: item?.first_name,
+                                  middle_name: item?.middle_name,
+                                  last_name: item?.last_name,
+                                })
+                              }
+                            >
+                              <td className="px-4 py-2">
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected(item?.mem_id, 'member')}
+                                  onClick={(e) => e.stopPropagation()}
+                                  onChange={() =>
+                                    toggleSelection({
+                                      id: item?.mem_id,
+                                      type: 'member',
+                                      name: getFullName(item),
+                                      first_name: item?.first_name,
+                                      middle_name: item?.middle_name,
+                                      last_name: item?.last_name,
+                                    })
+                                  }
+                                  className="h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500 transition-colors duration-200"
+                                />
+                              </td>
+
+                              <td className="px-4 py-2 text-sm text-gray-900">
+                                {item?.mem_id}
+                              </td>
+
+                              <td className="px-4 py-2">
+                                <div className="flex items-center space-x-3">
+                                  <span className="text-sm font-medium text-gray-900">
+                                    {getFullName(item)}
+                                  </span>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </>
+                      )}
                     </tbody>
+
                   </table>
                 </div>
               ) : (

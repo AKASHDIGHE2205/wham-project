@@ -3,12 +3,13 @@ import { useEffect, useState } from "react";
 import { getAllTasks } from "../../../services/master/masterApi";
 import CustomPagination from "../../../helper/CustomPagination";
 import AddTask from "./AddTask";
+import UpdateTask from "./UpdateTask";
 
 export interface Task {
   id: number;
   task_name: string;
   task_desc: string;
-  status?: string;
+  status: string;
   step_id: number;
   step_name: string;
 }
@@ -20,20 +21,23 @@ const TaskView = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [showAdd, setShowAdd] = useState(false);
+  const [showUpdate, setShowUpdate] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await getAllTasks();
-        setData(response.tasks || []);
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-        setData([]);
-      } finally {
-        setLoading(false);
-      }
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await getAllTasks();
+      setData(response.tasks || []);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      setData([]);
+    } finally {
+      setLoading(false);
     }
+  }
+  useEffect(() => {
+
     fetchData();
   }, [])
 
@@ -58,6 +62,11 @@ const TaskView = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+
+  const handleEdit = (item: Task) => {
+    setSelectedTask(item);
+    setShowUpdate(true);
+  }
 
   return (
     <div className="min-h-screen bg-white p-2 sm:p-6">
@@ -129,58 +138,75 @@ const TaskView = () => {
         {/* Tasks Table */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[600px] divide-y divide-gray-200 p-4">
+            <table className="w-full divide-y divide-gray-200 text-center">
               <thead className="bg-linear-to-r from-purple-50 to-orange-50">
                 <tr>
-                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     ID
                   </th>
-                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Name
                   </th>
-                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    Step Name
+                  </th>
+                  <th className="px-3 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider hidden sm:table-cell">
                     Description
                   </th>
-                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Action
                   </th>
                 </tr>
               </thead>
+
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-4 text-gray-500">
+                    <td colSpan={5} className="py-6 text-gray-500">
                       <div className="flex justify-center items-center text-orange-600 gap-2">
                         <div className="animate-spin h-6 w-6 border-4 border-orange-600 border-t-transparent rounded-full"></div>
-                        <span className=''>Loading...</span>
+                        <span>Loading...</span>
                       </div>
                     </td>
                   </tr>
                 ) : currentItems.length > 0 ? (
                   currentItems.map((task: Task) => (
                     <tr key={task.id} className="hover:bg-gray-50 transition-colors duration-150">
-                      <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{task.id}</td>
-                      <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{task.task_name}</td>
-                      <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{task.task_desc}</td>
-                      <td className="px-2 py-2 text-sm text-gray-900">{task.status}</td>
-                      <td className="px-3 py-2 whitespace-nowrap">
+                      <td className="px-3 py-3 text-sm text-gray-900 whitespace-nowrap">{task.id}</td>
+                      <td className="px-3 py-3 text-sm text-gray-900">{task.task_name}</td>
+                      <td className="px-3 py-3 text-sm text-gray-900">{task.step_name}</td>
+                      <td className="px-3 py-3 text-sm text-gray-900 hidden sm:table-cell">
+                        {task.task_desc}
+                      </td>
+                      <td className="px-3 py-3 text-sm text-gray-900 whitespace-nowrap">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${task.status === 'active' ? 'bg-green-100 text-green-800' :
+                          task.status === 'inactive' ? 'bg-red-100 text-red-800' :
+                            task.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-gray-100 text-gray-800'
+                          }`}>
+                          {task.status}
+                        </span>
+                      </td>
+                      <td className="px-3 py-3 whitespace-nowrap">
                         <button
+                          type="button"
+                          onClick={() => handleEdit(task)}
                           className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-orange-600 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-all duration-200 cursor-pointer"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-square-pen-icon lucide-square-pen">
-                            <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                            <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" />
+                          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                           </svg>
+                          Edit
                         </button>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="text-center py-4 text-orange-600">
+                    <td colSpan={5} className="py-6 text-orange-600">
                       No Records Found
                     </td>
                   </tr>
@@ -204,6 +230,15 @@ const TaskView = () => {
         <AddTask
           show={showAdd}
           setShow={setShowAdd}
+          fetchData={fetchData}
+        />
+      )}
+      {showUpdate && (
+        <UpdateTask
+          show={showUpdate}
+          setShow={setShowUpdate}
+          Data={selectedTask}
+          fetchData={fetchData}
         />
       )}
     </div>

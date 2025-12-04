@@ -418,6 +418,98 @@ export const addAttendence = async (req, res) => {
     const { eventId, Time, eventDate, stepId, taskId, userId, location, attenddesc } = req.body;
     const file = req.file;
 
+    let locationObj = typeof location === "string" ? JSON.parse(location) : location;
+
+    const dbQuery = (sql, params = []) => {
+      return new Promise((resolve, reject) => {
+        db.query(sql, params, (error, results) => {
+          if (error) reject(error);
+          else resolve(results);
+        });
+      });
+    };
+
+    // ⭐ Step 1: CHECK IF ALREADY ATTENDED
+    const checkQuery = `
+      SELECT 1 
+      FROM event_media
+      WHERE event_id = ?
+        AND mem_id = ?
+        AND event_date = ?
+        AND step_id = ?
+        AND task_id = ?
+      LIMIT 1
+    `;
+
+    const alreadyAttended = await dbQuery(checkQuery, [
+      eventId,
+      userId,
+      eventDate,
+      stepId,
+      taskId
+    ]);
+
+    if (alreadyAttended.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "You have already attended this event."
+      });
+    }
+
+    // ⭐ Step 2: (Your existing logic)
+    let savePath = null;
+    let mediaSrNo = null;
+
+    if (file) {
+      const folderName = `${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, "0")}`;
+      const uploadPath = path.join("uploads", folderName, userId.toString());
+
+      await fs.ensureDir(uploadPath);
+
+      const fileName = Date.now() + "_" + file.originalname;
+      savePath = path.posix.join(uploadPath.replace(/\\/g, "/"), fileName);
+
+      await sharp(file.buffer).jpeg({ quality: 40 }).toFile(savePath);
+
+      const mediaMaxResult = await dbQuery(
+        "SELECT COALESCE(MAX(sr_no), 0) + 1 as next_id FROM event_media"
+      );
+      mediaSrNo = mediaMaxResult[0].next_id;
+
+      const mediaQuery = `
+        INSERT INTO event_media(sr_no, event_id, in_time, event_date, media_path, address, lat, lng, media_desc, mem_id, step_id, task_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+
+      await dbQuery(mediaQuery, [
+        mediaSrNo,
+        eventId,
+        Time,
+        eventDate,
+        savePath,
+        locationObj?.address ?? null,
+        locationObj?.latitude ?? null,
+        locationObj?.longitude ?? null,
+        attenddesc,
+        userId,
+        stepId,
+        taskId
+      ]);
+    }
+
+    res.json({ success: true, message: "Attendance added successfully!" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
+
+export const addAttendence_old041225 = async (req, res) => {
+  try {
+    const { eventId, Time, eventDate, stepId, taskId, userId, location, attenddesc } = req.body;
+    const file = req.file;
+
     // Parse location if it's a string
     let locationObj = typeof location === "string" ? JSON.parse(location) : location;
 
@@ -444,7 +536,9 @@ export const addAttendence = async (req, res) => {
 
       // Filename
       const fileName = Date.now() + "_" + file.originalname;
-      savePath = path.join(uploadPath, fileName);
+      // savePath = path.join(uploadPath, fileName);
+      savePath = path.posix.join(uploadPath.replace(/\\/g, "/"), fileName);
+
 
       // Compress image
       await sharp(file.buffer).jpeg({ quality: 40 }).toFile(savePath);
@@ -487,7 +581,8 @@ export const addAttendence = async (req, res) => {
 };
 
 export const addSteps = (req, res) => {
-  const { eventId, eventDate, userId, description, taskId, status } = req.body;
+  const { eventId, eventDate, userId, description, taskId, stepId, status } = req.body;
+
   // STEP 1: Check if the step already exists
   const checkSql = `
                       SELECT * 
@@ -502,13 +597,11 @@ export const addSteps = (req, res) => {
     }
 
     if (results.length > 0) {
-      return res.status(400).json({
-        message: "Already exists!"
-      });
+      return res.status(400).json({ message: "Already exists!" });
     }
 
     // STEP 2: Get next step ID (sr_no + step_no)
-    const sql1 = `SELECT COALESCE(MAX(sr_no), 0) + 1 AS next_step_id FROM event_dt`;
+    const sql1 = `SELECT COALESCE(MAX(sr_no), 0) + 1 AS next_sr_no FROM event_dt`;
 
     db.query(sql1, [eventId, eventDate], (err, result) => {
       if (err) {
@@ -516,7 +609,7 @@ export const addSteps = (req, res) => {
         return res.status(500).json({ message: "Internal server error" });
       }
 
-      const nextStepId = result[0].next_step_id;
+      const nextStepId = result[0].next_sr_no;
 
       // STEP 3: Insert new step
       const insertSql = `
@@ -525,7 +618,7 @@ export const addSteps = (req, res) => {
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)
                       `;
 
-      db.query(insertSql, [nextStepId, eventId, eventDate, userId, description, nextStepId, taskId, status, userId], (err, insertResult) => {
+      db.query(insertSql, [nextStepId, eventId, eventDate, userId, description, stepId, taskId, status, userId], (err, insertResult) => {
         if (err) {
           console.error("Error adding step:", err);
           return res.status(500).json({ message: "Internal server error" });

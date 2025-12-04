@@ -20,7 +20,7 @@ const UpdateStep: FC<UpdateStepProps> = ({ show, setShow, Data, User, fetchAllDa
     taskdesc: "",
     status: "",
   });
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     setInputs({
       taskdesc: Data?.task_desc || "",
@@ -82,7 +82,7 @@ const UpdateStep: FC<UpdateStepProps> = ({ show, setShow, Data, User, fetchAllDa
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
+    setLoading(true);
     const body = {
       userId: User?.id || 0,
       srNo: Data.sr_no || 0,
@@ -96,6 +96,7 @@ const UpdateStep: FC<UpdateStepProps> = ({ show, setShow, Data, User, fetchAllDa
 
     const response = await updateSteps(body);
     if (response) {
+      setLoading(false);
       handleClose();
     }
   }
@@ -244,9 +245,10 @@ const UpdateStep: FC<UpdateStepProps> = ({ show, setShow, Data, User, fetchAllDa
                 </button>
                 <button
                   type="submit"
+                  disabled={loading}
                   className="px-6 py-2.5 text-sm font-medium text-white bg-orange-500 border border-orange-500 rounded-lg hover:bg-orange-600 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
                 >
-                  Submit
+                  {loading ? 'Updating' : 'Update'}
                 </button>
               </div>
             </div>

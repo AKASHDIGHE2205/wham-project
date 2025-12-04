@@ -98,6 +98,7 @@ const Dashboard = () => {
   const [attendEvents, setAttendEvents] = useState<EventForAttend[]>([]);
   const [loading, setLoading] = useState(true);
   const [showUpdate, setShowUpdate] = useState(false);
+
   const stats = [
     {
       label: 'Active Events',
@@ -186,7 +187,6 @@ const Dashboard = () => {
   }
 
   const handleUpdate = (data: any) => {
-    console.log(data);
     setSelectedEvent(data);
     setShowUpdate(true);
   }
@@ -410,14 +410,13 @@ const Dashboard = () => {
                                     event.dt_status === "C" ? "Completed" : ""
                               }
                             </p>
-
                           </div>
 
                           <div className="flex justify-end items-center gap-4">
                             {event.isapproved === "A" && (
                               <button
                                 onClick={() => handleAddAttend(event)}
-                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow hover:shadow-lg text-sm cursor-pointer"
+                                className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg shadow hover:shadow-lg text-sm cursor-pointer"
                               >
                                 Attend Event
                               </button>
@@ -546,6 +545,7 @@ const Dashboard = () => {
                 ))}
               </div>
             </div>
+
           </div>
 
         </div>

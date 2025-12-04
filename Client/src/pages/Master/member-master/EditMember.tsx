@@ -26,13 +26,11 @@ export interface Member {
   teams?: any[];
 }
 
-// Interface for TeamModal expected format
 interface TeamModalTeam {
   id: number;
   name: string;
 }
 
-// Interface for our internal team format (from API)
 export interface ApiTeam {
   team_id: number;
   name: string;
@@ -59,6 +57,7 @@ const EditMember = () => {
   const [showUser, setShowUser] = useState(false);
   const { user_id, user_name } = useSelector((state: RootState) => state.master)
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -136,12 +135,14 @@ const EditMember = () => {
       user_id: 0,
       role: ""
     })
+    dispatch(handleSelectUser({ id: 0, name: "" }))
     setSelectedTeams([])
     navigate('/master/view-members')
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     const body = {
       mem_id: id,
       first_name: inputs.first_name,
@@ -159,6 +160,7 @@ const EditMember = () => {
     }
     const response = await updateMember(body);
     if (response) {
+      setLoading(false);
       handleCancel();
     }
   }
@@ -606,9 +608,10 @@ const EditMember = () => {
                 </button>
                 <button
                   type="submit"
+                  disabled={loading}
                   className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-orange-600 to-purple-600 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
                 >
-                  Update Member
+                  {loading ? 'Updating' : 'Update'}
                 </button>
               </div>
             </form>

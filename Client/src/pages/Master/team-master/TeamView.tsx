@@ -57,10 +57,10 @@ const TeamView = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
   const filterData = data?.filter((item: Teams) =>
-    item.id.toString().toLowerCase().includes(search.toString().toLowerCase()) ||
-    item.name.toLowerCase().includes(search.toLowerCase()) ||
-    item.description.toLowerCase().includes(search.toLowerCase()) ||
-    item.status.toLowerCase().includes(search.toLowerCase())
+    item?.id.toString().toLowerCase().includes(search.toString().toLowerCase()) ||
+    item?.name.toLowerCase().includes(search.toLowerCase()) ||
+    item?.description.toLowerCase().includes(search.toLowerCase()) ||
+    item?.status.toLowerCase().includes(search.toLowerCase())
   ).slice(indexOfFirstItem, indexOfLastItem);
 
   return (
@@ -167,20 +167,20 @@ const TeamView = () => {
                       </td>
                     </tr>
                   ) : filterData?.length > 0 ? (
-                    filterData.map((item) => (
-                      <tr key={item.id} className="hover:bg-gray-50 transition-colors duration-150">
-                        <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{item.id}</td>
-                        <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{item.name}</td>
-                        <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{item.manager_name}</td>
-                        <td className="px-2 py-2 text-sm text-gray-900 hidden">{item.description}</td>
+                    filterData?.map((item) => (
+                      <tr key={item?.id} className="hover:bg-gray-50 transition-colors duration-150">
+                        <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{item?.id}</td>
+                        <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{item?.name}</td>
+                        <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{item?.manager_name}</td>
+                        <td className="px-2 py-2 text-sm text-gray-900 hidden">{item?.description}</td>
                         <td className="px-2 py-2 whitespace-nowrap">
                           <span
-                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${item.status === "A"
+                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${item?.status === "A"
                               ? "bg-green-100 text-green-800 border-green-200"
                               : "bg-red-100 text-red-800 border-red-200"
                               }`}
                           >
-                            {item.status === "A" ? "Active" : "In-active"}
+                            {item?.status === "A" ? "Active" : "In-active"}
                           </span>
                         </td>
                         <td className="px-3 py-2 whitespace-nowrap">

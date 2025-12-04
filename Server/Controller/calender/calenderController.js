@@ -222,11 +222,9 @@ export const getEvents = (req, res) => {
     return res.status(400).json({ message: "Missing userId" });
   }
 
-  // Define admin roles that can see all events
   const adminRoles = ['Master', 'Manager', 'Admin'];
   const isAdmin = adminRoles.includes(role);
 
-  // STEP 1: Get member_id from mst_members (needed for both admin and user flows)
   const getMemberQuery = `SELECT mem_id FROM mst_members WHERE user_id = ? LIMIT 1`;
 
   db.query(getMemberQuery, [userId], (err, memberData) => {
@@ -239,7 +237,7 @@ export const getEvents = (req, res) => {
     const memberId = memberData[0].mem_id;
 
     if (isAdmin) {
-      // ADMIN FLOW: Get all events without restrictions
+      // ADMIN FLOW: Get all events + organizer name
       const getAllEventsQuery = `
         SELECT DISTINCT
           eh.id AS event_id,
@@ -253,15 +251,15 @@ export const getEvents = (req, res) => {
           eh.isdeleted,
           eh.approved_by,
           eh.created_by,
+          CONCAT(mm.first_name, ' ', mm.middle_name, ' ', mm.last_name) AS organizer_name,
           eh.created_at,
           eh.updated_by,
           eh.updated_at
         FROM event_hd eh
-        WHERE 
-          eh.isdeleted = 'N'          
+        LEFT JOIN mst_members mm ON eh.created_by = mm.mem_id
+        WHERE eh.isdeleted = 'N'
         ORDER BY eh.from_date DESC, eh.created_at DESC
       `;
-      // AND isapproved != 'C'
 
       db.query(getAllEventsQuery, (err, eventsData) => {
         if (err) return res.status(500).json({ message: "Internal server error", err });
@@ -277,7 +275,6 @@ export const getEvents = (req, res) => {
       });
 
     } else {
-      // USER FLOW: Get only events assigned to the user or their teams
       const getTeamsQuery = `SELECT team_id FROM team_members WHERE member_id = ?`;
 
       db.query(getTeamsQuery, [memberId], (err, teamsData) => {
@@ -285,6 +282,7 @@ export const getEvents = (req, res) => {
 
         const userTeamIds = teamsData.map(t => t.team_id);
 
+        // USER FLOW with organizer name
         const getUserEventsQuery = `
           SELECT DISTINCT
             eh.id AS event_id,
@@ -298,12 +296,16 @@ export const getEvents = (req, res) => {
             eh.isdeleted,
             eh.approved_by,
             eh.created_by,
+            CONCAT(mm.first_name, ' ', mm.middle_name, ' ', mm.last_name) AS organizer_name,
             eh.created_at,
             eh.updated_by,
             eh.updated_at
           FROM event_hd eh
-          LEFT JOIN event_member em ON eh.id = em.event_id AND eh.event_date = em.event_date
-          LEFT JOIN event_team et ON eh.id = et.event_id AND eh.event_date = et.event_date
+          LEFT JOIN mst_members mm ON eh.created_by = mm.mem_id
+          LEFT JOIN event_member em 
+            ON eh.id = em.event_id AND eh.event_date = em.event_date
+          LEFT JOIN event_team et 
+            ON eh.id = et.event_id AND eh.event_date = et.event_date
           WHERE eh.isdeleted = 'N'
             AND (
               em.member_id = ?
@@ -330,6 +332,7 @@ export const getEvents = (req, res) => {
     }
   });
 };
+
 function fetchEventDetails(eventsData, res) {
   // Create arrays for event_id and event_date pairs for the IN clause
   const eventIdDatePairs = eventsData.map(e => [e.event_id, e.event_date]);

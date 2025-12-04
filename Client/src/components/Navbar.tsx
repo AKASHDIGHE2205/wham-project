@@ -56,22 +56,24 @@ const Navbar = () => {
 
           {/* Desktop Navigation - Middle */}
           <div className="hidden md:flex items-center space-x-4">
-            {/* Dashboard Mobile */}
+
+            {/* Home Mobile */}
             <div className="border-b border-gray-100">
               <Link
                 to={'/'}
                 className="flex items-center justify-between w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors duration-200"
               >
-                <span> Home</span>
+                Home
               </Link>
             </div>
+
             {/* Dashboard Mobile */}
             <div className="border-b border-gray-100">
               <Link
                 to={'/dashboard'}
                 className="flex items-center justify-between w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors duration-200"
               >
-                <span> Dashboard</span>
+                Dashboard
               </Link>
             </div>
 
@@ -85,7 +87,7 @@ const Navbar = () => {
                     : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
                     }`}
                 >
-                  <span>Master</span>
+                  Master
                   <svg
                     className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'Master' ? 'rotate-180' : ''
                       }`}
@@ -137,8 +139,18 @@ const Navbar = () => {
               </div>
             )}
 
+            {/* Calender Mobile */}
+            <div className="border-b border-gray-100">
+              <Link
+                to={'/calender'}
+                className="flex items-center justify-between w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors duration-200"
+              >
+                Calender
+              </Link>
+            </div>
+
             {/* Transaction Dropdown */}
-            <div className="relative">
+            <div className="relative hidden">
               <button
                 onClick={() => handleDropdownToggle('Transaction')}
                 className={`flex items-center space-x-1 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === 'Transaction'
@@ -146,7 +158,7 @@ const Navbar = () => {
                   : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
                   }`}
               >
-                <span>Transaction</span>
+                Transaction
                 <svg
                   className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'Transaction' ? 'rotate-180' : ''
                     }`}
@@ -172,7 +184,7 @@ const Navbar = () => {
             </div>
 
             {/* Reports Dropdown */}
-            <div className="relative">
+            <div className="relative ">
               <button
                 onClick={() => handleDropdownToggle('Reports')}
                 className={`flex items-center space-x-1 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === 'Reports'
@@ -180,7 +192,7 @@ const Navbar = () => {
                   : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
                   }`}
               >
-                <span>Reports</span>
+                Reports
                 <svg
                   className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'Reports' ? 'rotate-180' : ''
                     }`}
@@ -192,21 +204,22 @@ const Navbar = () => {
                 </svg>
                 {activeDropdown === 'Reports' && (
                   <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
-                    {/* <Link
-                      to="/calender"
+                    <Link
+                      to="report/report1"
                       className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200 group"
                       onClick={closeAllMenus}
                     >
                       <span className="text-lg">📅</span>
                       <span className="font-medium group-hover:translate-x-1 transition-transform duration-200">
-                        Calendar
+                        Report 1
                       </span>
-                    </Link> */}
+                    </Link>
                   </div>
                 )}
               </button>
 
             </div>
+
           </div>
 
           {/* User Profile - Right */}
@@ -216,7 +229,7 @@ const Navbar = () => {
             <div className="hidden md:block relative">
               <button
                 onClick={() => handleDropdownToggle('user')}
-                className="flex items-center space-x-2 p-1 rounded-full hover:bg-purple-50 transition-colors duration-200"
+                className="flex items-center space-x-2 p-1 rounded-full hover:bg-purple-50 transition-colors duration-200 cursor-pointer"
               >
                 <div className="w-8 h-8 bg-linear-to-r from-orange-400 to-purple-500 rounded-full flex items-center justify-center shadow-md">
                   {user?.firstName ? (
@@ -259,7 +272,7 @@ const Navbar = () => {
                     Profile
                   </Link>
                   <Link
-                    to="/auth/logout"
+                    to="/auth/log-out"
                     className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-orange-50 hover:text-orange-600 rounded-lg gap-2"
                     onClick={() => {
                       setIsMobileMenuOpen(false);
@@ -298,7 +311,8 @@ const Navbar = () => {
               <div className="border-b border-gray-100 pb-2">
                 <Link
                   to={'/'}
-                  className="flex items-center w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors duration-200"
+                  className="flex items-center w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg
+                  transition-colors duration-200"
                   onClick={handleMobileLinkClick}
                 >
                   Home
@@ -309,10 +323,11 @@ const Navbar = () => {
               <div className="border-b border-gray-100 pb-2">
                 <Link
                   to={'/dashboard'}
-                  className="flex items-center justify-between w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors duration-200"
+                  className="flex items-center w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg
+                  transition-colors duration-200"
                   onClick={handleMobileLinkClick}
                 >
-                  <span className="font-semibold">Dashboard</span>
+                  Dashboard
                 </Link>
               </div>
 
@@ -323,7 +338,7 @@ const Navbar = () => {
                     onClick={() => handleDropdownToggle('mobile-Master')}
                     className="flex items-center justify-between w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors duration-200"
                   >
-                    <span className="font-medium">Master</span>
+                    Master
                     <svg
                       className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'mobile-Master' ? 'rotate-180' : ''
                         }`}
@@ -367,15 +382,27 @@ const Navbar = () => {
                         onClick={handleMobileLinkClick}
                       >
                         <CheckSquare size={16} />
-                        Member
+                        Task
                       </Link>
                     </div>
                   )}
                 </div>
               )}
 
-              {/* Transaction Mobile */}
+              {/* Calender Mobile */}
               <div className="border-b border-gray-100 pb-2">
+                <Link
+                  to={'/calender'}
+                  className="flex items-center w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg
+                  transition-colors duration-200"
+                  onClick={handleMobileLinkClick}
+                >
+                  Calender
+                </Link>
+              </div>
+
+              {/* Transaction Mobile */}
+              <div className="border-b border-gray-100 pb-2 hidden">
                 <button
                   onClick={() => handleDropdownToggle('mobile-Transaction')}
                   className="flex items-center justify-between w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors duration-200"
@@ -406,7 +433,7 @@ const Navbar = () => {
               </div>
 
               {/* Reports Mobile */}
-              <div className="border-b border-gray-100 pb-2">
+              <div className="border-b border-gray-100 pb-2 ">
                 <button
                   onClick={() => handleDropdownToggle('mobile-Reports')}
                   className="flex items-center justify-between w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors duration-200"
@@ -424,14 +451,14 @@ const Navbar = () => {
                 </button>
                 {activeDropdown === 'mobile-Reports' && (
                   <div className="mt-2 ml-4 space-y-1">
-                    {/* <Link
-              to="/calender"
-              className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-colors duration-200"
-              onClick={handleMobileLinkClick}
-            >
-              <span>📅</span>
-              <span>Calendar</span>
-            </Link> */}
+                    <Link
+                      to="/report/report1"
+                      className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-colors duration-200"
+                      onClick={handleMobileLinkClick}
+                    >
+                      <span>📅</span>
+                      <span>Report 1</span>
+                    </Link>
                   </div>
                 )}
               </div>
@@ -495,7 +522,7 @@ const Navbar = () => {
                     Profile
                   </Link>
                   <Link
-                    to="/auth/logout"
+                    to="/auth/log-out"
                     className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-orange-50 hover:text-orange-600 rounded-lg"
                     onClick={() => {
                       setIsMobileMenuOpen(false);

@@ -466,7 +466,7 @@ export const getAllSidebarMembers = (req, res) => {
 
 export const getAllTasks = (req, res) => {
   const sql = `
-                SELECT a.id,a.task_name,a.task_desc,a.step_id,b.step_name
+                SELECT a.id,a.task_name,a.task_desc,a.step_id,b.step_name,a.status
                 FROM mst_tasks AS a 
                 LEFT JOIN mst_steps AS b ON a.step_id = b.id
               `;
@@ -505,6 +505,7 @@ export const addTask = (req, res) => {
 
 export const updateTask = (req, res) => {
   const { taskId, taskName, description, stepId, status } = req.body;
+
   const sql = `
                 UPDATE mst_tasks SET task_name=?, task_desc = ?, status = ?, step_id = ?
                 WHERE id = ?
@@ -519,7 +520,6 @@ export const updateTask = (req, res) => {
     }
     return res.status(200).json({
       message: "Task updated successfully",
-      updatedtaskId: id
     });
   }
   )

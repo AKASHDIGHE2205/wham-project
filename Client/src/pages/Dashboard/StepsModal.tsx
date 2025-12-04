@@ -1,6 +1,7 @@
 import { useEffect, useState, type FC } from "react"
 import type { Props } from "./AttendenceModal"
 import { addSteps, getActiveSteps, getActiveTasks } from "../../services/dashboard/DashboardApi";
+import toast from "react-hot-toast";
 
 export interface Steps {
   id: number;
@@ -30,12 +31,17 @@ const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, 
     taskdesc: "",
     status: "",
   });
+  const [stepLoading, setStepLoading] = useState(false);
+  const [taskLoading, setTaskLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchSteps = async () => {
+      setStepLoading(true)
       const response = await getActiveSteps();
       if (response) {
         setSteps(response.steps);
+        setStepLoading(false)
       }
     };
     fetchSteps();
@@ -43,10 +49,12 @@ const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, 
 
   useEffect(() => {
     const fetchTasks = async () => {
+      setTaskLoading(true)
       if (selectedStep && selectedStep !== 0) {
         const response = await getActiveTasks({ Id: selectedStep });
         if (response) {
           setTasks(response.tasks || []);
+          setTaskLoading(false)
         }
       } else {
         setTasks([]);
@@ -91,6 +99,10 @@ const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (!Data.event_id || !Data?.event_date || !inputs.status || !selectedStep || !selectedTask) {
+      toast.error('Please fill all required fields!')
+      return;
+    }
     const body = {
       eventId: Data.event_id || 0,
       eventDate: Data.event_date || '',
@@ -100,8 +112,10 @@ const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, 
       taskId: selectedTask || 0,
       status: inputs?.status || "",
     };
+    setLoading(true)
     const response = await addSteps(body);
     if (response) {
+      setLoading(false)
       handleClose();
     }
 
@@ -156,11 +170,15 @@ const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, 
                       required
                     >
                       <option value="0">Select Step</option>
-                      {steps?.map(item => (
-                        <option key={item.id} value={item.id}>
-                          {item.step_name}
-                        </option>
-                      ))}
+                      {stepLoading ? (
+                        <option value="" disabled>Loading...</option>
+                      ) : (
+                        steps?.map((item) => (
+                          <option key={item.id} value={item.id}>
+                            {item.step_name}
+                          </option>
+                        ))
+                      )}
                     </select>
                   </div>
                 </div>
@@ -180,16 +198,21 @@ const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, 
                       name="task"
                       onChange={handleTaskChange}
                       value={selectedTask}
-                      disabled={tasks.length === 0}
+                      disabled={taskLoading || tasks.length === 0}
                       className="w-full pl-10 px-2 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
                       required
                     >
                       <option value="0">Select Task</option>
-                      {tasks?.map(item => (
-                        <option key={item.id} value={item.id}>
-                          {item.task_name}
-                        </option>
-                      ))}
+
+                      {taskLoading ? (
+                        <option value="" disabled>Loading...</option>
+                      ) : (
+                        tasks?.map((item) => (
+                          <option key={item.id} value={item.id}>
+                            {item.task_name}
+                          </option>
+                        ))
+                      )}
                     </select>
                   </div>
                 </div>
@@ -253,9 +276,10 @@ const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, 
                 </button>
                 <button
                   type="submit"
+                  disabled={loading}
                   className="px-6 py-2.5 text-sm font-medium text-white bg-orange-500 border border-orange-500 rounded-lg hover:bg-orange-600 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
                 >
-                  Submit
+                  {loading ? 'Submiting' : 'Submit'}
                 </button>
               </div>
             </div>

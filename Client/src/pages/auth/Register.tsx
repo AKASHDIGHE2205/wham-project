@@ -15,6 +15,7 @@ const Register: React.FC = () => {
     confirmPassword: ""
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => { setInputs({ ...inputs, [e.target.name]: e.target.value }); }
@@ -39,6 +40,7 @@ const Register: React.FC = () => {
       password: inputs.password
     }
     try {
+      setLoading(true);
       const response = await registerApi(body);
       if (response) {
         setInputs({
@@ -54,6 +56,8 @@ const Register: React.FC = () => {
       }
     } catch (error) {
       console.error("Registration error:", error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -301,7 +305,8 @@ const Register: React.FC = () => {
                   type="submit"
                   className="flex-1 w-full bg-linear-to-r from-orange-500 to-purple-600 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center cursor-pointer"
                 >
-                  Register
+                  {loading ? "Registering" : "Register"}
+
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </button>
                 <p className="text-gray-600">

@@ -1,34 +1,50 @@
 import { useState, type FC } from "react";
+import StepModal from "./StepModal";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "../../../store/store";
+import { addTask } from "../../../services/master/masterApi";
+import { handleSelectStep } from "../../../feature/masterSlice";
 
 interface Props {
   show: boolean;
   setShow: (show: boolean) => void;
+  fetchData: () => void;
 }
-const AddTask: FC<Props> = ({ show, setShow }) => {
-
+const AddTask: FC<Props> = ({ show, setShow, fetchData }) => {
+  const [showSteps, setShowSteps] = useState(false);
   const [inputs, setInputs] = useState({
     name: "",
     status: "",
     description: ""
   })
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const { step_id, step_name } = useSelector((state: RootState) => state.master)
 
   if (!show) return null;
   const handleClose = () => {
+    dispatch(handleSelectStep({ id: 0, name: "" }))
+    fetchData();
     setShow(false);
   }
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setInputs({ ...inputs, [name]: value });
   };
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setLoading(true)
     const body = {
-      name: inputs.name,
-      status: inputs.status,
-      description: inputs.description
+      taskName: inputs.name || "",
+      status: inputs.status || "",
+      description: inputs.description || "",
+      stepId: step_id || 0
     }
-    console.log(body);
+    const response = await addTask(body);
+    if (response) {
+      setLoading(true)
+      handleClose();
+    }
 
   }
   return (
@@ -73,27 +89,29 @@ const AddTask: FC<Props> = ({ show, setShow }) => {
               value={inputs.name}
               onChange={handleChange}
               placeholder="Enter task name"
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
               required
             />
           </div>
 
-          {/* Manager Selection */}
+          {/* Step Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Task Manager <span className="text-orange-600">*</span>
+              Task Step <span className="text-orange-600">*</span>
             </label>
             <div className="flex gap-2">
               <div className="flex-1">
                 <input
                   type="text"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
-                  placeholder="Select task manager..."
+                  placeholder="Select task Step..."
                   readOnly
+                  value={step_name}
                 />
               </div>
               <button
                 type="button"
+                onClick={() => setShowSteps(true)}
                 className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-orange-500 to-purple-600 rounded-lg hover:shadow transition duration-300 flex items-center gap-2 cursor-pointer"
               >
                 <svg
@@ -179,14 +197,21 @@ const AddTask: FC<Props> = ({ show, setShow }) => {
             </button>
             <button
               type="submit"
+              disabled={loading}
               className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-orange-500 to-purple-600 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
             >
-              Create Task
+              {loading ? 'Submitting' : 'Submit'}
             </button>
           </div>
         </form>
-      </div >
-    </div >
+      </div>
+      {showSteps && (
+        <StepModal
+          show={showSteps}
+          setShow={setShowSteps}
+        />
+      )}
+    </div>
   )
 }
 

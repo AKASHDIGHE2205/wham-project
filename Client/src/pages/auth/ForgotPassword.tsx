@@ -12,8 +12,14 @@ const ForgotPassword: React.FC = () => {
   const [cPassword, setCPassword] = useState('');
   const [showPass, setShowPass] = useState(false)
   const [otp, setOtp] = useState(0)
-  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds (10 * 60 = 600)
+  const [timeLeft, setTimeLeft] = useState(600);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [loading, setLoading] = useState({
+    sendOtp: false,
+    verifyOtp: false,
+    resetPassword: false,
+    resendOtp: false
+  });
   const navigate = useNavigate();
   const maskedMobile = mobile ? mobile.toString().slice(0, -3).replace(/./g, "X") + mobile.toString().slice(-3) : "";
 
@@ -35,7 +41,6 @@ const ForgotPassword: React.FC = () => {
     };
   }, [isTimerRunning, timeLeft]);
 
-  // Format time to MM:SS
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -47,12 +52,22 @@ const ForgotPassword: React.FC = () => {
       toast.error("Please enter a valid mobile number.");
       return;
     }
-    const body = { mobile }
-    const response = await sendOtp(body);
-    if (response?.status === 200) {
-      setStep(2);
-      setTimeLeft(600);
-      setIsTimerRunning(true);
+
+    setLoading(prev => ({ ...prev, sendOtp: true }));
+
+    try {
+      const body = { mobile }
+      const response = await sendOtp(body);
+      if (response?.status === 200) {
+        setStep(2);
+        setTimeLeft(600);
+        setIsTimerRunning(true);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error('Failed to send OTP. Please try again.');
+    } finally {
+      setLoading(prev => ({ ...prev, sendOtp: false }));
     }
   };
 
@@ -68,14 +83,23 @@ const ForgotPassword: React.FC = () => {
       return;
     }
 
-    const body = {
-      mobile,
-      otp
-    }
-    const response = await ValidateOtp(body);
-    if (response?.status === 200) {
-      setIsTimerRunning(false); // Stop the timer
-      setStep(3);
+    setLoading(prev => ({ ...prev, verifyOtp: true }));
+
+    try {
+      const body = {
+        mobile,
+        otp
+      }
+      const response = await ValidateOtp(body);
+      if (response?.status === 200) {
+        setIsTimerRunning(false);
+        setStep(3);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error('Invalid OTP. Please try again.');
+    } finally {
+      setLoading(prev => ({ ...prev, verifyOtp: false }));
     }
   };
 
@@ -89,21 +113,30 @@ const ForgotPassword: React.FC = () => {
       return;
     }
 
-    const body = {
-      mobile,
-      password
-    }
+    setLoading(prev => ({ ...prev, resetPassword: true }));
 
-    const response = await UpdateOtp(body);
-    if (response?.status === 200) {
-      setCPassword('');
-      setMobile([]);
-      setOtp(0);
-      setPassword('');
-      setTimeLeft(600);
-      setIsTimerRunning(false);
-      setStep(1)
-      navigate('/auth/login')
+    try {
+      const body = {
+        mobile,
+        password
+      }
+
+      const response = await UpdateOtp(body);
+      if (response?.status === 200) {
+        setCPassword('');
+        setMobile([]);
+        setOtp(0);
+        setPassword('');
+        setTimeLeft(600);
+        setIsTimerRunning(false);
+        setStep(1)
+        navigate('/auth/login')
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error('Failed to reset password. Please try again.');
+    } finally {
+      setLoading(prev => ({ ...prev, resetPassword: false }));
     }
   };
 
@@ -114,15 +147,23 @@ const ForgotPassword: React.FC = () => {
       return;
     }
 
-    const body = {
-      mobile
-    }
-    const response = await sendOtp(body);
-    if (response?.status === 200) {
-      setTimeLeft(600); // Reset to 10 minutes
-      setIsTimerRunning(true); // Start the countdown
-      setOtp(0); // Clear previous OTP
-      // toast.success('New OTP sent successfully!');
+    setLoading(prev => ({ ...prev, resendOtp: true }));
+
+    try {
+      const body = {
+        mobile
+      }
+      const response = await sendOtp(body);
+      if (response?.status === 200) {
+        setTimeLeft(600); // Reset to 10 minutes
+        setIsTimerRunning(true); // Start the countdown
+        setOtp(0);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error('Failed to resend OTP. Please try again.');
+    } finally {
+      setLoading(prev => ({ ...prev, resendOtp: false }));
     }
   };
 
@@ -249,9 +290,14 @@ const ForgotPassword: React.FC = () => {
                       <button
                         type="button"
                         onClick={handleSendOtp}
-                        className="px-4 py-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors duration-200 whitespace-nowrap"
+                        disabled={loading.sendOtp}
+                        className="px-4 py-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors duration-200 whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-w-[90px]"
                       >
-                        Send OTP
+                        {loading.sendOtp ? (
+                          'Sending OTP'
+                        ) : (
+                          'Send OTP'
+                        )}
                       </button>
                     </div>
                   </div>
@@ -276,9 +322,14 @@ const ForgotPassword: React.FC = () => {
                       <button
                         type="button"
                         onClick={handleVerifyOtp}
-                        className="px-4 py-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors duration-200 whitespace-nowrap"
+                        disabled={loading.verifyOtp}
+                        className="px-4 py-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors duration-200 whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-w-[100px]"
                       >
-                        Verify OTP
+                        {loading.verifyOtp ? (
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          'Verify OTP'
+                        )}
                       </button>
                     </div>
 
@@ -296,9 +347,17 @@ const ForgotPassword: React.FC = () => {
                           <button
                             type="button"
                             onClick={handleResendOtp}
-                            className="text-sm text-orange-600 hover:text-orange-700 font-medium underline"
+                            disabled={loading.resendOtp || (isTimerRunning && timeLeft > 0)}
+                            className="text-sm text-orange-600 hover:text-orange-700 font-medium underline disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                           >
-                            Resend OTP
+                            {loading.resendOtp ? (
+                              <>
+                                <div className="w-3 h-3 border-2 border-orange-600 border-t-transparent rounded-full animate-spin mr-1"></div>
+                                Sending...
+                              </>
+                            ) : (
+                              'Resend OTP'
+                            )}
                           </button>
                         )}
                       </div>
@@ -358,10 +417,20 @@ const ForgotPassword: React.FC = () => {
                     <button
                       type="button"
                       onClick={handleResetPassword}
-                      className="w-full bg-linear-to-r from-orange-500 to-purple-600 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center hover:shadow-lg transition-shadow duration-300"
+                      disabled={loading.resetPassword}
+                      className="w-full bg-linear-to-r from-orange-500 to-purple-600 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center hover:shadow-lg transition-shadow duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
-                      Reset Password
-                      <ArrowRight className="w-4 h-4 ml-2" />
+                      {loading.resetPassword ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                          Resetting...
+                        </>
+                      ) : (
+                        <>
+                          Reset Password
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </>
+                      )}
                     </button>
                   </div>
                 </>
@@ -383,6 +452,7 @@ const ForgotPassword: React.FC = () => {
       </div>
     </div>
   );
+
 };
 
 export default ForgotPassword;
