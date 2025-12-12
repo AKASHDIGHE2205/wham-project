@@ -117,7 +117,7 @@ app.use('/api/reports', ReportRoutes);
 // HTTPS Server ONLY - Skip HTTP for now
 https.createServer(sslOptions, app).listen(PORT, () => {
   console.log(`🚀 HTTPS Server running on https://localhost:${PORT}`);
-  console.log(`📊 Test the connection: https://localhost:${PORT}/api/test`);
+  // console.log(`📊 Test the connection: https://localhost:${PORT}/api/test`);
 });
 
 // Optional: Handle uncaught errors

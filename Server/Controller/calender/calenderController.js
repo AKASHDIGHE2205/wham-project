@@ -606,3 +606,32 @@ export const updateEvent = (req, res) => {
     return res.status(500).json({ message: "Server Error" });
   }
 };
+
+export const deleteEvent = (req, res) => {
+  const { id, event_date, isdeleted } = req.body;
+
+  try {
+    if (!id || !event_date) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const sql = `
+                          UPDATE event_hd 
+                          SET isdeleted=?
+                          WHERE id=? AND event_date=?
+                        `;
+
+    db.query(sql, [isdeleted, id, event_date], (err) => {
+      if (err) {
+        console.error("event_hd update error:", err);
+        return res.status(500).json({ message: "Failed delete event" });
+      }
+      return res.status(200).json({ message: "Event deleted successfully." })
+    }
+    );
+
+  } catch (err) {
+    console.error("updateEvent Exception:", err);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};

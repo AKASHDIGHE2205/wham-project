@@ -121,11 +121,11 @@ const Profile: React.FC = () => {
             <div className="relative z-10">
               <div className="w-22 h-22 bg-linear-to-br from-orange-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl border-4 border-white">
                 <span className="text-2xl font-bold text-white">
-                  {userData.firstName?.[0]}{userData.lastName?.[0]}
+                  {userData?.firstName?.[0]}{userData?.lastName?.[0]}
                 </span>
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                {userData.firstName} {userData.lastName}
+                {userData?.firstName} {userData?.lastName}
               </h2>
               <div className="inline-flex items-center px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-medium mb-4 border border-green-200">
                 <CheckCircle className="w-4 h-4 mr-2" />
@@ -160,21 +160,22 @@ const Profile: React.FC = () => {
 
           {/* Information Cards */}
           <InfoCard icon={User} title="Personal Information">
-            <InfoItem label="First Name" value={userData.firstName} icon={User} />
-            <InfoItem label="Last Name" value={userData.lastName} icon={User} />
+            <InfoItem label="First Name" value={userData?.firstName} icon={User} />
+            <InfoItem label="Middle Name" value={userData?.middleName} icon={User} />
+            <InfoItem label="Last Name" value={userData?.lastName} icon={User} />
           </InfoCard>
 
           <InfoCard icon={Mail} title="Contact Information">
-            <InfoItem label="Email Address" value={userData.email} icon={Mail} />
-            <InfoItem label="Phone Number" value={userData.phone} icon={Phone} />
+            <InfoItem label="Email Address" value={userData?.email} icon={Mail} />
+            <InfoItem label="Phone Number" value={userData?.phone} icon={Phone} />
           </InfoCard>
 
           <InfoCard icon={IdCard} title="Account Information">
-            <InfoItem label="User ID" value={userData.id} icon={IdCard} />
-            <InfoItem label="Account Role" value={userData.role} icon={Shield} />
+            <InfoItem label="User ID" value={userData?.id} icon={IdCard} />
+            <InfoItem label="Account Role" value={userData?.role} icon={Shield} />
             <InfoItem
               label="Member Since"
-              value={userData.createdAt ? new Date(userData.createdAt).toLocaleDateString('en-US', {
+              value={userData?.createdAt ? new Date(userData?.createdAt).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'

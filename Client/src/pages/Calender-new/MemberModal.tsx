@@ -431,8 +431,8 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
                             <tr
                               key={`member-${item?.mem_id}`}
                               className={`hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${isSelected(item?.mem_id, 'member')
-                                  ? "bg-orange-50 border-l-4 border-l-orange-500"
-                                  : ""
+                                ? "bg-orange-50 border-l-4 border-l-orange-500"
+                                : ""
                                 }`}
                               onClick={() =>
                                 toggleSelection({
@@ -509,7 +509,7 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
             <button
               onClick={handleConfirm}
               disabled={selectedItems?.length === 0}
-              className="px-6 py-3 text-sm font-medium text-white bg-linear-to-r from-orange-500 to-purple-600 rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm flex items-center gap-2 cursor-pointer"
+              className="px-6 py-3 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm flex items-center gap-2 cursor-pointer"
             >
               Confirm ({selectedItems?.length}) Selection
             </button>

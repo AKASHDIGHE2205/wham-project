@@ -36,6 +36,7 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
     attenddesc: ""
   });
   const [loading, setLoading] = useState(false);
+
   const getAddressFromCoordinates = async (lat: number, lng: number): Promise<string> => {
     try {
       const response = await fetch(
@@ -136,8 +137,9 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
       toast.error('Please Select all required fields!');
       return;
     }
-
-    const currentTime = new Date().toLocaleTimeString();
+    const currentDate = new Date();
+    const currentTime = currentDate.toLocaleTimeString();
+    const punchDate = currentDate.toISOString().split('T')[0];
 
     const body = {
       eventId: Data.event_id || 0,
@@ -159,6 +161,7 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
     // Convert all values to strings before appending
     formData.append("eventId", body.eventId.toString());
     formData.append("Time", currentTime);
+    formData.append("punchDate", punchDate);
     formData.append("eventDate", body.eventDate.toString());
     formData.append("userId", body.userId.toString());
     formData.append("stepId", body.stepId.toString());
@@ -173,7 +176,6 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
 
     const response = await addAttendence(formData);
     if (response) {
-      setLoading(false);
       handleClose()
     }
   };
@@ -182,6 +184,7 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
 
   const handleClose = () => {
     setShow(false);
+    setLoading(false);
     setLocation(null);
     setSelectedEvent({});
     fetchAllData();
@@ -210,9 +213,10 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
             </div>
           </div>
           <button
-            className="flex items-center justify-center w-10 h-10 hover:bg-gray-100 text-gray-700 transition-all duration-200 hover:scale-105 hover:shadow-lg cursor-pointer"
+            className="flex items-center justify-center w-10 h-10 hover:bg-gray-100 text-gray-700 transition-all duration-200 hover:scale-105 hover:shadow-lg cursor-pointer disabled:cursor-not-allowed"
             onClick={handleClose}
             title="Close"
+            disabled={isGettingLocation}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -305,10 +309,12 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
                 <input
                   type="file"
                   name="media"
+                  accept="image/*"
                   onChange={handleFileChange}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   required
                 />
+
               </div>
             </div>
 
@@ -318,14 +324,15 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+                  disabled={isGettingLocation}
+                  className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer disabled:cursor-not-allowed"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="px-6 py-2.5 text-sm font-medium text-white bg-orange-500 border border-orange-500 rounded-lg hover:bg-orange-600 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+                  disabled={(loading) || (isGettingLocation)}
+                  className="px-6 py-2.5 text-sm font-medium text-white bg-orange-500 border border-orange-500 rounded-lg hover:bg-orange-600 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer disabled:cursor-not-allowed"
                 >
                   {loading ? 'Submiting' : 'Submit'}
                 </button>

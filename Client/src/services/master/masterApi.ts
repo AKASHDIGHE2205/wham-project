@@ -99,9 +99,12 @@ export const updateMember = async (data: any) => {
   }
 };
 
-export const getAllSidebarMembers = async () => {
+export const getAllSidebarMembers = async (data: any) => {
   try {
-    const response = await axios.get(`${BASE_URL}/master/getAllmembers`);
+    const response = await axios.post(
+      `${BASE_URL}/master/getAllSidebarMembers`,
+      data
+    );
     return response.data;
   } catch (error: any) {
     toast.error(error.response?.data?.message || "Failed to fetch teams");

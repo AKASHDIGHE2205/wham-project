@@ -5,11 +5,10 @@ import CryptoJS from "crypto-js";
 import { useEffect, useState } from 'react';
 import { getTeamMembers } from '../../services/auth/authApi';
 import { Link } from 'react-router-dom';
-import { getActiveEvents, getEventForAttend, getUpcomingEvents } from '../../services/dashboard/DashboardApi';
+import { getActiveEvents, getEventForAttend, getMemberDetailsForDashboard, getUpcomingEvents } from '../../services/dashboard/DashboardApi';
 import moment from 'moment';
 import AttendenceModal from './AttendenceModal';
 import type { Member } from '../Master/member-master/EditMember';
-import { getMemberDetails } from '../../services/master/masterApi';
 import StepsModal from './StepsModal';
 import UpdateStep from './UpdateStep';
 
@@ -151,7 +150,9 @@ const Dashboard = () => {
 
       if (!id) return;
 
-      const memberResponse = await getMemberDetails(id);
+      const memberResponse = await getMemberDetailsForDashboard(id);
+      console.log(memberResponse.member);
+
       setData(memberResponse?.member || null);
 
       const teamsResponse = await getTeamMembers({ userId: id || 0 });
@@ -172,6 +173,7 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchAllData();
   }, []);
@@ -397,19 +399,26 @@ const Dashboard = () => {
                             <h3 className="font-semibold text-gray-900">
                               Title : {event.title}
                             </h3>
-                          </div>
-
-                          <div>
-                            <p className="text-sm text-gray-800"><span className='font-medium'>Step : </span>{event.step_name}</p>
-                            <p className="text-xs text-gray-800"><span className='font-medium'>Task : </span>{event.task_name}</p>
-                            <p className="text-xs text-gray-800">
-                              <span className="font-medium">Status: </span>
+                            <p className={`px-2 py-1 rounded-full text-xs border font-semibold 
+                            ${event.dt_status === "S"
+                                ? "bg-green-100 text-green-700 border-green-200"
+                                : event.dt_status === "P"
+                                  ? "bg-yellow-100 text-yellow-700 border-yellow-200"
+                                  : event.dt_status === "C"
+                                    ? "bg-blue-100 text-blue-700 border-blue-200"
+                                    : "bg-red-100 text-red-700 border-red-200"
+                              }`}>
                               {
-                                event.dt_status === "P" ? "Process" :
+                                event.dt_status === "P" ? "Progress" :
                                   event.dt_status === "S" ? "Start" :
                                     event.dt_status === "C" ? "Completed" : ""
                               }
                             </p>
+                          </div>
+
+                          <div>
+                            <p className="text-sm text-gray-800 truncate  max-w-[200px] sm:max-w-[400px] "><span className='font-medium'>Step : </span>{event.step_name}</p>
+                            <p className="text-xs text-gray-800 truncate max-w-[200px] sm:max-w-[400px]"><span className='font-medium '>Task : </span>{event.task_name}</p>
                           </div>
 
                           <div className="flex justify-end items-center gap-4">
@@ -549,7 +558,7 @@ const Dashboard = () => {
           </div>
 
         </div>
-      </div>
+      </div >
       {showAttend && (
         <AttendenceModal
           show={showAttend}
@@ -559,26 +568,31 @@ const Dashboard = () => {
           setSelectedEvent={setSelectedEvent}
           fetchAllData={fetchAllData}
         />
-      )}
-      {showAddSteps && (
-        <StepsModal
-          show={showAddSteps}
-          setShow={setShowAddSteps}
-          Data={selectedEvent}
-          Member={data}
-          setSelectedEvent={setSelectedEvent}
-          fetchAllData={fetchAllData}
-        />
-      )}
-      {showUpdate && (
-        <UpdateStep
-          show={showUpdate}
-          setShow={setShowUpdate}
-          Data={selectedEvent}
-          User={user}
-          fetchAllData={fetchAllData}
-        />
-      )}
+      )
+      }
+      {
+        showAddSteps && (
+          <StepsModal
+            show={showAddSteps}
+            setShow={setShowAddSteps}
+            Data={selectedEvent}
+            Member={data}
+            setSelectedEvent={setSelectedEvent}
+            fetchAllData={fetchAllData}
+          />
+        )
+      }
+      {
+        showUpdate && (
+          <UpdateStep
+            show={showUpdate}
+            setShow={setShowUpdate}
+            Data={selectedEvent}
+            User={user}
+            fetchAllData={fetchAllData}
+          />
+        )
+      }
     </>
   )
 }

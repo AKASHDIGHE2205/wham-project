@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import CryptoJS from "crypto-js";
+import { Link, NavLink } from 'react-router-dom';
 import { Calendar, CheckSquare, Layers, LogOutIcon, User, Users } from "lucide-react";
-import { secretKey } from '../constant/Baseurl';
+import { getUserFromStorage } from '../helper/cryptoUser';
 
 const Navbar = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -22,19 +21,7 @@ const Navbar = () => {
     setIsMobileMenuOpen(false);
   };
 
-  const decryptUser = (encrypted: string | null) => {
-    if (!encrypted) return null;
-    try {
-      const bytes = CryptoJS.AES.decrypt(encrypted, secretKey);
-      return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-    } catch (error) {
-      console.error("Decryption failed", error);
-      return null;
-    }
-  };
-
-  const encryptedUser = localStorage.getItem("user");
-  const user = decryptUser(encryptedUser);
+  const user = getUserFromStorage();
 
   return (
     <nav className="bg-white shadow-lg border-b border-gray-100 sticky top-0 z-50">
@@ -102,38 +89,62 @@ const Navbar = () => {
                 {activeDropdown === 'Master' && (
                   <div className="absolute top-full left-0 mt-2 w-40 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
 
-                    <Link
+                    <NavLink
                       to="/master/team-view"
-                      className="flex items-center space-x-3 px-2 py-1 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200 group gap-2"
+                      className={({ isActive }) =>
+                        `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+     ${isActive
+                          ? 'bg-orange-100 text-orange-600 font-medium'
+                          : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                      }
                       onClick={closeAllMenus}
                     >
-                      <Users size={16} />
+                      <User size={16} />
                       Team
-                    </Link>
-                    <Link
+                    </NavLink>
+
+                    <NavLink
                       to="/master/view-members"
-                      className="flex items-center space-x-3 px-2 py-1 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200 group gap-2"
+                      className={({ isActive }) =>
+                        `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+     ${isActive
+                          ? 'bg-orange-100 text-orange-600 font-medium'
+                          : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                      }
                       onClick={closeAllMenus}
                     >
                       <User size={16} />
                       Member
-                    </Link>
-                    <Link
+                    </NavLink>
+
+                    <NavLink
                       to="/master/view-steps"
-                      className="flex items-center space-x-3 px-2 py-1 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200 group gap-2"
+                      className={({ isActive }) =>
+                        `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+     ${isActive
+                          ? 'bg-orange-100 text-orange-600 font-medium'
+                          : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                      }
                       onClick={closeAllMenus}
                     >
                       <Layers size={16} />
                       Steps
-                    </Link>
-                    <Link
+                    </NavLink>
+
+                    <NavLink
                       to="/master/view-tasks"
-                      className="flex items-center space-x-3 px-2 py-1 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200 group gap-2"
+                      className={({ isActive }) =>
+                        `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+     ${isActive
+                          ? 'bg-orange-100 text-orange-600 font-medium'
+                          : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                      }
                       onClick={closeAllMenus}
                     >
                       <CheckSquare size={16} />
                       Tasks
-                    </Link>
+                    </NavLink>
+
                   </div>
                 )}
               </div>
@@ -204,16 +215,21 @@ const Navbar = () => {
                 </svg>
                 {activeDropdown === 'Reports' && (
                   <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
-                    <Link
+                    <NavLink
                       to="report/report1"
-                      className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200 group"
+                      className={({ isActive }) =>
+                        `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+     ${isActive
+                          ? 'bg-orange-100 text-orange-600 font-medium'
+                          : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                      }
                       onClick={closeAllMenus}
                     >
                       <span className="text-lg">📅</span>
                       <span className="font-medium group-hover:translate-x-1 transition-transform duration-200">
                         Report 1
                       </span>
-                    </Link>
+                    </NavLink>
                   </div>
                 )}
               </button>

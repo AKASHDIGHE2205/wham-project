@@ -303,7 +303,7 @@ const Register: React.FC = () => {
               <div className="space-y-6" data-aos="fade-up" data-aos-delay="600">
                 <button
                   type="submit"
-                  className="flex-1 w-full bg-linear-to-r from-orange-500 to-purple-600 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center cursor-pointer"
+                  className="flex-1 w-full bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center cursor-pointer"
                 >
                   {loading ? "Registering" : "Register"}
 

@@ -126,7 +126,7 @@ const NewTeam: FC<Props> = ({ show, setShow, fetchData }) => {
                 <div className="flex-1">
                   <input
                     type="text"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                    className="w-full px-4 py-2 border bg-gray-100 border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
                     placeholder="Select team manager..."
                     value={`${first_name} ${middle_name} ${last_name}`}
                     readOnly
@@ -134,25 +134,10 @@ const NewTeam: FC<Props> = ({ show, setShow, fetchData }) => {
                 </div>
                 <button
                   type="button"
-                  className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-orange-500 to-purple-600 rounded-lg hover:shadow transition duration-300 flex items-center gap-2 cursor-pointer"
+                  className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 rounded-lg hover:shadow transition duration-300 flex items-center gap-2 cursor-pointer"
                   onClick={() => setShowMemModal(true)}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <line x1="19" x2="19" y1="8" y2="14" />
-                    <line x1="22" x2="16" y1="11" y2="11" />
-                  </svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-list-icon lucide-list"><path d="M3 5h.01" /><path d="M3 12h.01" /><path d="M3 19h.01" /><path d="M8 5h13" /><path d="M8 12h13" /><path d="M8 19h13" /></svg>
                 </button>
               </div>
             </div>
@@ -214,14 +199,14 @@ const NewTeam: FC<Props> = ({ show, setShow, fetchData }) => {
               <button
                 type="button"
                 onClick={handleClose}
-                className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200"
+                className="px-6 py-2 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-orange-500 to-purple-600 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
+                className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
               >
                 {loading ? 'Submitting' : 'Submit'}
               </button>

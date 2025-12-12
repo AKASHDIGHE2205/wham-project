@@ -47,7 +47,7 @@ export const deleteEvent = async (data: any) => {
       return response.data;
     }
   } catch (error: any) {
-    toast.error(error.response?.data?.message || "Failed to update event");
+    toast.error(error.response?.data?.message || "Failed to delete event");
     console.log(error);
   }
 };

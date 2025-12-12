@@ -119,7 +119,7 @@ const TeamView = () => {
                 {/* Add button */}
                 <div className="shrink-0">
                   <button
-                    className="inline-flex items-center justify-center px-4 py-2 bg-linear-to-r from-orange-500 to-purple-600 text-white font-medium rounded-lg hover:shadow-lg transition-all duration-200 shadow-sm cursor-pointer text-sm sm:text-base whitespace-nowrap"
+                    className="inline-flex items-center justify-center px-4 py-2 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 text-white font-medium rounded-lg hover:shadow-lg transition-all duration-200 shadow-sm cursor-pointer text-sm sm:text-base whitespace-nowrap"
                     onClick={handleCreate}
                   >
                     <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />

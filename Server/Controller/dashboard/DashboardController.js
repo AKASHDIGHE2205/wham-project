@@ -415,9 +415,8 @@ export const getActiveTasks = (req, res) => {
 
 export const addAttendence = async (req, res) => {
   try {
-    const { eventId, Time, eventDate, stepId, taskId, userId, location, attenddesc } = req.body;
+    const { eventId, Time, punchDate, eventDate, stepId, taskId, userId, location, attenddesc } = req.body;
     const file = req.file;
-
     let locationObj = typeof location === "string" ? JSON.parse(location) : location;
 
     const dbQuery = (sql, params = []) => {
@@ -429,30 +428,25 @@ export const addAttendence = async (req, res) => {
       });
     };
 
-    // ⭐ Step 1: CHECK IF ALREADY ATTENDED
+    // ⭐ Step 1: CHECK IF ALREADY ATTENDED OR IF PUNCH_DATE ALREADY EXISTS
     const checkQuery = `
-      SELECT 1 
+      SELECT 1
       FROM event_media
-      WHERE event_id = ?
-        AND mem_id = ?
-        AND event_date = ?
-        AND step_id = ?
+      WHERE event_id = ? 
+        AND mem_id = ? 
+        AND event_date = ? 
+        AND step_id = ? 
         AND task_id = ?
+        AND punch_date = ?
       LIMIT 1
     `;
 
-    const alreadyAttended = await dbQuery(checkQuery, [
-      eventId,
-      userId,
-      eventDate,
-      stepId,
-      taskId
-    ]);
+    const alreadyAttended = await dbQuery(checkQuery, [eventId, userId, eventDate, stepId, taskId, punchDate]);
 
     if (alreadyAttended.length > 0) {
       return res.status(400).json({
         success: false,
-        message: "You have already attended this event."
+        message: `You have already attended this event on ${punchDate}.`
       });
     }
 
@@ -477,14 +471,15 @@ export const addAttendence = async (req, res) => {
       mediaSrNo = mediaMaxResult[0].next_id;
 
       const mediaQuery = `
-        INSERT INTO event_media(sr_no, event_id, in_time, event_date, media_path, address, lat, lng, media_desc, mem_id, step_id, task_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO event_media(sr_no, event_id, in_time, punch_date, event_date, media_path, address, lat, lng, media_desc, mem_id, step_id, task_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
 
       await dbQuery(mediaQuery, [
         mediaSrNo,
         eventId,
         Time,
+        punchDate,
         eventDate,
         savePath,
         locationObj?.address ?? null,
@@ -751,11 +746,72 @@ export const updateSteps = (req, res) => {
                 WHERE sr_no = ? AND event_id = ? AND event_date = ?
               `;
 
-  db.query(sql, [status, stepId, taskId, req.body.userId, srNo, eventId, eventDate], (err, result) => {
+  db.query(sql, [status, stepId, taskId, userId, srNo, eventId, eventDate], (err, result) => {
     if (err) {
       console.error("Error updating step:", err);
       return res.status(500).json({ message: "Internal server error" });
     }
     return res.status(200).json({ message: "Step updated successfully" });
   });
+};
+
+export const getMemberDetailsForDashboard = (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const sql = `
+                  SELECT a.mem_id,a.first_name,a.middle_name,a.last_name,a.mobile,a.email,a.birth_date,a.address,
+                         a.designation,a.isorganizer,a.status,a.user_id, b.role,c.team_id,d.name,a.gender,
+                         CONCAT(b.first_name,' ',b.middle_name,' ',b.last_name) as user_name
+                  FROM mst_members AS a
+                  LEFT JOIN users AS b ON a.user_id = b.id
+                  LEFT JOIN team_members AS c ON c.member_id = a.mem_id
+                  LEFT JOIN mst_team AS d on c.team_id = d.id
+                  WHERE a.user_id = ?
+                `;
+
+    db.query(sql, [id], (err, results) => {
+      if (err) {
+        console.error("Error:", err);
+        return res.status(500).json({ message: "Internal server error" });
+      }
+
+      if (results.length === 0) {
+        return res.status(404).json({ message: "Member not found" });
+      }
+
+      const base = results[0];
+
+      const member = {
+        mem_id: base.mem_id,
+        first_name: base.first_name,
+        middle_name: base.middle_name,
+        last_name: base.last_name,
+        mobile: base.mobile,
+        email: base.email,
+        birth_date: base.birth_date,
+        address: base.address,
+        designation: base.designation,
+        isorganizer: base.isorganizer,
+        status: base.status,
+        user_id: base.user_id,
+        user_name: base.user_name,
+        role: base.role,
+        gender: base.gender,
+        teams: results.map(row => ({
+          team_id: row.team_id,
+          name: row.name
+        })).filter(team => team.team_id !== null)
+      };
+
+      return res.status(200).json({
+        message: "Member fetched successfully",
+        member
+      });
+    });
+
+  } catch (error) {
+    console.error("Exception:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
 };

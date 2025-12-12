@@ -149,7 +149,7 @@ const GoogleLocation: FC<Props> = ({ isShow, setIsShow, onLocationSelect }) => {
             <button
               onClick={handleAddLocation}
               disabled={!marker}
-              className="px-6 py-3 bg-linear-to-r from-orange-500 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+              className="px-6 py-3 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
             >
               Confirm Location
             </button>

@@ -356,7 +356,7 @@ const EventModal: FC<EventModalProps> = ({ isShow, setIsShow, selectedDate, fetc
 
                     <button
                       type="button"
-                      className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-orange-500 to-purple-600 rounded-lg hover:shadow transition duration-300 flex items-center gap-2 cursor-pointer"
+                      className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 rounded-lg hover:shadow transition duration-300 flex items-center gap-2 cursor-pointer"
                       onClick={() => setShowMember(true)}
                     >
                       <svg
@@ -529,7 +529,7 @@ const EventModal: FC<EventModalProps> = ({ isShow, setIsShow, selectedDate, fetc
 
                     <button
                       type="button"
-                      className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-orange-500 to-purple-600 rounded-lg hover:shadow transition duration-300 flex items-center gap-2 cursor-pointer"
+                      className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 rounded-lg hover:shadow transition duration-300 flex items-center gap-2 cursor-pointer"
                       onClick={() => setShowLocation(true)}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-map-pin-plus-icon lucide-map-pin-plus"><path d="M19.914 11.105A7.298 7.298 0 0 0 20 10a8 8 0 0 0-16 0c0 4.993 5.539 10.193 7.399 11.799a1 1 0 0 0 1.202 0 32 32 0 0 0 .824-.738" /><circle cx="12" cy="10" r="3" /><path d="M16 18h6" /><path d="M19 15v6" /></svg>
@@ -571,7 +571,7 @@ const EventModal: FC<EventModalProps> = ({ isShow, setIsShow, selectedDate, fetc
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-orange-500 to-purple-600 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
+                  className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
                 >
                   Add {inputs.type === 'event' ? 'Event' : 'Task'}
                 </button>

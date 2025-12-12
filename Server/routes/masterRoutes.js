@@ -21,6 +21,6 @@ router.get('/getAllSteps', getAllSteps);
 router.post('/add-step', addStep);
 router.put('/update-step', updateStep);
 
-router.get('/getAllSidebarMembers', getAllSidebarMembers);
+router.post('/getAllSidebarMembers', getAllSidebarMembers);
 
 export default router;

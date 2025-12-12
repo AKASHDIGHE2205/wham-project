@@ -131,7 +131,7 @@ export const getAllmembers = (req, res) => {
 };
 
 export const addMember = (req, res) => {
-  const { first_name, middle_name, last_name, mobile, email, address, designation, birth_date, isOrganizer, teams, } = req.body;
+  const { first_name, middle_name, last_name, mobile, email, address, designation, birth_date, isOrganizer, teams, gender } = req.body;
 
   try {
     /** ------------------------------------------
@@ -151,11 +151,11 @@ export const addMember = (req, res) => {
        * ------------------------------------------ */
       const sqlInsertMember = `
         INSERT INTO mst_members
-          (mem_id, first_name, middle_name, last_name, mobile, email, birth_date, address, designation, isorganizer, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          (mem_id, first_name, middle_name, last_name, gender, mobile, email, birth_date, address, designation, isorganizer, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
 
-      db.query(sqlInsertMember, [nextMemId, first_name, middle_name, last_name, mobile, email, birth_date, address, designation, isOrganizer, "A",], (err, insertResult) => {
+      db.query(sqlInsertMember, [nextMemId, first_name, middle_name, last_name, gender, mobile, email, birth_date, address, designation, isOrganizer, "A",], (err, insertResult) => {
         if (err) {
           console.error("Error inserting member:", err);
           return res.status(500).json({ message: "Internal server error" });
@@ -213,7 +213,7 @@ export const getMemberDetails = (req, res) => {
   try {
     const sql = `
                   SELECT a.mem_id,a.first_name,a.middle_name,a.last_name,a.mobile,a.email,a.birth_date,a.address,
-                         a.designation,a.isorganizer,a.status,a.user_id, b.role,c.team_id,d.name,
+                         a.designation,a.isorganizer,a.status,a.user_id, b.role,c.team_id,d.name,a.gender,
                          CONCAT(b.first_name,' ',b.middle_name,' ',b.last_name) as user_name
                   FROM mst_members AS a
                   LEFT JOIN users AS b ON a.user_id = b.id
@@ -249,6 +249,7 @@ export const getMemberDetails = (req, res) => {
         user_id: base.user_id,
         user_name: base.user_name,
         role: base.role,
+        gender: base.gender,
         teams: results.map(row => ({
           team_id: row.team_id,
           name: row.name
@@ -287,25 +288,19 @@ export const getUsers = (req, res) => {
 
 export const updateMember = (req, res) => {
   try {
-    const {
-      mem_id, first_name, middle_name, last_name, mobile, email,
-      address, designation, birth_date, isOrganizer, role, user_id, teams
-    } = req.body;
+    const { mem_id, first_name, middle_name, last_name, mobile, email, gender, address, designation, birth_date, isOrganizer, role, user_id, teams } = req.body;
 
     /** ------------------------------------------
      * 1. Update mst_members table
      * ------------------------------------------ */
     const sql1 = `
       UPDATE mst_members 
-      SET first_name=?, middle_name=?, last_name=?, mobile=?, email=?, address=?, 
+      SET first_name=?, middle_name=?, last_name=?, gender = ?, mobile=?, email=?, address=?, 
           designation=?, birth_date=?, isOrganizer=?, user_id=?
       WHERE mem_id = ?
     `;
 
-    db.query(sql1, [
-      first_name, middle_name, last_name, mobile, email,
-      address, designation, birth_date, isOrganizer, user_id, mem_id
-    ], (err) => {
+    db.query(sql1, [first_name, middle_name, last_name, gender, mobile, email, address, designation, birth_date, isOrganizer, user_id, mem_id], (err) => {
       if (err) {
         console.error("Error updating member:", err);
         return res.status(500).json({ message: "Internal server error" });
@@ -404,64 +399,6 @@ export const updateMember = (req, res) => {
     console.error(error);
     return res.status(500).json({ message: "Something went wrong" });
   }
-};
-
-export const getAllSidebarMembers = (req, res) => {
-  const sql = `
-      SELECT 
-        a.mem_id,
-        CONCAT(a.first_name, ' ', a.middle_name, ' ', a.last_name) AS mem_name,
-        a.mobile,
-        a.email,
-        a.birth_date,
-        a.address,
-        a.designation,
-        a.isorganizer,
-        a.status,
-        b.team_id,
-        c.name AS team_name
-      FROM mst_members AS a
-      LEFT JOIN team_members AS b ON b.member_id = a.mem_id
-      LEFT JOIN mst_team AS c ON b.team_id = c.id
-  `;
-
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.error("Error:", err);
-      return res.status(500).json({ message: "Internal server error" });
-    }
-
-    // Group by member
-    const membersMap = {};
-
-    results.forEach(row => {
-      if (!membersMap[row.mem_id]) {
-        membersMap[row.mem_id] = {
-          mem_id: row.mem_id,
-          mem_name: row.mem_name,
-          mobile: row.mobile,
-          email: row.email,
-          birth_date: row.birth_date,
-          address: row.address,
-          designation: row.designation,
-          isorganizer: row.isorganizer,
-          status: row.status,
-          teams: []
-        };
-      }
-
-      if (row.team_id) {
-        membersMap[row.mem_id].teams.push({
-          id: row.team_id,
-          name: row.team_name
-        });
-      }
-    });
-
-    const finalData = Object.values(membersMap);
-
-    res.status(200).json({ message: "Members fetched successfully", members: finalData });
-  });
 };
 
 export const getAllTasks = (req, res) => {
@@ -584,3 +521,132 @@ export const getAllSteps = (req, res) => {
   }
   );
 }
+
+export const getAllSidebarMembers = (req, res) => {
+  const { from_date, to_date, userId, role } = req.body;
+  const adminRoles = ["Admin", "Master", "Manager"];
+
+  if (!from_date || !to_date) {
+    return res.status(400).json({ message: "from_date and to_date required" });
+  }
+
+  // Get mem_id if role = User
+  const getMemIdSql = "SELECT mem_id FROM mst_members WHERE user_id = ?";
+
+  const fetchData = (limitToMemId = null) => {
+
+    /**STEP 1: Get all members in events**/
+    let membersSql = `
+      SELECT DISTINCT m.mem_id,
+        CONCAT(m.first_name, ' ', m.middle_name, ' ', m.last_name) AS mem_name,
+        m.mobile, m.email, m.birth_date, m.address,
+        m.designation, m.isorganizer, m.status
+      FROM mst_members m
+      WHERE m.mem_id IN (
+          SELECT DISTINCT em.member_id
+          FROM event_member em
+          JOIN event_hd eh ON eh.id = em.event_id
+           AND eh.event_date = em.event_date
+           AND eh.isdeleted='N'
+           AND eh.from_date <= ? AND eh.to_date >= ?
+
+          UNION
+
+          SELECT DISTINCT tm.member_id
+          FROM team_members tm
+          JOIN event_team et ON et.team_id = tm.team_id
+          JOIN event_hd eh ON eh.id = et.event_id
+           AND eh.event_date = et.event_date
+           AND eh.isdeleted='N'
+           AND eh.from_date <= ? AND eh.to_date >= ?
+      )
+    `;
+
+    const params = [to_date, from_date, to_date, from_date];
+
+    if (limitToMemId) {
+      membersSql += " AND m.mem_id = ? ";
+      params.push(limitToMemId);
+    }
+
+    db.query(membersSql, params, (err, members) => {
+      if (err) return res.status(500).json({ message: "Member fetch error" });
+
+      if (!members.length)
+        return res.status(200).json({ message: "No members", members: [] });
+
+      /**STEP 2: Fetch event stats**/
+      const statsSql = `
+                        SELECT
+                          x.mem_id,
+                          COUNT(DISTINCT CONCAT(x.event_id,'_',x.event_date)) AS total_events,
+                          COUNT(DISTINCT CONCAT(em2.event_id,'_',em2.event_date)) AS completed_events
+                        FROM (
+                            SELECT DISTINCT em.member_id AS mem_id, em.event_id, em.event_date
+                            FROM event_member em
+                            JOIN event_hd eh ON eh.id = em.event_id
+                            AND eh.event_date = em.event_date
+                            AND eh.isdeleted='N'
+                            AND eh.from_date <= ? AND eh.to_date >= ?
+
+                            UNION
+
+                            SELECT DISTINCT tm.member_id AS mem_id, et.event_id, et.event_date
+                            FROM team_members tm
+                            JOIN event_team et ON et.team_id = tm.team_id
+                            JOIN event_hd eh ON eh.id = et.event_id
+                            AND eh.event_date = et.event_date
+                            AND eh.isdeleted='N'
+                            AND eh.from_date <= ? AND eh.to_date >= ?
+                        ) x
+                        LEFT JOIN event_media em2
+                          ON em2.mem_id = x.mem_id
+                        AND em2.event_id = x.event_id
+                        AND em2.event_date = x.event_date
+                        GROUP BY x.mem_id
+                      `;
+
+
+      db.query(statsSql, params, (err, stats) => {
+        if (err) return res.status(500).json({ message: "Stats error" });
+
+        const statsMap = {};
+        stats.forEach(s => {
+          statsMap[s.mem_id] = {
+            total_events: s.total_events,
+            completed_events: s.completed_events,
+            pending_events: s.total_events - s.completed_events
+          };
+        });
+
+        const final = members.map(m => ({
+          ...m,
+          ...statsMap[m.mem_id] || {
+            total_events: 0,
+            completed_events: 0,
+            pending_events: 0
+          }
+        }));
+
+        res.status(200).json({
+          message: "Members fetched successfully",
+          members: final
+        });
+      });
+    });
+  };
+
+  // ROLE FLOW
+  if (adminRoles.includes(role)) {
+    fetchData();
+  } else if (role === "User") {
+    db.query(getMemIdSql, [userId], (err, rs) => {
+      if (err || !rs.length) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      fetchData(rs[0].mem_id);
+    });
+  } else {
+    return res.status(403).json({ message: "Unauthorized role" });
+  }
+};

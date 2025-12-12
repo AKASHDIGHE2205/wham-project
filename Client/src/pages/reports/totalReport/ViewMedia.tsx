@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { getMedia } from "../../../services/reports/reportServices";
 import { MEDIA_URL } from "../../../constant/Baseurl";
 import { MapPin, User } from "lucide-react";
+import moment from "moment";
 
 interface Props {
   show: boolean;
@@ -20,6 +21,7 @@ export interface MediaItem {
   task_id: number;
   task_name: string;
   in_time: string;
+  punch_date: string;
   media_path: string;
   address: string;
   member_name: string;
@@ -36,6 +38,8 @@ export interface MediaResponse {
 }
 
 const ViewMedia: FC<Props> = ({ show, setShow, selectedEvent }) => {
+  console.log(selectedEvent);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [allPhotos, setAllPhotos] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -110,8 +114,8 @@ const ViewMedia: FC<Props> = ({ show, setShow, selectedEvent }) => {
   const totalPhotos = allPhotos?.length;
 
   return (
-    <div className="fixed inset-0 bg-orange-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-gray-200">
+    <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-screen overflow-hidden shadow-2xl border border-gray-200">
         {/* Modal Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
@@ -124,14 +128,19 @@ const ViewMedia: FC<Props> = ({ show, setShow, selectedEvent }) => {
               <h3 className="text-xl font-bold text-gray-900">View Photos</h3>
 
               <div className="flex gap-2">
-                <span className="font-semibold">Step Name:</span>
-                <span >{currentPhoto?.step_name}</span>
+                <span className="font-semibold">Step:</span>
+                <span className="truncate max-w-[200px]">
+                  {currentPhoto ? currentPhoto?.step_name : selectedEvent?.step_name}
+                </span>
               </div>
 
               <div className="flex gap-2">
-                <span className="font-semibold">Task Name:</span>
-                <span>{currentPhoto?.task_name}</span>
+                <span className="font-semibold">Task:</span>
+                <span className="truncate max-w-[200px] sm:max-w-[600px]">
+                  {currentPhoto ? currentPhoto?.task_name : selectedEvent?.task_name}
+                </span>
               </div>
+
             </div>
 
 
@@ -139,7 +148,7 @@ const ViewMedia: FC<Props> = ({ show, setShow, selectedEvent }) => {
           <button
             type="button"
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer p-2 hover:bg-gray-100 rounded-lg"
+            className="text-black transition-colors cursor-pointer p-2 hover:bg-gray-100 rounded-lg"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -159,7 +168,7 @@ const ViewMedia: FC<Props> = ({ show, setShow, selectedEvent }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               <p className="text-lg font-medium">No photos available</p>
-              <p className="text-sm">No media found for this event</p>
+              <p className="text-sm">No media found for this task.</p>
             </div>
           ) : (
             <div className="relative w-full h-[400px] flex items-center justify-center">
@@ -167,9 +176,7 @@ const ViewMedia: FC<Props> = ({ show, setShow, selectedEvent }) => {
                 src={`${MEDIA_URL}/${currentPhoto?.media_path}`}
                 alt={`Photo ${currentIndex + 1}`}
                 className="max-h-full max-w-full object-contain rounded-lg shadow-lg"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = "https://via.placeholder.com/400x300?text=Image+Not+Found";
-                }}
+                onError={(e) => { (e.target as HTMLImageElement).src = "https://via.placeholder.com/400x300?text=Image+Not+Found"; }}
               />
 
               {/* Photo Info Overlay - Responsive Version */}
@@ -192,9 +199,9 @@ const ViewMedia: FC<Props> = ({ show, setShow, selectedEvent }) => {
                     {/* Right Column */}
                     <div className="space-y-1 sm:space-y-2">
                       <div className="flex items-center gap-1 sm:gap-3 text-xs">
-                        <div className="whitespace-nowrap">
+                        <div className="whitespace-nowrap ">
                           <span className="font-medium">Date:</span>{" "}
-                          <span className="truncate">{currentPhoto?.event_date}</span>
+                          <span className="truncate">{moment(currentPhoto?.punch_date).format("DD/MMM/YYYY")}</span>
                         </div>
                         <div className="w-px h-3 sm:h-4 bg-white/30"></div>
                         <div className="whitespace-nowrap">
@@ -230,6 +237,7 @@ const ViewMedia: FC<Props> = ({ show, setShow, selectedEvent }) => {
             </div>
           )}
         </div>
+
         {/* Modal Footer */}
         <div className="flex items-center justify-between p-6 border-t border-gray-200">
 

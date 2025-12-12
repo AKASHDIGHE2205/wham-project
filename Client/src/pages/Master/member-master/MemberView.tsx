@@ -119,7 +119,7 @@ const MemberView = () => {
               <div className="shrink-0">
                 <Link
                   to={"/master/add-member"}
-                  className="inline-flex items-center justify-center px-4 py-2 bg-linear-to-r from-orange-500 to-purple-600 text-white font-medium rounded-lg hover:shadow-lg transition-all duration-200 shadow-sm cursor-pointer text-sm sm:text-base whitespace-nowrap"
+                  className="inline-flex items-center justify-center px-4 py-2 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 text-white font-medium rounded-lg hover:shadow-lg transition-all duration-200 shadow-sm cursor-pointer text-sm sm:text-base whitespace-nowrap"
                 >
                   <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   Add Member
@@ -171,15 +171,15 @@ const MemberView = () => {
                   </tr>
                 ) : filterData?.length > 0 ? (
                   filterData?.map((item) => (
-                    <tr key={item?.mem_id} className="hover:bg-gray-50 transition-colors duration-150">
-                      <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{item?.mem_id}</td>
-                      <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{item?.mem_name}</td>
-                      <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">
+                    <tr key={item?.mem_id} className="hover:bg-orange-50 transition-colors duration-150">
+                      <td className="px-2 py-2 whitespace-nowrap text-sm text-black">{item?.mem_id}</td>
+                      <td className="px-2 py-2 whitespace-nowrap text-sm text-black">{item?.mem_name}</td>
+                      <td className="px-2 py-2 whitespace-nowrap text-sm text-black">
                         {item?.mobile || item?.email ? [item?.mobile, item?.email].filter(Boolean).join(" / ") : ""}
                       </td>
 
-                      <td className="px-2 py-2 text-sm text-gray-900">{item?.address}</td>
-                      <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-2 py-2 text-sm text-black">{item?.address}</td>
+                      <td className="px-2 py-2 whitespace-nowrap text-sm text-black">
                         {item?.teams?.map(team => team.name).join(', ') || 'No team assigned'}
                       </td>
                       <td className="px-2 py-2 whitespace-nowrap">

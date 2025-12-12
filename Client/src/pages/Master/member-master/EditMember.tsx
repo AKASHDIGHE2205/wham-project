@@ -19,6 +19,7 @@ export interface Member {
   address: string;
   designation: string;
   isorganizer: string;
+  gender: string; // Added gender field
   status: string;
   user_id: number;
   role: string | null;
@@ -49,6 +50,7 @@ const EditMember = () => {
     designation: "",
     birth_date: "",
     isOrganizer: "",
+    gender: "",
     user_id: 0,
     role: ""
   });
@@ -72,6 +74,7 @@ const EditMember = () => {
         designation: data?.designation || "",
         birth_date: data?.birth_date || "",
         isOrganizer: data?.isorganizer || "",
+        gender: data?.gender || "", // Added gender field
         user_id: data?.user_id || 0,
         role: data?.role || ""
       });
@@ -132,6 +135,7 @@ const EditMember = () => {
       designation: "",
       birth_date: "",
       isOrganizer: "",
+      gender: "", // Added gender field
       user_id: 0,
       role: ""
     })
@@ -154,6 +158,7 @@ const EditMember = () => {
       designation: inputs.designation,
       birth_date: inputs.birth_date,
       isOrganizer: inputs.isOrganizer,
+      gender: inputs.gender, // Added gender field
       role: inputs.role,
       user_id: user_id,
       teams: selectedTeams
@@ -244,6 +249,60 @@ const EditMember = () => {
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
 
                     />
+                  </div>
+                </div>
+
+                {/* Gender and Birth Date in Personal Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  {/* Gender */}
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-2">
+                      Gender
+                    </label>
+                    <div className="relative group">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      </div>
+                      <select
+                        name="gender"
+                        value={inputs.gender}
+                        onChange={handleChange}
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer"
+                      >
+                        <option value="" disabled>Select gender</option>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                        <option value="O" hidden>Other</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Birth Date */}
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-2">
+                      Birth Date
+                    </label>
+                    <div className="relative group">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <input
+                        type="date"
+                        name="birth_date"
+                        value={inputs.birth_date}
+                        onChange={handleChange}
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -354,29 +413,6 @@ const EditMember = () => {
                     </div>
                   </div>
 
-                  {/* Birth Date */}
-                  <div>
-                    <label className="block text-sm font-medium text-black mb-2">
-                      Birth Date
-                    </label>
-                    <div className="relative group">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <input
-                        type="date"
-                        name="birth_date"
-                        value={inputs.birth_date}
-                        onChange={handleChange}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                   {/* Is Organizer */}
                   <div>
                     <label className="block text-sm font-medium text-black mb-2">
@@ -406,7 +442,10 @@ const EditMember = () => {
                       </div>
                     </div>
                   </div>
+                </div>
 
+                {/* Team Selection */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                   {/* Team Selection */}
                   <div>
                     <label className="block text-sm font-medium text-black mb-2">
@@ -425,29 +464,16 @@ const EditMember = () => {
                         </div>
                         <button
                           type="button"
-                          className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-orange-500 to-purple-600 rounded-lg hover:shadow-lg transition duration-300 flex items-center gap-2 cursor-pointer"
+                          className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 rounded-lg hover:shadow-lg transition duration-300 flex items-center gap-2 cursor-pointer"
                           onClick={() => setShowTeams(true)}
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                            <circle cx="9" cy="7" r="4" />
-                            <line x1="19" x2="19" y1="8" y2="14" />
-                            <line x1="22" x2="16" y1="11" y2="11" />
-                          </svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-list-icon lucide-list"><path d="M3 5h.01" /><path d="M3 12h.01" /><path d="M3 19h.01" /><path d="M8 5h13" /><path d="M8 12h13" /><path d="M8 19h13" /></svg>
                         </button>
                       </div>
                     </div>
                   </div>
+                  {/* Empty div to maintain grid structure */}
+                  <div></div>
                 </div>
                 {/* Selected Teams Preview */}
                 {selectedTeams.length > 0 && (
@@ -570,7 +596,7 @@ const EditMember = () => {
                         </div>
                         <button
                           type="button"
-                          className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-orange-500 to-purple-600 rounded-lg hover:shadow-lg transition duration-300 flex items-center gap-2 cursor-pointer"
+                          className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 rounded-lg hover:shadow-lg transition duration-300 flex items-center gap-2 cursor-pointer"
                           onClick={() => setShowUser(true)}
                         >
                           <svg
@@ -609,7 +635,7 @@ const EditMember = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-orange-600 to-purple-600 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
+                  className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
                 >
                   {loading ? 'Updating' : 'Update'}
                 </button>

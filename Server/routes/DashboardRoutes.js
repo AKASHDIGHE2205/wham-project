@@ -1,5 +1,5 @@
 import express from "express";
-import { addAttendence, addSteps, getActiveEvents, getActiveSteps, getActiveTasks, getEventForAttend, getUpcomingEvents, updateSteps } from "../Controller/dashboard/DashboardController.js";
+import { addAttendence, addSteps, getActiveEvents, getActiveSteps, getActiveTasks, getEventForAttend, getMemberDetailsForDashboard, getUpcomingEvents, updateSteps } from "../Controller/dashboard/DashboardController.js";
 import multer from "multer";
 
 const router = express.Router();
@@ -14,5 +14,6 @@ router.post('/getEventForAttend', getEventForAttend)
 router.post('/addAttendence', upload.single("media"), addAttendence);
 router.post('/addSteps', addSteps);
 router.put('/updateSteps', updateSteps);
+router.get('/getMemberDetailsForDashboard/:id', getMemberDetailsForDashboard);
 
 export default router;

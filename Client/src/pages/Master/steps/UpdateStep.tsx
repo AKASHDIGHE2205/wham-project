@@ -169,7 +169,7 @@ const UpdateStep: FC<UpdateStepProps> = ({ show, setShow, stepData, fetchData })
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-orange-500 to-purple-600 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
+              className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
             >
               {loading ? 'Updatting' : 'Update'}
             </button>

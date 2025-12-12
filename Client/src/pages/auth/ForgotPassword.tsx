@@ -65,7 +65,6 @@ const ForgotPassword: React.FC = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error('Failed to send OTP. Please try again.');
     } finally {
       setLoading(prev => ({ ...prev, sendOtp: false }));
     }
@@ -97,7 +96,6 @@ const ForgotPassword: React.FC = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error('Invalid OTP. Please try again.');
     } finally {
       setLoading(prev => ({ ...prev, verifyOtp: false }));
     }

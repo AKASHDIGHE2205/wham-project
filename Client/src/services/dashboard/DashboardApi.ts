@@ -127,3 +127,17 @@ export const updateSteps = async (data: any) => {
     console.log(error);
   }
 };
+
+export const getMemberDetailsForDashboard = async (id: number | string) => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/dashboard/getMemberDetailsForDashboard/${id}`
+    );
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || "Failed to fetch member");
+    console.error(error);
+  }
+};

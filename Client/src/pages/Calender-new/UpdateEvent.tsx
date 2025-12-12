@@ -6,7 +6,7 @@ import CryptoJS from "crypto-js";
 import MemberModal from "./MemberModal";
 import GoogleLocation from "./GoogleLocation";
 import type { SelectedLocation, SelectedMembers, SelectedTeam } from "./NewEventModal";
-import { updateEvent } from "../../services/calender/calenderApi";
+import { deleteEvent, updateEvent } from "../../services/calender/calenderApi";
 
 export interface EventModalProps {
   isShow: boolean;
@@ -142,8 +142,8 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
       return;
     }
     const body = {
-      id: Event.event_id,
-      event_date: Event.event_date,
+      id: Event?.event_id,
+      event_date: Event?.event_date,
       title,
       fromDate,
       toDate,
@@ -162,7 +162,32 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
     }
   }
 
-  const disabled = Event.isapproved === 'C' || Event.isapproved === 'A' || !['Master', 'Admin', 'Manager'].includes(Role);
+  const handleDelete = async () => {
+    if (!Event?.event_id || !Event?.event_date) {
+      toast.error('Please fill in all required fields.');
+      return;
+    }
+
+    const isConfirmed = window.confirm(
+      'Are you sure you want to delete this event?'
+    );
+
+    if (!isConfirmed) return;
+
+    const body = {
+      id: Event.event_id,
+      event_date: Event.event_date,
+      isdeleted: "Y"
+    };
+
+    const response = await deleteEvent(body);
+    if (response) {
+      handleCancel();
+    }
+  };
+
+
+  const disabled = Event?.isapproved === 'C' || Event?.isapproved === 'A' || !['Master', 'Admin', 'Manager'].includes(Role);
 
 
   if (!isShow) return null;
@@ -170,7 +195,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
     <>
       <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100">
-          {/* Header */}
+
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white rounded-t-2xl">
             <div className="flex items-center space-x-3">
@@ -194,6 +219,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
             </div>
             <div className="flex items-center space-x-2">
               {/* Approve Toggle Button */}
+
               <div className="flex items-center space-x-2 mr-4">
                 <span className="text-sm font-medium text-gray-700">Approve</span>
                 <button
@@ -317,7 +343,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                   type="button"
                   onClick={() => setShowMember(true)}
                   disabled={disabled}
-                  className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-orange-500 to-purple-600 rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 cursor-pointer"
+                  className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-lg hover:shadow-lg disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 cursor-pointer"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-user-plus-icon lucide-user-plus">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
@@ -495,7 +521,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                     type="button"
                     onClick={() => setShowLocation(true)}
                     disabled={disabled}
-                    className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-orange-500 to-purple-600 rounded-lg hover:shadow transition duration-300 flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed"
+                    className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-lg hover:shadow transition duration-300 flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-map-pin-plus-icon lucide-map-pin-plus"><path d="M19.914 11.105A7.298 7.298 0 0 0 20 10a8 8 0 0 0-16 0c0 4.993 5.539 10.193 7.399 11.799a1 1 0 0 0 1.202 0 32 32 0 0 0 .824-.738" /><circle cx="12" cy="10" r="3" /><path d="M16 18h6" /><path d="M19 15v6" /></svg>
                   </button>
@@ -525,6 +551,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
 
             {/* Footer Buttons */}
             <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-200">
+
               <button
                 type="button"
                 onClick={handleCancel}
@@ -532,12 +559,23 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-orange-500 to-purple-600 rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm flex items-center gap-2 cursor-pointer"
-              >
-                Update Event
-              </button>
+              {((Role === "Admin") || (Role === "Master") || (Role === "Manager")) && (
+                <>
+                  <button
+                    type="button"
+                    className="px-6 py-2 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-700 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm flex items-center gap-2 cursor-pointer"
+                    onClick={handleDelete}
+                  >
+                    Delete
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm flex items-center gap-2 cursor-pointer"
+                  >
+                    Update
+                  </button>
+                </>
+              )}
             </div>
           </form>
         </div>

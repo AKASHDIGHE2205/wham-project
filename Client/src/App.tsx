@@ -7,10 +7,9 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from './store/store';
-import { BASE_URL, secretKey } from './constant/Baseurl';
+import { BASE_URL } from './constant/Baseurl';
 import axios from 'axios';
 import { login, logout } from './feature/authSlice';
-import CryptoJS from "crypto-js";
 import Loadings from './components/Loadings';
 import DefaultLayout from './layout/DefaultLayout';
 import Logout from './pages/auth/Logout';
@@ -18,6 +17,7 @@ import StepView from './pages/Master/steps/StepView';
 import TaskView from './pages/Master/task/TaskView';
 import ReportView from './pages/reports/totalReport/ReportView';
 import toast from 'react-hot-toast';
+import { getUserFromStorage } from './helper/cryptoUser';
 
 const Login = lazy(() => import('./pages/auth/Login'));
 const Register = lazy(() => import('./pages/auth/Register'));
@@ -43,19 +43,8 @@ function App() {
           const response = await axios.get(`${BASE_URL}/auth/validate-token`, {
             headers: { Authorization: `Bearer ${token}` }
           });
-
-          const decryptUser = (encrypted: string | null) => {
-            if (!encrypted) return null;
-            try {
-              const bytes = CryptoJS.AES.decrypt(encrypted, secretKey);
-              return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-            } catch (error) {
-              console.error("Decryption failed", error);
-              return null;
-            }
-          };
           if (response.status === 200) {
-            const user = decryptUser(localStorage.getItem('user'));
+            const user = getUserFromStorage();
             dispatch(login({ data: { ...user, token } }));
           }
         } catch (error: any) {

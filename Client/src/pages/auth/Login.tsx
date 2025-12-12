@@ -200,7 +200,7 @@ const Login: React.FC = () => {
               <div className="space-y-4" data-aos="fade-up" data-aos-delay="700">
                 <button
                   type="submit"
-                  className="w-full bg-linear-to-r from-orange-500 to-purple-600 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+                  className="w-full bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center hover:shadow-lg transition-shadow duration-300 cursor-pointer"
                 >
                   {loading ? 'Signing In' : "Sign In"}
 

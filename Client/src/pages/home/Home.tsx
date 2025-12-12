@@ -1,27 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Rocket, Calendar, Users, Target, Star, Award } from 'lucide-react';
-import { secretKey } from '../../constant/Baseurl';
-import CryptoJS from "crypto-js";
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { getUserFromStorage } from '../../helper/cryptoUser';
 
 const Home = () => {
   const [user, setUser] = useState<any>(null);
 
-  const decryptUser = (encrypted: string | null) => {
-    if (!encrypted) return null;
-    try {
-      const bytes = CryptoJS.AES.decrypt(encrypted, secretKey);
-      return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-    } catch (error) {
-      console.error("Decryption failed", error);
-      return null;
-    }
-  };
+  // const decryptUser = (encrypted: string | null) => {
+  //   if (!encrypted) return null;
+  //   try {
+  //     const bytes = CryptoJS.AES.decrypt(encrypted, secretKey);
+  //     return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+  //   } catch (error) {
+  //     console.error("Decryption failed", error);
+  //     return null;
+  //   }
+  // };
 
   useEffect(() => {
-    const encryptedUser = localStorage.getItem("user");
-    const decryptedUser = decryptUser(encryptedUser);
+    // const encryptedUser = localStorage.getItem("user");
+    const decryptedUser = getUserFromStorage();
     setUser(decryptedUser);
   }, []);
 
