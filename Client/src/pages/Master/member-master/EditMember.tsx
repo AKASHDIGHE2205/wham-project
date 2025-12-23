@@ -19,7 +19,7 @@ export interface Member {
   address: string;
   designation: string;
   isorganizer: string;
-  gender: string; // Added gender field
+  gender: string;
   status: string;
   user_id: number;
   role: string | null;
@@ -158,7 +158,7 @@ const EditMember = () => {
       designation: inputs.designation,
       birth_date: inputs.birth_date,
       isOrganizer: inputs.isOrganizer,
-      gender: inputs.gender, // Added gender field
+      gender: inputs.gender,
       role: inputs.role,
       user_id: user_id,
       teams: selectedTeams
@@ -215,7 +215,6 @@ const EditMember = () => {
                         onChange={handleChange}
                         placeholder="Enter first name"
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
-
                       />
                     </div>
                   </div>
@@ -247,7 +246,6 @@ const EditMember = () => {
                       onChange={handleChange}
                       placeholder="Enter last name"
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
-
                     />
                   </div>
                 </div>
@@ -332,7 +330,6 @@ const EditMember = () => {
                         onChange={handleChange}
                         placeholder="Enter mobile number"
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
-
                       />
                     </div>
                   </div>
@@ -355,7 +352,6 @@ const EditMember = () => {
                         onChange={handleChange}
                         placeholder="Enter email address"
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
-
                       />
                     </div>
                   </div>
@@ -408,7 +404,6 @@ const EditMember = () => {
                         onChange={handleChange}
                         placeholder="Enter designation"
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
-
                       />
                     </div>
                   </div>
@@ -429,7 +424,6 @@ const EditMember = () => {
                         value={inputs.isOrganizer}
                         onChange={handleChange}
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer"
-
                       >
                         <option value="" disabled>Select option</option>
                         <option value="Y">Yes</option>
@@ -560,7 +554,6 @@ const EditMember = () => {
                       <select
                         name="role"
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer"
-
                         value={inputs.role}
                         onChange={handleChange}
                       >
@@ -659,7 +652,6 @@ const EditMember = () => {
           setShow={setShowUser}
         />
       )}
-
     </>
   )
 }

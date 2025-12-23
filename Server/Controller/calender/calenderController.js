@@ -47,13 +47,12 @@ export const addEvent = (req, res) => {
       }
 
       const eventId = result[0].next_id;
-      const primaryTeam = teamsId.length > 0 ? teamsId[0] : null;
 
       // Insert into event_hd with explicit ID
       const hdSQL = `
         INSERT INTO event_hd
-        (id, title, description, from_date, to_date, team_id, isapproved, type, isdeleted, created_by, approved_by, created_at, event_date)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (id, title, description, from_date, to_date, isapproved, type, isdeleted, created_by, approved_by, created_at, event_date)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
 
       db.query(
@@ -64,7 +63,6 @@ export const addEvent = (req, res) => {
           description,
           fromDate,
           toDate,
-          primaryTeam,
           isapproved,
           type,
           isdeleted,

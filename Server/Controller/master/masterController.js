@@ -522,7 +522,7 @@ export const getAllSteps = (req, res) => {
   );
 }
 
-export const getAllSidebarMembers = (req, res) => {
+export const getAllSidebarMembers_old = (req, res) => {
   const { from_date, to_date, userId, role } = req.body;
   const adminRoles = ["Admin", "Master", "Manager"];
 
@@ -637,6 +637,160 @@ export const getAllSidebarMembers = (req, res) => {
   };
 
   // ROLE FLOW
+  if (adminRoles.includes(role)) {
+    fetchData();
+  } else if (role === "User") {
+    db.query(getMemIdSql, [userId], (err, rs) => {
+      if (err || !rs.length) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      fetchData(rs[0].mem_id);
+    });
+  } else {
+    return res.status(403).json({ message: "Unauthorized role" });
+  }
+};
+
+export const getAllSidebarMembers = (req, res) => {
+  const { from_date, to_date, userId, role } = req.body;
+
+  const adminRoles = ["Admin", "Master", "Manager"];
+
+  if (!from_date || !to_date) {
+    return res.status(400).json({ message: "from_date and to_date required" });
+  }
+
+  // Fetch member id for User role
+  const getMemIdSql = `
+    SELECT mem_id 
+    FROM mst_members 
+    WHERE user_id = ?
+  `;
+
+  const fetchData = (limitToMemId = null) => {
+
+    /* ================================
+       STEP 1: FETCH ALL MEMBERS
+    ================================= */
+    let membersSql = `
+      SELECT 
+        m.mem_id,
+        CONCAT(m.first_name, ' ', m.middle_name, ' ', m.last_name) AS mem_name,
+        m.mobile,
+        m.email,
+        m.birth_date,
+        m.address,
+        m.designation,
+        m.isorganizer,
+        m.status
+      FROM mst_members m
+    `;
+
+    const memberParams = [];
+
+    if (limitToMemId) {
+      membersSql += ` WHERE m.mem_id = ?`;
+      memberParams.push(limitToMemId);
+    }
+
+    db.query(membersSql, memberParams, (err, members) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Member fetch error" });
+      }
+
+      if (!members.length) {
+        return res.status(200).json({
+          message: "No members found",
+          members: []
+        });
+      }
+
+      /* ================================
+         STEP 2: FETCH EVENT STATS
+      ================================= */
+      const statsSql = `
+        SELECT
+          x.mem_id,
+          COUNT(DISTINCT CONCAT(x.event_id,'_',x.event_date)) AS total_events,
+          COUNT(DISTINCT CONCAT(em2.event_id,'_',em2.event_date)) AS completed_events
+        FROM (
+            SELECT DISTINCT 
+              em.member_id AS mem_id,
+              em.event_id,
+              em.event_date
+            FROM event_member em
+            JOIN event_hd eh
+              ON eh.id = em.event_id
+             AND eh.event_date = em.event_date
+             AND eh.isdeleted = 'N'
+             AND eh.from_date <= ?
+             AND eh.to_date >= ?
+
+            UNION
+
+            SELECT DISTINCT 
+              tm.member_id AS mem_id,
+              et.event_id,
+              et.event_date
+            FROM team_members tm
+            JOIN event_team et 
+              ON et.team_id = tm.team_id
+            JOIN event_hd eh
+              ON eh.id = et.event_id
+             AND eh.event_date = et.event_date
+             AND eh.isdeleted = 'N'
+             AND eh.from_date <= ?
+             AND eh.to_date >= ?
+        ) x
+        LEFT JOIN event_media em2
+          ON em2.mem_id = x.mem_id
+         AND em2.event_id = x.event_id
+         AND em2.event_date = x.event_date
+        GROUP BY x.mem_id
+      `;
+
+      const statsParams = [to_date, from_date, to_date, from_date];
+
+      db.query(statsSql, statsParams, (err, stats) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ message: "Stats fetch error" });
+        }
+
+        /* ================================
+           STEP 3: MAP STATS TO MEMBERS
+        ================================= */
+        const statsMap = {};
+
+        stats.forEach(s => {
+          statsMap[s.mem_id] = {
+            total_events: s.total_events,
+            completed_events: s.completed_events,
+            pending_events: s.total_events - s.completed_events
+          };
+        });
+
+        const finalMembers = members.map(m => ({
+          ...m,
+          ...(statsMap[m.mem_id] || {
+            total_events: 0,
+            completed_events: 0,
+            pending_events: 0
+          })
+        }));
+
+        return res.status(200).json({
+          message: "Members fetched successfully",
+          members: finalMembers
+        });
+      });
+    });
+  };
+
+  /* ================================
+     ROLE BASED ACCESS
+  ================================= */
   if (adminRoles.includes(role)) {
     fetchData();
   } else if (role === "User") {

@@ -151,8 +151,6 @@ const Dashboard = () => {
       if (!id) return;
 
       const memberResponse = await getMemberDetailsForDashboard(id);
-      console.log(memberResponse.member);
-
       setData(memberResponse?.member || null);
 
       const teamsResponse = await getTeamMembers({ userId: id || 0 });
@@ -564,7 +562,7 @@ const Dashboard = () => {
           show={showAttend}
           setShow={setShowAttend}
           Data={selectedEvent}
-          Member={data}
+          Member={user}
           setSelectedEvent={setSelectedEvent}
           fetchAllData={fetchAllData}
         />

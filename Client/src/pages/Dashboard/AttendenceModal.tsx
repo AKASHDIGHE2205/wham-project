@@ -47,8 +47,8 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
       console.log("data", data);
 
 
-      if (data.status === "OK" && data.results[0]) {
-        return data.results[0].formatted_address;
+      if (Data?.status === "OK" && Data?.results[0]) {
+        return Data?.results[0].formatted_address;
       }
       return "Address not found";
     } catch (error) {
@@ -142,11 +142,11 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
     const punchDate = currentDate.toISOString().split('T')[0];
 
     const body = {
-      eventId: Data.event_id || 0,
-      eventDate: Data.event_Date || '',
-      stepId: Data.step_no || 0,
-      taskId: Data.task_id || 0,
-      userId: Member.mem_id || 0,
+      eventId: Data?.event_id || 0,
+      eventDate: Data?.event_Date || '',
+      stepId: Data?.step_no || 0,
+      taskId: Data?.task_id || 0,
+      userId: Member?.id || 0,
       media: inputs.media || "",
       attenddesc: inputs.attenddesc || "",
       location: location ? {
@@ -159,19 +159,19 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
     const formData = new FormData();
 
     // Convert all values to strings before appending
-    formData.append("eventId", body.eventId.toString());
-    formData.append("Time", currentTime);
-    formData.append("punchDate", punchDate);
-    formData.append("eventDate", body.eventDate.toString());
-    formData.append("userId", body.userId.toString());
-    formData.append("stepId", body.stepId.toString());
-    formData.append("taskId", body.taskId.toString());
-    formData.append("attenddesc", body.attenddesc);
-    formData.append("location", JSON.stringify(body.location));
+    formData?.append("eventId", body.eventId.toString());
+    formData?.append("Time", currentTime);
+    formData?.append("punchDate", punchDate);
+    formData?.append("eventDate", body.eventDate.toString());
+    formData?.append("userId", body.userId.toString());
+    formData?.append("stepId", body.stepId.toString());
+    formData?.append("taskId", body.taskId.toString());
+    formData?.append("attenddesc", body.attenddesc);
+    formData?.append("location", JSON.stringify(body.location));
 
     // For file, append it directly (it's already a File object)
     if (body.media && typeof body.media !== 'string') {
-      formData.append("media", body.media);
+      formData?.append("media", body.media);
     }
 
     const response = await addAttendence(formData);

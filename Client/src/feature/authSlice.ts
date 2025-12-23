@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import CryptoJS from "crypto-js";
-
-const secretKey = `Malpani@2025`;
+import { secretKey } from "../constant/Baseurl";
 
 // ✅ Helper to decrypt safely
 const decryptUser = (encrypted: string | null) => {
@@ -28,17 +27,17 @@ export const authSlice = createSlice({
   reducers: {
     login: (state, action) => {
       const { data } = action.payload;
-      state.isAuthenticated = !!data.token;
-      state.user = data.user || data;
-      state.token = data.token;
+      state.isAuthenticated = !!data?.token;
+      state.user = data?.user || data;
+      state.token = data?.token;
 
       const encryptedData = CryptoJS.AES.encrypt(
-        JSON.stringify(data.user || data),
+        JSON.stringify(data?.user || data),
         secretKey
       ).toString();
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("refreshToken", data.refreshToken);
+      localStorage.setItem("token", data?.token);
+      localStorage.setItem("refreshToken", data?.refreshToken);
       localStorage.setItem("user", encryptedData);
     },
     logout: (state) => {

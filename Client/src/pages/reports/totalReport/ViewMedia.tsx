@@ -38,8 +38,6 @@ export interface MediaResponse {
 }
 
 const ViewMedia: FC<Props> = ({ show, setShow, selectedEvent }) => {
-  console.log(selectedEvent);
-
   const [currentIndex, setCurrentIndex] = useState(0);
   const [allPhotos, setAllPhotos] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);

@@ -49,7 +49,7 @@ function App() {
           }
         } catch (error: any) {
           console.log(error);
-          toast.error(error?.response?.data?.message || "Invalid token");
+          toast.error(error?.response?.data?.message || "Time Out");
           dispatch(logout());
         }
       }
