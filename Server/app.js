@@ -93,7 +93,7 @@ app.use((req, res, next) => {
 });
 
 // Test route
-app.get('/api/test', (req, res) => {
+app.get('/', (req, res) => {
   res.json({
     message: 'HTTPS server is running!',
     port: PORT,
