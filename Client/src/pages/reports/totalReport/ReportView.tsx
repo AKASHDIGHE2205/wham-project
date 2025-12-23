@@ -64,8 +64,10 @@ const ReportView = () => {
   const formatedDate = (date: any) => {
     return date.toISOString().split('T')[0];
   };
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
   const [fromDate, setFromDate] = useState(formatedDate(startOfMonthUTC));
-  const [toDate, setToDate] = useState(formatedDate(today));
+  const [toDate, setToDate] = useState(formatedDate(tomorrow));
   const [showMedia, setShowMedia] = useState(false);
   const [data, setData] = useState<Data | null>(null);
   const [loading, setLoading] = useState(false);
@@ -244,7 +246,7 @@ const ReportView = () => {
                   disabled={loading}
                   className="flex justify-center items-center px-4 py-2.5 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-lg text-white font-medium text-sm shadow-sm transition-all cursor-pointer disabled:cursor-not-allowed gap-1"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-refresh-cw-icon lucide-refresh-cw"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 16H3v5" /></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-refresh-cw-icon lucide-refresh-cw"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 16H3v5" /></svg>
                   {loading ? 'Generating...' : 'Generate'}
                 </button>
               </div>
@@ -332,7 +334,7 @@ const ReportView = () => {
                             {eventDetails?.locations?.length > 0 && (
                               <div className="border border-gray-200 p-2 rounded-lg">
                                 <div className="flex items-center justify-between gap-2 mb-2">
-                                  <div className="flex gap-2"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1B43BA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-map-pin-check-icon lucide-map-pin-check"><path d="M19.43 12.935c.357-.967.57-1.955.57-2.935a8 8 0 0 0-16 0c0 4.993 5.539 10.193 7.399 11.799a1 1 0 0 0 1.202 0 32.197 32.197 0 0 0 .813-.728" /><circle cx="12" cy="10" r="3" /><path d="m16 18 2 2 4-4" /></svg>
+                                  <div className="flex gap-2"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1B43BA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-map-pin-check-icon lucide-map-pin-check"><path d="M19.43 12.935c.357-.967.57-1.955.57-2.935a8 8 0 0 0-16 0c0 4.993 5.539 10.193 7.399 11.799a1 1 0 0 0 1.202 0 32.197 32.197 0 0 0 .813-.728" /><circle cx="12" cy="10" r="3" /><path d="m16 18 2 2 4-4" /></svg>
 
                                     <h4 className="text-sm font-semibold text-gray-700">Locations</h4>
                                   </div>
@@ -445,7 +447,7 @@ const ReportView = () => {
                                         className="px-1 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-medium flex items-center transition-colors cursor-pointer"
                                       >
                                         View Media
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1100ff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6" /></svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1100ff" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6" /></svg>
                                       </button>
                                     </div>
                                     <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-200">

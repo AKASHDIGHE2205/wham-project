@@ -43,12 +43,8 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_MAPS_API_KEY}`
       );
       const data = await response.json();
-      console.log("response", response);
-      console.log("data", data);
-
-
-      if (Data?.status === "OK" && Data?.results[0]) {
-        return Data?.results[0].formatted_address;
+      if (data?.status === "OK" && data?.results?.length > 0) {
+        return data.results[0].formatted_address;
       }
       return "Address not found";
     } catch (error) {
@@ -56,6 +52,7 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
       return "Error fetching address";
     }
   };
+
 
   const handlePunchIn = async () => {
     if (!navigator.geolocation) {
@@ -146,7 +143,7 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
       eventDate: Data?.event_Date || '',
       stepId: Data?.step_no || 0,
       taskId: Data?.task_id || 0,
-      userId: Member?.id || 0,
+      memId: Member?.mem_id || 0,
       media: inputs.media || "",
       attenddesc: inputs.attenddesc || "",
       location: location ? {
@@ -163,7 +160,7 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
     formData?.append("Time", currentTime);
     formData?.append("punchDate", punchDate);
     formData?.append("eventDate", body.eventDate.toString());
-    formData?.append("userId", body.userId.toString());
+    formData?.append("userId", body.memId.toString());
     formData?.append("stepId", body.stepId.toString());
     formData?.append("taskId", body.taskId.toString());
     formData?.append("attenddesc", body.attenddesc);

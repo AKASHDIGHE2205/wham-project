@@ -377,9 +377,9 @@ const Dashboard = () => {
                     <p className="text-orange-600">No events available</p>
                   )
                   }
-                  {attendEvents?.map((event) => (
+                  {attendEvents?.map((event, index) => (
                     <div
-                      key={event.event_id}
+                      key={index}
                       className="bg-orange-50 hover:bg-orange-100 border border-orange-100 rounded-xl p-2 hover:shadow-md transition"
                     >
                       <div className="flex gap-2">
@@ -562,7 +562,7 @@ const Dashboard = () => {
           show={showAttend}
           setShow={setShowAttend}
           Data={selectedEvent}
-          Member={user}
+          Member={data}
           setSelectedEvent={setSelectedEvent}
           fetchAllData={fetchAllData}
         />

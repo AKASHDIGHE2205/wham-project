@@ -1,5 +1,5 @@
 import { type FC, useEffect, useState } from "react";
-import { GoogleMap, Marker, useJsApiLoader, Autocomplete, } from "@react-google-maps/api";
+import { GoogleMap, Marker, useJsApiLoader, } from "@react-google-maps/api";
 import { GOOGLE_MAPS_API_KEY } from "../../constant/Baseurl";
 
 interface Props {
@@ -17,7 +17,6 @@ const GoogleLocation: FC<Props> = ({ isShow, setIsShow, onLocationSelect }) => {
   const [marker, setMarker] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedAddress, setSelectedAddress] = useState("");
   const [mapCenter, setMapCenter] = useState({ lat: 18.5308, lng: 73.8478 });
-  const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: `${GOOGLE_MAPS_API_KEY}`,
@@ -56,19 +55,6 @@ const GoogleLocation: FC<Props> = ({ isShow, setIsShow, onLocationSelect }) => {
     setMarker({ lat, lng });
     getAddress(lat, lng);
   };
-
-  const handlePlaceChanged = () => {
-    const place = autocomplete?.getPlace();
-    if (!place?.geometry?.location) return;
-
-    const lat = place.geometry.location.lat();
-    const lng = place.geometry.location.lng();
-
-    setMarker({ lat, lng });
-    setMapCenter({ lat, lng });
-    setSelectedAddress(place.formatted_address || "");
-  };
-
   const handleAddLocation = () => {
     if (marker && selectedAddress) {
       onLocationSelect({
@@ -92,23 +78,20 @@ const GoogleLocation: FC<Props> = ({ isShow, setIsShow, onLocationSelect }) => {
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-xl p-6 max-w-2xl w-full shadow-2xl">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Select Location</h2>
+        <div className=" flex justify-between">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Select Location</h2>
+          <button
+            onClick={() => setIsShow(false)}
+            className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer p-2 hover:bg-gray-100 rounded-lg"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
         {isLoaded ? (
           <>
-            <div className="mb-4" >
-              <Autocomplete
-                onLoad={setAutocomplete}
-                onPlaceChanged={handlePlaceChanged}
-              >
-                <input
-                  type="text"
-                  placeholder="Search a location..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all"
-                />
-              </Autocomplete>
-            </div>
-
             {/* Map container with original styling */}
             <div className="rounded-lg overflow-hidden border border-gray-300">
               <GoogleMap
@@ -127,12 +110,12 @@ const GoogleLocation: FC<Props> = ({ isShow, setIsShow, onLocationSelect }) => {
           </div>
         )}
 
-        <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <p className="text-gray-700 mb-2">
-            <span className="font-semibold">Selected Address:</span> {selectedAddress || "Click on map or search to select location"}
+        <div className="mt-2 p-2 bg-green-100 rounded-lg border border-green-300">
+          <p className="text-green-700 mb-2 text-sm">
+            <span className="font-semibold">Selected Address:</span> {selectedAddress || "Click on map to select location"}
           </p>
           {marker && (
-            <p className="text-sm text-gray-600">
+            <p className="text-xs text-green-600">
               <strong>Coordinates:</strong> Lat: {marker.lat.toFixed(6)}, Lng: {marker.lng.toFixed(6)}
             </p>
           )}

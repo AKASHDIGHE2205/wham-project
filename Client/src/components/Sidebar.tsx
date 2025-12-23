@@ -38,9 +38,12 @@ const Sidebar = () => {
   };
 
   const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
   const [fromDate] = useState(formatDate(firstDayOfMonth));
-  const [toDate] = useState(formatDate(today));
+  const [toDate] = useState(formatDate(tomorrow));
 
   const fetchData = async () => {
     setLoading(true)
@@ -111,7 +114,7 @@ const Sidebar = () => {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 text-sm"
+            className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent transition-all duration-300 text-sm"
             placeholder="Search members by name..."
           />
           {search && (
