@@ -297,25 +297,26 @@ const Register: React.FC = () => {
                     />
                   </div>
                 </div>
+                {/*Button */}
+                <div className="space-y-6">
+                  <button
+                    type="submit"
+                    className="flex-1 w-full bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center cursor-pointer"
+                  >
+                    {loading ? "Registering" : "Register"}
+
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </button>
+                  <p className="text-gray-600">
+                    Already have an account?{" "}
+                    <Link to="/auth/login" className="text-orange-600 hover:underline font-medium">
+                      Sign in here
+                    </Link>
+                  </p>
+                </div>
               </div>
 
-              {/*Button */}
-              <div className="space-y-6" data-aos="fade-up" data-aos-delay="600">
-                <button
-                  type="submit"
-                  className="flex-1 w-full bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center cursor-pointer"
-                >
-                  {loading ? "Registering" : "Register"}
 
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </button>
-                <p className="text-gray-600">
-                  Already have an account?{" "}
-                  <Link to="/auth/login" className="text-orange-600 hover:underline font-medium">
-                    Sign in here
-                  </Link>
-                </p>
-              </div>
             </form>
           </div>
         </div>

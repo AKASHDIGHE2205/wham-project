@@ -396,11 +396,27 @@ export const getActiveSteps = (req, res) => {
   });
 }
 
-export const getActiveTasks = (req, res) => {
+export const getActiveTasks_old = (req, res) => {
   const { Id } = req.params;
   const sql = `SELECT * FROM mst_tasks WHERE status = 'A' AND step_id=?`;
 
   db.query(sql, [Id], (err, results) => {
+    if (err) {
+      console.error("Error fetching tasks:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+
+    return res.status(200).json({
+      message: "Tasks fetched successfully",
+      tasks: results
+    });
+  });
+}
+
+export const getActiveTasks = (req, res) => {
+  const sql = `SELECT * FROM mst_tasks WHERE status = 'A'`;
+
+  db.query(sql, (err, results) => {
     if (err) {
       console.error("Error fetching tasks:", err);
       return res.status(500).json({ message: "Internal server error" });

@@ -9,7 +9,8 @@ const upload = multer({ storage });
 router.post('/getUpcomingEvents', getUpcomingEvents)
 router.post('/getActiveEvents', getActiveEvents)
 router.get('/getActiveSteps', getActiveSteps)
-router.get('/getActiveTasks/:Id', getActiveTasks)
+// router.get('/getActiveTasks/:Id', getActiveTasks)
+router.get('/getActiveTasks', getActiveTasks)
 router.post('/getEventForAttend', getEventForAttend)
 router.post('/addAttendence', upload.single("media"), addAttendence);
 router.post('/addSteps', addSteps);

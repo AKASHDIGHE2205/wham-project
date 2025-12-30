@@ -12,7 +12,6 @@ export interface Props {
   Member: any;
   setSelectedEvent: (event: any) => void;
   fetchAllData: () => void;
-
 }
 
 interface Location {
@@ -307,6 +306,7 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
                   type="file"
                   name="media"
                   accept="image/*"
+                  capture="environment"
                   onChange={handleFileChange}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   required

@@ -44,24 +44,34 @@ const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, 
         setStepLoading(false)
       }
     };
-    fetchSteps();
-  }, []);
-
-  useEffect(() => {
     const fetchTasks = async () => {
       setTaskLoading(true)
-      if (selectedStep && selectedStep !== 0) {
-        const response = await getActiveTasks({ Id: selectedStep });
-        if (response) {
-          setTasks(response.tasks || []);
-          setTaskLoading(false)
-        }
-      } else {
-        setTasks([]);
+
+      const response = await getActiveTasks();
+      if (response) {
+        setTasks(response.tasks || []);
+        setTaskLoading(false)
       }
     };
     fetchTasks();
-  }, [selectedStep]);
+    fetchSteps();
+  }, []);
+
+  // useEffect(() => {
+  //   const fetchTasks = async () => {
+  //     setTaskLoading(true)
+  //     if (selectedStep && selectedStep !== 0) {
+  //       const response = await getActiveTasks({ Id: selectedStep });
+  //       if (response) {
+  //         setTasks(response.tasks || []);
+  //         setTaskLoading(false)
+  //       }
+  //     } else {
+  //       setTasks([]);
+  //     }
+  //   };
+  //   fetchTasks();
+  // }, [selectedStep]);
 
   const handleStepChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const stepValue = parseInt(event.target.value);
@@ -96,8 +106,8 @@ const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, 
     });
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
     if (!Data.event_id || !Data?.event_date || !inputs.status || !selectedStep || !selectedTask) {
       toast.error('Please fill all required fields!')
@@ -120,6 +130,7 @@ const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, 
     }
 
   }
+
   return (
     <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100">

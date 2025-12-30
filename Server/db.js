@@ -26,6 +26,8 @@
 // });
 
 // export default db;
+
+
 // db.js
 import mysql from "mysql";
 import dotenv from "dotenv";

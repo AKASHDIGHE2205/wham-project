@@ -45,7 +45,19 @@ export const getActiveSteps = async () => {
   }
 };
 
-export const getActiveTasks = async (params: { Id: number }) => {
+export const getActiveTasks = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/dashboard/getActiveTasks`);
+    return response.data;
+  } catch (error: any) {
+    toast.error(
+      error.response?.data?.message || "Failed to fetch Active Tasks"
+    );
+    console.log(error);
+  }
+};
+
+export const getActiveTasks_old = async (params: { Id: number }) => {
   try {
     const response = await axios.get(
       `${BASE_URL}/dashboard/getActiveTasks/${params.Id}`

@@ -132,7 +132,7 @@ const Login: React.FC = () => {
             <hr className='text-orange-600 mb-4' />
             {/* Login Form */}
             <form className="space-y-6" onSubmit={handleSubmit}>
-              <div className="space-y-6" data-aos="fade-up" data-aos-delay="500">
+              <div className="space-y-6">
                 {/* Email Field */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Email Address <span className='text-red-600'>*</span> </label>
@@ -180,7 +180,7 @@ const Login: React.FC = () => {
               </div>
 
               {/* Remember Me & Forgot Password */}
-              <div className="flex items-center justify-between" data-aos="fade-up" data-aos-delay="600">
+              <div className="flex items-center justify-between" >
                 <div className="flex items-center hidden">
                   <input
                     type="checkbox"
@@ -197,7 +197,7 @@ const Login: React.FC = () => {
               </div>
 
               {/* Submit Button */}
-              <div className="space-y-4" data-aos="fade-up" data-aos-delay="700">
+              <div className="space-y-4" >
                 <button
                   type="submit"
                   className="w-full bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center hover:shadow-lg transition-shadow duration-300 cursor-pointer"
