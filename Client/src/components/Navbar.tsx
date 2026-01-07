@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Calendar, CheckSquare, Layers, LogOutIcon, User, Users } from "lucide-react";
+import { ActivityIcon, Calendar, CheckSquare, FileBarChart, Home, Layers, LogOutIcon, ShieldCheck, User, Users } from "lucide-react";
 import { getUserFromStorage } from '../helper/cryptoUser';
 
 const Navbar = () => {
@@ -46,22 +46,34 @@ const Navbar = () => {
 
             {/* Home Mobile */}
             <div className="border-b border-gray-100">
-              <Link
+              <NavLink
                 to={'/'}
-                className="flex items-center justify-between w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors duration-200"
+                className={({ isActive }) =>
+                  `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                    ? 'bg-orange-100 text-orange-600'
+                    : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'}`
+                }
               >
+                <Home size={16} />
                 Home
-              </Link>
+              </NavLink>
             </div>
 
             {/* Dashboard Mobile */}
             <div className="border-b border-gray-100">
-              <Link
+              <NavLink
                 to={'/dashboard'}
-                className="flex items-center justify-between w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors duration-200"
+                className={({ isActive }) =>
+                  `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                    ? 'bg-orange-100 text-orange-600'
+                    : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'}`
+                }
               >
+                <ActivityIcon size={16} />
                 Dashboard
-              </Link>
+              </NavLink>
             </div>
 
             {/* Master Dropdown */}
@@ -74,6 +86,7 @@ const Navbar = () => {
                     : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
                     }`}
                 >
+                  <ShieldCheck size={16} />
                   Master
                   <svg
                     className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'Master' ? 'rotate-180' : ''
@@ -99,7 +112,7 @@ const Navbar = () => {
                       }
                       onClick={closeAllMenus}
                     >
-                      <User size={16} />
+                      <Users size={16} />
                       Team
                     </NavLink>
 
@@ -152,12 +165,18 @@ const Navbar = () => {
 
             {/* Calender Mobile */}
             <div className="border-b border-gray-100">
-              <Link
+              <NavLink
                 to={'/calender'}
-                className="flex items-center justify-between w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors duration-200"
+                className={({ isActive }) =>
+                  `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                    ? 'bg-orange-100 text-orange-600'
+                    : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'}`
+                }
               >
+                <Calendar size={16} />
                 Calender
-              </Link>
+              </NavLink>
             </div>
 
             {/* Transaction Dropdown */}
@@ -203,6 +222,7 @@ const Navbar = () => {
                   : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
                   }`}
               >
+                <FileBarChart size={16} />
                 Reports
                 <svg
                   className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'Reports' ? 'rotate-180' : ''
@@ -276,9 +296,14 @@ const Navbar = () => {
                     <p className="text-sm font-semibold text-orange-600">{user?.firstName} {' '} {user?.lastName}</p>
                     <p className="text-sm text-gray-600 hover:text-gray-700 ">{user?.email}</p>
                   </div>
-                  <Link
+                  <NavLink
                     to="/auth/profile"
-                    className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-orange-50 hover:text-orange-600 rounded-lg gap-2"
+                    className={({ isActive }) =>
+                      `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                        ? 'bg-orange-100 text-orange-600'
+                        : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                    }
                     onClick={() => {
                       setIsMobileMenuOpen(false);
                       setActiveDropdown(null);
@@ -286,7 +311,7 @@ const Navbar = () => {
                   >
                     <User size={16} />
                     Profile
-                  </Link>
+                  </NavLink>
                   <Link
                     to="/auth/log-out"
                     className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-orange-50 hover:text-orange-600 rounded-lg gap-2"
@@ -325,26 +350,40 @@ const Navbar = () => {
 
               {/* Home Mobile */}
               <div className="border-b border-gray-100 pb-2">
-                <Link
+                <NavLink
                   to={'/'}
-                  className="flex items-center w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg
-                  transition-colors duration-200"
+                  className={({ isActive }) =>
+                    `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                      ? 'bg-orange-100 text-orange-600'
+                      : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                  }
                   onClick={handleMobileLinkClick}
                 >
-                  Home
-                </Link>
+                  <span className=' font-medium flex justify-center items-center gap-2'>
+                    <Home size={16} />
+                    Home
+                  </span>
+                </NavLink>
               </div>
 
               {/* Dashboard Mobile */}
               <div className="border-b border-gray-100 pb-2">
-                <Link
+                <NavLink
                   to={'/dashboard'}
-                  className="flex items-center w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg
-                  transition-colors duration-200"
+                  className={({ isActive }) =>
+                    `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                      ? 'bg-orange-100 text-orange-600'
+                      : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                  }
                   onClick={handleMobileLinkClick}
                 >
-                  Dashboard
-                </Link>
+                  <span className='flex justify-center items-center gap-2 font-medium'>
+                    <ActivityIcon size={16} />
+                    Dashboard
+                  </span>
+                </NavLink>
               </div>
 
               {/* Master Mobile */}
@@ -352,9 +391,14 @@ const Navbar = () => {
                 <div className="border-b border-gray-100 pb-2">
                   <button
                     onClick={() => handleDropdownToggle('mobile-Master')}
-                    className="flex items-center justify-between w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors duration-200"
-                  >
-                    Master
+                    className={`flex justify-between w-full items-center space-x-1 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === 'mobile-Master'
+                      ? 'bg-orange-50 text-orange-600 border border-orange-200'
+                      : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
+                      }`}
+                  ><div className='flex justify-center items-center gap-2'>
+                      <ShieldCheck size={16} />
+                      Master
+                    </div>
                     <svg
                       className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'mobile-Master' ? 'rotate-180' : ''
                         }`}
@@ -368,38 +412,58 @@ const Navbar = () => {
 
                   {activeDropdown === 'mobile-Master' && (
                     <div className="mt-2 ml-4 space-y-1">
-                      <Link
+                      <NavLink
                         to="/master/team-view"
-                        className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-colors duration-200 gap-2"
+                        className={({ isActive }) =>
+                          `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                            ? 'bg-orange-100 text-orange-600'
+                            : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                        }
                         onClick={handleMobileLinkClick}
                       >
                         <Users size={16} />
                         Team
-                      </Link>
-                      <Link
+                      </NavLink>
+                      <NavLink
                         to="/master/view-members"
-                        className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-colors duration-200 gap-2"
+                        className={({ isActive }) =>
+                          `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                            ? 'bg-orange-100 text-orange-600'
+                            : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                        }
                         onClick={handleMobileLinkClick}
                       >
                         <User size={16} />
                         Member
-                      </Link>
-                      <Link
+                      </NavLink>
+                      <NavLink
                         to="/master/view-steps"
-                        className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-colors duration-200 gap-2"
+                        className={({ isActive }) =>
+                          `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                            ? 'bg-orange-100 text-orange-600'
+                            : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                        }
                         onClick={handleMobileLinkClick}
                       >
                         <Layers size={16} />
                         Steps
-                      </Link>
-                      <Link
+                      </NavLink>
+                      <NavLink
                         to="/master/view-tasks"
-                        className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-colors duration-200 gap-2"
+                        className={({ isActive }) =>
+                          `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                            ? 'bg-orange-100 text-orange-600'
+                            : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                        }
                         onClick={handleMobileLinkClick}
                       >
                         <CheckSquare size={16} />
                         Task
-                      </Link>
+                      </NavLink>
                     </div>
                   )}
                 </div>
@@ -407,14 +471,21 @@ const Navbar = () => {
 
               {/* Calender Mobile */}
               <div className="border-b border-gray-100 pb-2">
-                <Link
+                <NavLink
                   to={'/calender'}
-                  className="flex items-center w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg
-                  transition-colors duration-200"
+                  className={({ isActive }) =>
+                    `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                      ? 'bg-orange-100 text-orange-600'
+                      : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                  }
                   onClick={handleMobileLinkClick}
                 >
-                  Calender
-                </Link>
+                  <span className=' font-medium flex justify-center items-center gap-2'>
+                    <Calendar size={16} />
+                    Calender
+                  </span>
+                </NavLink>
               </div>
 
               {/* Transaction Mobile */}
@@ -441,8 +512,10 @@ const Navbar = () => {
                       className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-colors duration-200"
                       onClick={handleMobileLinkClick}
                     >
-                      <span>📅</span>
-                      <span>Calendar</span>
+                      <span className='font-medium flex justify-center items-center gap-2'>
+                        <Calendar size={16} />
+                        Calendar
+                      </span>
                     </Link>
                   </div>
                 )}
@@ -452,9 +525,14 @@ const Navbar = () => {
               <div className="border-b border-gray-100 pb-2 ">
                 <button
                   onClick={() => handleDropdownToggle('mobile-Reports')}
-                  className="flex items-center justify-between w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors duration-200"
-                >
-                  <span className="font-medium">Reports</span>
+                  className={`flex justify-between w-full items-center space-x-1 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === 'mobile-Reports'
+                    ? 'bg-orange-50 text-orange-600 border border-orange-200'
+                    : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
+                    }`}
+                ><div className='flex justify-center items-center gap-2'>
+                    <FileBarChart size={16} />
+                    Report
+                  </div>
                   <svg
                     className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'mobile-Reports' ? 'rotate-180' : ''
                       }`}
@@ -467,14 +545,18 @@ const Navbar = () => {
                 </button>
                 {activeDropdown === 'mobile-Reports' && (
                   <div className="mt-2 ml-4 space-y-1">
-                    <Link
+                    <NavLink
                       to="/report/report1"
-                      className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-colors duration-200"
+                      className={({ isActive }) =>
+                        `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                          ? 'bg-orange-100 text-orange-600'
+                          : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                      }
                       onClick={handleMobileLinkClick}
                     >
-                      <span>📅</span>
                       <span>Report 1</span>
-                    </Link>
+                    </NavLink>
                   </div>
                 )}
               </div>
@@ -526,9 +608,14 @@ const Navbar = () => {
                     <p className="text-sm text-gray-500">{user?.email}</p>
                   </div>
 
-                  <Link
+                  <NavLink
                     to="/auth/profile"
-                    className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-orange-50 hover:text-orange-600 rounded-lg"
+                    className={({ isActive }) =>
+                      `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                        ? 'bg-orange-100 text-orange-600'
+                        : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                    }
                     onClick={() => {
                       setIsMobileMenuOpen(false);
                       setActiveDropdown(null);
@@ -536,7 +623,7 @@ const Navbar = () => {
                   >
                     <User size={16} />
                     Profile
-                  </Link>
+                  </NavLink>
                   <Link
                     to="/auth/log-out"
                     className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-orange-50 hover:text-orange-600 rounded-lg"

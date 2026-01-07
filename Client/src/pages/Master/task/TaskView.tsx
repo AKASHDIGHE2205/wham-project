@@ -37,7 +37,6 @@ const TaskView = () => {
     }
   }
   useEffect(() => {
-
     fetchData();
   }, [])
 
@@ -69,7 +68,7 @@ const TaskView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white p-2 sm:p-6">
+    <div className="min-h-screen bg-orange-50/30 p-2 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">

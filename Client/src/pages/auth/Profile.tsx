@@ -2,28 +2,15 @@
 import React, { useEffect, useState } from 'react';
 import { User, Mail, CheckCircle, IdCard, Phone, Shield, Zap, Sparkles, ChevronDown, ChevronUp, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import CryptoJS from 'crypto-js';
 import { getTeamMembers } from '../../services/auth/authApi';
+import { getUserFromStorage } from '../../helper/cryptoUser';
 
 const Profile: React.FC = () => {
   const [data, setData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const secretKey = `Malpani@2025`;
   const [showTeams, setShowTeams] = useState(false);
 
-  const decryptUser = (encrypted: string | null) => {
-    if (!encrypted) return null;
-    try {
-      const bytes = CryptoJS.AES.decrypt(encrypted, secretKey);
-      return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-    } catch (error) {
-      console.error("Decryption failed", error);
-      return null;
-    }
-  };
-
-  const encryptedUser = localStorage.getItem("user");
-  const userData = decryptUser(encryptedUser);
+  const userData = getUserFromStorage();
 
   useEffect(() => {
     const fetchTeamData = async () => {
@@ -173,15 +160,6 @@ const Profile: React.FC = () => {
           <InfoCard icon={IdCard} title="Account Information">
             <InfoItem label="User ID" value={userData?.id} icon={IdCard} />
             <InfoItem label="Account Role" value={userData?.role} icon={Shield} />
-            <InfoItem
-              label="Member Since"
-              value={userData?.createdAt ? new Date(userData?.createdAt).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              }) : "N/A"}
-              icon={CheckCircle}
-            />
           </InfoCard>
 
           {/* Teams Card */}

@@ -1,16 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Calendar, BarChart3, Users, Rocket, ChevronRight, Clock, MapPin, Calendar1 } from 'lucide-react';
-import { secretKey } from '../../constant/Baseurl';
-import CryptoJS from "crypto-js";
-import { useEffect, useState } from 'react';
-import { getTeamMembers } from '../../services/auth/authApi';
-import { Link } from 'react-router-dom';
-import { getActiveEvents, getEventForAttend, getMemberDetailsForDashboard, getUpcomingEvents } from '../../services/dashboard/DashboardApi';
 import moment from 'moment';
-import AttendenceModal from './AttendenceModal';
-import type { Member } from '../Master/member-master/EditMember';
 import StepsModal from './StepsModal';
 import UpdateStep from './UpdateStep';
+import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import AttendenceModal from './AttendenceModal';
+import { getTeamMembers } from '../../services/auth/authApi';
+import type { Member } from '../Master/member-master/EditMember';
+import { Calendar, BarChart3, Users, Rocket, ChevronRight, Clock, MapPin, Calendar1 } from 'lucide-react';
+import { getActiveEvents, getEventForAttend, getMemberDetailsForDashboard, getUpcomingEvents } from '../../services/dashboard/DashboardApi';
+import { getUserFromStorage } from '../../helper/cryptoUser';
 
 export interface EventMember {
   event_id: number;
@@ -122,19 +121,7 @@ const Dashboard = () => {
     },
   ];
 
-  const decryptUser = (encrypted: string | null) => {
-    if (!encrypted) return null;
-    try {
-      const bytes = CryptoJS.AES.decrypt(encrypted, secretKey);
-      return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-    } catch (error) {
-      console.error("Decryption failed", error);
-      return null;
-    }
-  };
-
-  const encryptedUser = localStorage.getItem("user");
-  const user = decryptUser(encryptedUser);
+  const user = getUserFromStorage();
 
   const fetchAllData = async () => {
     setLoading(true);
@@ -205,7 +192,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-linear-to-br from-white to-orange-50/30">
+      <div className="min-h-screen bg-orange-50/30 border border-orange-300 m-1 rounded-md">
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
@@ -347,7 +334,7 @@ const Dashboard = () => {
                           </div>
 
                           <div className="flex justify-end items-center gap-4 space-y-2 ">
-                            {(["Admin", "Manager", "Master"].includes(user?.role) || data?.isorganizer === "A") && (
+                            {user && (["Admin", "Manager", "Master"].includes(user?.role) || data?.isorganizer === "A") && (
                               <button
                                 className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow hover:shadow-lg text-sm cursor-pointer"
                                 onClick={() => handleAddSteps(event)}

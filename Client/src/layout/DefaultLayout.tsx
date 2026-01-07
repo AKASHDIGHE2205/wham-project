@@ -7,7 +7,7 @@ const DefaultLayout = () => {
   return (
     <div className="flex h-screen">
       {/* <!-- Sidebar - Hidden on mobile, compact on desktop --> */}
-      <div className="hidden md:block bg-white border-r border-gray-100 h-screen overflow-hidden">
+      <div className="hidden md:block bg-white border-r border-orange-300 h-screen overflow-hidden">
         <Sidebar />
       </div>
 
@@ -18,8 +18,8 @@ const DefaultLayout = () => {
         </div>
 
         {/* <!-- Main Content --> */}
-        <main className="flex-1 bg-Linear-to-br from-orange-50 to-blue-50 overflow-auto">
-          <div className="h-full w-full p-4">
+        <main className="flex-1 bg-orange-50 overflow-auto">
+          <div className="h-full w-full">
             <Outlet />
           </div>
         </main>

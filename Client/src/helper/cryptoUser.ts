@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import CryptoJS from "crypto-js";
+import Cookies from "js-cookie";
 import { secretKey } from "../constant/Baseurl";
+
 export interface User {
   id: number;
   firstName: string;
@@ -7,11 +10,14 @@ export interface User {
   lastName: string;
   email: string;
   phone: string;
-  role: "Admin" | "Master" | "Manager" | "User";
+  role: string;
   token: string;
 }
 
-export const decryptUser = <T = User>(encrypted: string | null): T | null => {
+// Update your decryptUser utility to handle the nested structure
+export const decryptUser = <T = any>(
+  encrypted: string | undefined
+): T | null => {
   if (!encrypted) return null;
 
   try {
@@ -19,14 +25,33 @@ export const decryptUser = <T = User>(encrypted: string | null): T | null => {
     const decrypted = bytes.toString(CryptoJS.enc.Utf8);
     if (!decrypted) return null;
 
-    return JSON.parse(decrypted);
+    return JSON.parse(decrypted) as T;
   } catch (error) {
     console.error("Decryption failed", error);
     return null;
   }
 };
 
-export const getUserFromStorage = <T = User>(): T | null => {
-  const encryptedUser = localStorage.getItem("user");
-  return decryptUser<T>(encryptedUser);
+// Get user from storage with proper typing
+export const getUserFromStorage = (): User | null => {
+  const encryptedData = Cookies.get("user");
+  const decryptedData = decryptUser<any>(encryptedData);
+
+  // Handle both cases: if user data is nested or direct
+  if (decryptedData?.user) {
+    // If data has nested user object (like your response)
+    return decryptedData.user as User;
+  } else if (decryptedData?.id) {
+    // If data is the user object directly
+    return decryptedData as User;
+  }
+
+  return null;
+};
+
+// Also get the token if needed
+export const getTokenFromStorage = (): string | null => {
+  const encryptedData = Cookies.get("user");
+  const decryptedData = decryptUser<any>(encryptedData);
+  return decryptedData?.token || null;
 };

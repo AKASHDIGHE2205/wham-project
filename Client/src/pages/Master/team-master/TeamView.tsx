@@ -65,7 +65,7 @@ const TeamView = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-white p-2 sm:p-6">
+      <div className="min-h-screen bg-orange-50/30 p-2 sm:p-6 border border-orange-300 m-1 rounded-md">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
@@ -136,22 +136,22 @@ const TeamView = () => {
               <table className="w-full min-w-[600px]">
                 <thead className="bg-linear-to-r from-purple-50 to-orange-50">
                   <tr>
-                    <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-2 py-3 text-center  text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       ID
                     </th>
-                    <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-2 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Name
                     </th>
-                    <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-2 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Team Lead
                     </th>
-                    <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden">
+                    <th className="px-2 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider hidden">
                       Description
                     </th>
-                    <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-2 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-2 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Action
                     </th>
                   </tr>
@@ -169,11 +169,11 @@ const TeamView = () => {
                   ) : filterData?.length > 0 ? (
                     filterData?.map((item) => (
                       <tr key={item?.id} className="hover:bg-gray-50 transition-colors duration-150">
-                        <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{item?.id}</td>
-                        <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{item?.name}</td>
-                        <td className="px-2 py-2 whitespace-nowrap text-sm text-gray-900">{item?.manager_name}</td>
-                        <td className="px-2 py-2 text-sm text-gray-900 hidden">{item?.description}</td>
-                        <td className="px-2 py-2 whitespace-nowrap">
+                        <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-900">{item?.id}</td>
+                        <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-900">{item?.name}</td>
+                        <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-900">{item?.manager_name}</td>
+                        <td className="px-2 py-2 text-center text-sm text-gray-900 hidden">{item?.description}</td>
+                        <td className="px-2 py-2 text-center whitespace-nowrap">
                           <span
                             className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${item?.status === "A"
                               ? "bg-green-100 text-green-800 border-green-200"
@@ -183,7 +183,7 @@ const TeamView = () => {
                             {item?.status === "A" ? "Active" : "In-active"}
                           </span>
                         </td>
-                        <td className="px-3 py-2 whitespace-nowrap">
+                        <td className=" text-center px-3 py-2 whitespace-nowrap">
                           <button
                             className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-orange-600 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-all duration-200 cursor-pointer"
                             onClick={() => handleEdit(item)}

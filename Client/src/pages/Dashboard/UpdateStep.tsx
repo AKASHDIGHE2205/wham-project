@@ -43,7 +43,7 @@ const UpdateStep: FC<UpdateStepProps> = ({ show, setShow, Data, User, fetchAllDa
   useEffect(() => {
     const fetchTasks = async () => {
       if (selectedStep && selectedStep !== 0) {
-        const response = await getActiveTasks({ Id: selectedStep });
+        const response = await getActiveTasks();
         if (response) {
           setTasks(response.tasks || []);
         }

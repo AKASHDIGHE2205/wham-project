@@ -7,9 +7,8 @@ import MonthlyView from './MonthlyView';
 import YearlyView from './YearlyView';
 import EventModal from './NewEventModal';
 import { getEvent } from '../../services/calender/calenderApi';
-import CryptoJS from "crypto-js";
-import { secretKey } from '../../constant/Baseurl';
 import UpdateEvent from './UpdateEvent';
+import { getUserFromStorage } from '../../helper/cryptoUser';
 
 export interface CalendarEvent {
   id: string;
@@ -118,18 +117,7 @@ const Calendar: React.FC<CalendarProps> = () => {
     }
   };
 
-  const decryptUser = (encrypted: string | null) => {
-    if (!encrypted) return null;
-    try {
-      const bytes = CryptoJS.AES.decrypt(encrypted, secretKey);
-      return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-    } catch (error) {
-      console.error("Decryption failed", error);
-      return null;
-    }
-  };
-  const encryptedUser = localStorage.getItem("user");
-  const user = decryptUser(encryptedUser);
+  const user = getUserFromStorage();
 
   const fetchData = async () => {
     setLoading(true);
@@ -157,7 +145,7 @@ const Calendar: React.FC<CalendarProps> = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-orange-50/30">
       {/* HEADER — NO CHANGES */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 sm:p-6 border-b border-orange-100 bg-linear-to-r from-white to-orange-50/30">
         {/* HEADER SECTION */}
@@ -247,7 +235,7 @@ const Calendar: React.FC<CalendarProps> = () => {
           setIsShow={setIsShowModal}
           selectedDate={selectedData}
           fetchData={fetchData}
-          Role={user?.role}
+          Role={user?.role || ''}
         />
       )}
       {isEditShowModal && (
@@ -256,7 +244,7 @@ const Calendar: React.FC<CalendarProps> = () => {
           setIsShow={setIsEditShowModal}
           fetchData={fetchData}
           Event={editData}
-          Role={user?.role}
+          Role={user?.role || ''}
         />
       )}
     </div>

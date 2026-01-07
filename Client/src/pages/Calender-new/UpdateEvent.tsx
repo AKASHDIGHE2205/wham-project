@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, type FC } from "react";
 import toast from "react-hot-toast";
-import { secretKey } from "../../constant/Baseurl";
-import CryptoJS from "crypto-js";
 import MemberModal from "./MemberModal";
 import GoogleLocation from "./GoogleLocation";
 import type { SelectedLocation, SelectedMembers, SelectedTeam } from "./NewEventModal";
 import { deleteEvent, updateEvent } from "../../services/calender/calenderApi";
+import { getUserFromStorage } from "../../helper/cryptoUser";
 
 export interface EventModalProps {
   isShow: boolean;
@@ -93,18 +92,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
     setShowLocation(false);
   };
 
-  const decryptUser = (encrypted: string | null) => {
-    if (!encrypted) return null;
-    try {
-      const bytes = CryptoJS.AES.decrypt(encrypted, secretKey);
-      return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-    } catch (error) {
-      console.error("Decryption failed", error);
-      return null;
-    }
-  };
-  const encryptedUser = localStorage.getItem("user");
-  const user = decryptUser(encryptedUser);
+  const user = getUserFromStorage();
 
   const handleCancel = () => {
     setInputs(
@@ -415,7 +403,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
             </div>
 
             {/* Status (Conditional) */}
-            {['Master', 'Manager', 'Admin'].includes(user?.role) && (
+            {user && ['Master', 'Manager', 'Admin'].includes(user?.role) && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Approve Status <span className="text-orange-600">*</span>

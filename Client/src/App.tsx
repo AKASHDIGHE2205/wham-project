@@ -1,23 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import './App.css';
 import Calender from './pages/Calender-new/Calender';
 import { lazy, Suspense, useEffect } from 'react';
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import type { RootState } from './store/store';
-import { BASE_URL } from './constant/Baseurl';
-import axios from 'axios';
-import { login, logout } from './feature/authSlice';
 import Loadings from './components/Loadings';
 import DefaultLayout from './layout/DefaultLayout';
 import Logout from './pages/auth/Logout';
-import StepView from './pages/Master/steps/StepView';
-import TaskView from './pages/Master/task/TaskView';
-import ReportView from './pages/reports/totalReport/ReportView';
-import toast from 'react-hot-toast';
-import { getUserFromStorage } from './helper/cryptoUser';
 
 const Login = lazy(() => import('./pages/auth/Login'));
 const Register = lazy(() => import('./pages/auth/Register'));
@@ -29,34 +20,12 @@ const MemberView = lazy(() => import('./pages/Master/member-master/MemberView'))
 const NewMember = lazy(() => import('./pages/Master/member-master/NewMember'));
 const EditMember = lazy(() => import('./pages/Master/member-master/EditMember'));
 const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'));
+const ReportView = lazy(() => import('./pages/reports/totalReport/ReportView'));
+const TaskView = lazy(() => import('./pages/Master/task/TaskView'));
+const StepView = lazy(() => import('./pages/Master/steps/StepView'));
 
 function App() {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    const validateToken = async () => {
-      const token = localStorage.getItem('token');
-
-      if (token) {
-        try {
-          const response = await axios.get(`${BASE_URL}/auth/validate-token`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          if (response.status === 200) {
-            const user = getUserFromStorage();
-            dispatch(login({ data: { ...user, token } }));
-          }
-        } catch (error: any) {
-          console.log(error);
-          toast.error(error?.response?.data?.message || "Time Out");
-          dispatch(logout());
-        }
-      }
-    };
-
-    validateToken();
-  }, [dispatch]);
 
   useEffect(() => {
     AOS.init({

@@ -462,7 +462,7 @@ export const addAttendence = async (req, res) => {
     if (alreadyAttended.length > 0) {
       return res.status(400).json({
         success: false,
-        message: `You have already attended this event on ${punchDate}.`
+        message: `You have already attended this task on ${punchDate}.`
       });
     }
 

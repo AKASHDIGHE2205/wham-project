@@ -86,7 +86,6 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ setSelectedDate, currentDate,
 
   return (
     <div className="h-full bg-white sm:mx-4 my-2 rounded-xl shadow-md overflow-hidden">
-
       {/* Header */}
       <div className="grid grid-cols-7 bg-linear-to-br from-gray-50 to-blue-50/30 border-b text-xs sm:text-sm font-semibold text-gray-600">
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']?.map(day => (

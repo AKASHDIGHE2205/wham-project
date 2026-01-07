@@ -7,19 +7,7 @@ import { getUserFromStorage } from '../../helper/cryptoUser';
 const Home = () => {
   const [user, setUser] = useState<any>(null);
 
-  // const decryptUser = (encrypted: string | null) => {
-  //   if (!encrypted) return null;
-  //   try {
-  //     const bytes = CryptoJS.AES.decrypt(encrypted, secretKey);
-  //     return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-  //   } catch (error) {
-  //     console.error("Decryption failed", error);
-  //     return null;
-  //   }
-  // };
-
   useEffect(() => {
-    // const encryptedUser = localStorage.getItem("user");
     const decryptedUser = getUserFromStorage();
     setUser(decryptedUser);
   }, []);
@@ -70,14 +58,14 @@ const Home = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-linear-to-br from-white to-orange-50/30">
+      <div className="min-h-screen bg-orange-50/30 border border-orange-300 m-1 rounded-md">
         {/* Hero Section */}
-        <div className="max-w-7xl mx-auto px-4 py-10">
+        <div className="max-w-7xl mx-auto px-4 py-1">
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-6">
               Welcome to Mission Control
             </h1>
-            <p className="text-xl mb-8 text-orange-600 max-w-3xl mx-auto">
+            <p className="text-xl mb-2 text-orange-600 max-w-3xl mx-auto">
               Your command center for planning, executing, and tracking successful missions.
               Where great ideas become extraordinary achievements.
             </p>
@@ -93,9 +81,9 @@ const Home = () => {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 py-10">
+        <div className="max-w-7xl mx-auto px-4 py-6">
           {/* Welcome Message */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-6">
             <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-700 px-4 py-2 rounded-full mb-6">
               <Star className="w-4 h-4" />
               <span className="font-medium">Hello, {user?.firstName}! Ready for your next mission?</span>

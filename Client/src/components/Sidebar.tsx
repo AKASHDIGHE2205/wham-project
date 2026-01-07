@@ -87,7 +87,7 @@ const Sidebar = () => {
   const user = getUserFromStorage();
 
   return (
-    <div className="bg-white shadow-lg border-r border-gray-500 h-screen sticky top-0 w-80 transition-all duration-300 flex flex-col">
+    <div className="bg-white shadow-lg h-screen sticky top-0 w-80 transition-all duration-300 flex flex-col">
       {/* Header */}
       <div
         className="flex items-center justify-between p-4 border-b border-gray-100 cursor-pointer"

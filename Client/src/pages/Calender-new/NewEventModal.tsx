@@ -2,10 +2,9 @@ import { useState, type FC, useEffect } from "react";
 import { formatDate } from "../../helper/DateFormate";
 import { addEvent } from "../../services/calender/calenderApi";
 import toast from "react-hot-toast";
-import CryptoJS from "crypto-js";
-import { secretKey } from "../../constant/Baseurl";
 import MemberModal from "./MemberModal";
 import GoogleLocation from "./GoogleLocation";
+import { getUserFromStorage } from "../../helper/cryptoUser";
 // import LocationModal from "./LocationModal";
 
 export interface EventModalProps {
@@ -13,7 +12,7 @@ export interface EventModalProps {
   setIsShow: (show: boolean) => void;
   selectedDate: Date | null;
   fetchData: () => void;
-  Role: string
+  Role: string;
 }
 
 export interface Team {
@@ -120,20 +119,7 @@ const EventModal: FC<EventModalProps> = ({ isShow, setIsShow, selectedDate, fetc
     setInputs(prev => ({ ...prev, type }));
   }
 
-  const decryptUser = (encrypted: string | null) => {
-    if (!encrypted) return null;
-    try {
-      const bytes = CryptoJS.AES.decrypt(encrypted, secretKey);
-      return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-    } catch (error) {
-      console.error("Decryption failed", error);
-      return null;
-    }
-  };
-
-  const encryptedUser = localStorage.getItem("user");
-  const user = decryptUser(encryptedUser);
-
+  const user = getUserFromStorage();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 

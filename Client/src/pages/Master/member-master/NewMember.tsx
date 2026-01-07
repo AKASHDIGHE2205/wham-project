@@ -77,7 +77,7 @@ const NewMember = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-white p-2 sm:p-6">
+      <div className="min-h-screen bg-orange-50/30 border border-orange-300 m-1 rounded-md p-2 sm:p-6">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 transform hover:shadow-md transition-all duration-300">
@@ -99,8 +99,7 @@ const NewMember = () => {
             <form className="space-y-6" onSubmit={handleSubmit}>
               {/* Personal Information Section */}
               <div className="border-b border-gray-200 pb-4">
-                <h2 className="text-lg font-semibold text-black mb-4">Personal Information</h2>
-
+                <h2 className="text-lg font-semibold text-orange-600 mb-4">Personal Information</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* First Name */}
                   <div>
@@ -179,7 +178,7 @@ const NewMember = () => {
                         <option value="" disabled>Select gender</option>
                         <option value="M">Male</option>
                         <option value="F">Female</option>
-                        <option value="O" hidden>Other</option>
+                        <option value="O">Other</option>
                       </select>
                       <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                         <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -171,9 +171,11 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
     }
 
     const response = await addAttendence(formData);
+    setLoading(false);
     if (response) {
-      handleClose()
+      handleClose();
     }
+
   };
 
   if (!show) return null;
