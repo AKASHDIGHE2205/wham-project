@@ -133,25 +133,25 @@ const TeamView = () => {
           {/* Teams Table */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[600px]">
+              <table className="w-full min-w-[400px]">
                 <thead className="bg-linear-to-r from-purple-50 to-orange-50">
                   <tr>
                     <th className="px-2 py-3 text-center  text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       ID
                     </th>
-                    <th className="px-2 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Name
                     </th>
-                    <th className="px-2 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Team Lead
                     </th>
-                    <th className="px-2 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider hidden">
+                    <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden">
                       Description
                     </th>
-                    <th className="px-2 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-2 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Action
                     </th>
                   </tr>
@@ -170,10 +170,10 @@ const TeamView = () => {
                     filterData?.map((item) => (
                       <tr key={item?.id} className="hover:bg-gray-50 transition-colors duration-150">
                         <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-900">{item?.id}</td>
-                        <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-900">{item?.name}</td>
-                        <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-900">{item?.manager_name}</td>
-                        <td className="px-2 py-2 text-center text-sm text-gray-900 hidden">{item?.description}</td>
-                        <td className="px-2 py-2 text-center whitespace-nowrap">
+                        <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-gray-900">{item?.name}</td>
+                        <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-gray-900">{item?.manager_name}</td>
+                        <td className="px-2 py-2 text-left text-sm text-gray-900 hidden">{item?.description}</td>
+                        <td className="px-2 py-2 text-left whitespace-nowrap">
                           <span
                             className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${item?.status === "A"
                               ? "bg-green-100 text-green-800 border-green-200"
@@ -183,7 +183,7 @@ const TeamView = () => {
                             {item?.status === "A" ? "Active" : "In-active"}
                           </span>
                         </td>
-                        <td className=" text-center px-3 py-2 whitespace-nowrap">
+                        <td className=" text-left px-3 py-2 whitespace-nowrap">
                           <button
                             className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-orange-600 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-all duration-200 cursor-pointer"
                             onClick={() => handleEdit(item)}

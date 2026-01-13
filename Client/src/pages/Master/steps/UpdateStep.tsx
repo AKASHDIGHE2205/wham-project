@@ -66,7 +66,7 @@ const UpdateStep: FC<UpdateStepProps> = ({ show, setShow, stepData, fetchData })
               </svg>
             </div>
             <h3 className="text-xl font-bold text-gray-900">
-              Create New Step
+              Update Step
             </h3>
           </div>
           <button

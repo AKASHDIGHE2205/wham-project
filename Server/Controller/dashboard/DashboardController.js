@@ -431,9 +431,10 @@ export const getActiveTasks = (req, res) => {
 
 export const addAttendence = async (req, res) => {
   try {
-    const { eventId, Time, punchDate, eventDate, stepId, taskId, userId, location, attenddesc } = req.body;
+    const { eventId, Time, punchDate, eventDate, stepId, taskId, memId, location, attenddesc } = req.body;
     const file = req.file;
     let locationObj = typeof location === "string" ? JSON.parse(location) : location;
+    console.log(req.body);
 
     const dbQuery = (sql, params = []) => {
       return new Promise((resolve, reject) => {
@@ -444,7 +445,7 @@ export const addAttendence = async (req, res) => {
       });
     };
 
-    // ⭐ Step 1: CHECK IF ALREADY ATTENDED OR IF PUNCH_DATE ALREADY EXISTS
+    // Step 1: CHECK IF ALREADY ATTENDED OR IF PUNCH_DATE ALREADY EXISTS
     const checkQuery = `
       SELECT 1
       FROM event_media
@@ -457,22 +458,19 @@ export const addAttendence = async (req, res) => {
       LIMIT 1
     `;
 
-    const alreadyAttended = await dbQuery(checkQuery, [eventId, userId, eventDate, stepId, taskId, punchDate]);
+    const alreadyAttended = await dbQuery(checkQuery, [eventId, memId, eventDate, stepId, taskId, punchDate]);
 
     if (alreadyAttended.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: `You have already attended this task on ${punchDate}.`
-      });
+      return res.status(400).json({ success: false, message: `You have already attended this task.` });
     }
 
-    // ⭐ Step 2: (Your existing logic)
+    // Step 2: (Your existing logic)
     let savePath = null;
     let mediaSrNo = null;
 
     if (file) {
       const folderName = `${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, "0")}`;
-      const uploadPath = path.join("uploads", folderName, userId.toString());
+      const uploadPath = path.join("uploads", folderName, memId.toString());
 
       await fs.ensureDir(uploadPath);
 
@@ -491,21 +489,7 @@ export const addAttendence = async (req, res) => {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
 
-      await dbQuery(mediaQuery, [
-        mediaSrNo,
-        eventId,
-        Time,
-        punchDate,
-        eventDate,
-        savePath,
-        locationObj?.address ?? null,
-        locationObj?.latitude ?? null,
-        locationObj?.longitude ?? null,
-        attenddesc,
-        userId,
-        stepId,
-        taskId
-      ]);
+      await dbQuery(mediaQuery, [mediaSrNo, eventId, Time, punchDate, eventDate, savePath, locationObj?.address ?? null, locationObj?.latitude ?? null, locationObj?.longitude ?? null, attenddesc, memId, stepId, taskId]);
     }
 
     res.json({ success: true, message: "Attendance added successfully!" });

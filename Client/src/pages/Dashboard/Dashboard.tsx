@@ -100,24 +100,27 @@ const Dashboard = () => {
   const stats = [
     {
       label: 'Active Events',
-      value: ActiveEvent?.length,
+      value: ActiveEvent?.length || 0,
       change: '+3',
       icon: Rocket,
-      color: 'bg-orange-500'
+      color: 'bg-orange-500',
+      bgcolor: 'bg-orange-100'
     },
     {
       label: 'Upcoming Events',
-      value: upcomingEvent?.length,
+      value: upcomingEvent?.length || 0,
       change: '+5%',
       icon: BarChart3,
-      color: 'bg-yellow-500'
+      color: 'bg-yellow-500',
+      bgcolor: 'bg-yellow-100'
     },
     {
       label: 'Team Members',
-      value: teams?.length,
+      value: teams?.length || 0,
       change: '+1',
       icon: Users,
-      color: 'bg-purple-500'
+      color: 'bg-purple-500',
+      bgcolor: 'bg-purple-100'
     },
   ];
 
@@ -209,7 +212,7 @@ const Dashboard = () => {
             {stats?.map((stat, index) => (
               <div
                 key={index}
-                className="bg-white rounded-2xl p-6 shadow-3xl border border-orange-200 transition-all duration-300 hover:shadow-[0_0_40px_rgba(249,115,22,0.4)] hover:border-orange-300 relative"
+                className={`${stat?.bgcolor} rounded-2xl p-6 shadow-3xl border border-orange-200 transition-all duration-300 hover:shadow-[0_0_40px_rgba(249,115,22,0.4)] hover:border-orange-300 relative`}
               >
                 <div className="flex items-center justify-between">
                   <div>
@@ -253,15 +256,15 @@ const Dashboard = () => {
                   }
                   {ActiveEvent?.map((event) => (
                     <div
-                      key={event.event_id}
+                      key={event?.event_id}
                       className="bg-orange-50 border border-orange-100 rounded-xl p-4 hover:shadow-md transition"
                     >
                       <div className="flex gap-4">
                         {/* Date Badge */}
                         <div className="flex flex-col justify-center items-center w-12 h-12 bg-linear-to-br from-orange-500 to-yellow-500 rounded-xl text-white">
-                          <span className="text-xl font-bold">{new Date(event.from_date).getDate()}</span>
+                          <span className="text-xl font-bold">{new Date(event?.from_date).getDate()}</span>
                           <span className="text-xs uppercase">
-                            {new Date(event.from_date).toLocaleDateString('en', { month: 'short' })}
+                            {new Date(event?.from_date).toLocaleDateString('en', { month: 'short' })}
                           </span>
                         </div>
 
@@ -269,24 +272,24 @@ const Dashboard = () => {
                         <div className="flex-1 space-y-1">
                           <div className="flex justify-between items-start">
                             <h3 className="font-semibold text-gray-900">
-                              Title : {event.title}
+                              Title : {event?.title}
                             </h3>
 
                             <span
-                              className={`px-2 py-1 rounded-full text-xs border font-semibold ${event.isapproved === "A"
+                              className={`px-2 py-1 rounded-full text-xs border font-semibold ${event?.isapproved === "A"
                                 ? "bg-green-100 text-green-700 border-green-200"
-                                : event.isapproved === "P"
+                                : event?.isapproved === "P"
                                   ? "bg-yellow-100 text-yellow-700 border-yellow-200"
-                                  : event.isapproved === "C"
+                                  : event?.isapproved === "C"
                                     ? "bg-blue-100 text-blue-700 border-blue-200"
                                     : "bg-red-100 text-red-700 border-red-200"
                                 }`}
                             >
-                              {event.isapproved === "A"
+                              {event?.isapproved === "A"
                                 ? "Approved"
-                                : event.isapproved === "P"
+                                : event?.isapproved === "P"
                                   ? "Pending"
-                                  : event.isapproved === "C"
+                                  : event?.isapproved === "C"
                                     ? "Completed"
                                     : "Rejected"}
                             </span>
@@ -294,26 +297,26 @@ const Dashboard = () => {
 
                           <div className="flex items-center text-sm text-gray-600">
                             <Clock className="w-4 h-4 mr-2 text-orange-500" />
-                            {moment(event.from_date).format("hh:mm A")} -{" "}
-                            {moment(event.to_date).format("hh:mm A")}
+                            {moment(event?.from_date).format("hh:mm A")} -{" "}
+                            {moment(event?.to_date).format("hh:mm A")}
                           </div>
                           <div className="text-xs text-gray-500">
                             <Calendar1 className="w-4 h-4 mr-2 text-orange-500 inline" />
-                            {moment(event.from_date).format("DD MMM YYYY")} —{" "}
-                            {moment(event.to_date).format("DD MMM YYYY")}
+                            {moment(event?.from_date).format("DD MMM YYYY")} —{" "}
+                            {moment(event?.to_date).format("DD MMM YYYY")}
                           </div>
                           {(event.teams).length > 0 && (
                             <div className="flex items-center text-sm text-gray-600">
                               <Users className="w-4 h-4 mr-2 text-orange-500" />
                               <span className="font-medium mr-1">Teams:</span>
-                              {event.teams.map((t) => t.name).join(", ")}
+                              {event?.teams.map((t) => t.name).join(", ")}
                             </div>
                           )}
                           {(event.members).length > 0 && (
                             <div className="flex items-center text-sm text-gray-600">
                               <Users className="w-4 h-4 mr-2 text-orange-500" />
                               <span className="font-medium mr-1">Members:</span>
-                              {event.members.map((m) => m.full_name).join(", ")}
+                              {event?.members.map((m) => m.full_name).join(", ")}
                             </div>
                           )}
 
@@ -322,7 +325,7 @@ const Dashboard = () => {
                             <MapPin className="w-5 h-5 text-orange-500 mt-0.5" />
                             <span className="font-medium mr-1">Venue:</span>
                             <div className="flex flex-col">
-                              {event.locations.map((loc, index) => (
+                              {event?.locations.map((loc, index) => (
                                 <span
                                   key={index}
                                   className="line-clamp-2"
@@ -372,9 +375,9 @@ const Dashboard = () => {
                       <div className="flex gap-2">
                         {/* Date Badge */}
                         <div className="flex flex-col justify-center items-center w-12 h-12 bg-linear-to-br from-orange-500 to-yellow-500 rounded-xl text-white">
-                          <span className="text-xl font-bold">{new Date(event.from_date).getDate()}</span>
+                          <span className="text-xl font-bold">{new Date(event?.from_date).getDate()}</span>
                           <span className="text-xs uppercase">
-                            {new Date(event.from_date).toLocaleDateString('en', { month: 'short' })}
+                            {new Date(event?.from_date).toLocaleDateString('en', { month: 'short' })}
                           </span>
                         </div>
 
@@ -382,32 +385,32 @@ const Dashboard = () => {
                         <div className="flex-1 space-y-0">
                           <div className="flex justify-between items-start">
                             <h3 className="font-semibold text-gray-900">
-                              Title : {event.title}
+                              Title : {event?.title}
                             </h3>
                             <p className={`px-2 py-1 rounded-full text-xs border font-semibold 
-                            ${event.dt_status === "S"
+                            ${event?.dt_status === "S"
                                 ? "bg-green-100 text-green-700 border-green-200"
-                                : event.dt_status === "P"
+                                : event?.dt_status === "P"
                                   ? "bg-yellow-100 text-yellow-700 border-yellow-200"
-                                  : event.dt_status === "C"
+                                  : event?.dt_status === "C"
                                     ? "bg-blue-100 text-blue-700 border-blue-200"
                                     : "bg-red-100 text-red-700 border-red-200"
                               }`}>
                               {
-                                event.dt_status === "P" ? "Progress" :
-                                  event.dt_status === "S" ? "Start" :
-                                    event.dt_status === "C" ? "Completed" : ""
+                                event?.dt_status === "P" ? "Progress" :
+                                  event?.dt_status === "S" ? "Start" :
+                                    event?.dt_status === "C" ? "Completed" : ""
                               }
                             </p>
                           </div>
 
                           <div>
-                            <p className="text-sm text-gray-800 truncate  max-w-[200px] sm:max-w-[400px] "><span className='font-medium'>Step : </span>{event.step_name}</p>
-                            <p className="text-xs text-gray-800 truncate max-w-[200px] sm:max-w-[400px]"><span className='font-medium '>Task : </span>{event.task_name}</p>
+                            <p className="text-sm text-gray-800 truncate  max-w-[200px] sm:max-w-[400px] "><span className='font-medium'>Step : </span>{event?.step_name}</p>
+                            <p className="text-xs text-gray-800 truncate max-w-[200px] sm:max-w-[400px]"><span className='font-medium '>Task : </span>{event?.task_name}</p>
                           </div>
 
                           <div className="flex justify-end items-center gap-4">
-                            {event.isapproved === "A" && (
+                            {event?.isapproved === "A" && (
                               <button
                                 onClick={() => handleAddAttend(event)}
                                 className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg shadow hover:shadow-lg text-sm cursor-pointer"
@@ -415,7 +418,7 @@ const Dashboard = () => {
                                 Attend Event
                               </button>
                             )}
-                            {((user?.role === 'Manager' || user?.role === 'Admin' || user?.role === 'Master') && (event.isapproved === "A")) && (
+                            {((user?.role === 'Manager' || user?.role === 'Admin' || user?.role === 'Master') && (event?.isapproved === "A")) && (
                               <button
                                 onClick={() => handleUpdate(event)}
                                 className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow hover:shadow-lg text-sm cursor-pointer"
@@ -449,42 +452,42 @@ const Dashboard = () => {
               </div>
 
               <div className="p-6 space-y-4">
-                {upcomingEvent.length === 0 && (
+                {upcomingEvent?.length === 0 && (
                   <p className="text-orange-600">No upcoming events available</p>
                 )
                 }
                 {upcomingEvent?.map((event) => (
                   <div
-                    key={event.event_id}
+                    key={event?.event_id}
                     className="bg-orange-50 border border-orange-100 rounded-xl p-4 hover:shadow-md transition"
                   >
                     <div className="flex gap-4">
                       <div className="flex flex-col justify-center items-center w-12 h-12 bg-linear-to-br from-orange-500 to-yellow-500 rounded-xl text-white">
-                        <span className="text-xl font-bold">{new Date(event.from_date).getDate()}</span>
+                        <span className="text-xl font-bold">{new Date(event?.from_date).getDate()}</span>
                         <span className="text-xs uppercase">
-                          {new Date(event.from_date).toLocaleDateString("en", { month: "short" })}
+                          {new Date(event?.from_date).toLocaleDateString("en", { month: "short" })}
                         </span>
                       </div>
 
                       <div className="flex-1 space-y-2">
                         <div className="flex justify-between items-start">
-                          <h3 className="font-semibold text-gray-900">Title : {event.title}</h3>
+                          <h3 className="font-semibold text-gray-900">Title : {event?.title}</h3>
 
                           <span
-                            className={`px-2 py-1 rounded-full text-xs border font-semibold ${event.isapproved === "A"
+                            className={`px-2 py-1 rounded-full text-xs border font-semibold ${event?.isapproved === "A"
                               ? "bg-green-100 text-green-700 border-green-200"
-                              : event.isapproved === "P"
+                              : event?.isapproved === "P"
                                 ? "bg-yellow-100 text-yellow-700 border-yellow-200"
-                                : event.isapproved === "C"
+                                : event?.isapproved === "C"
                                   ? "bg-blue-100 text-blue-700 border-blue-200"
                                   : "bg-red-100 text-red-700 border-red-200"
                               }`}
                           >
-                            {event.isapproved === "A"
+                            {event?.isapproved === "A"
                               ? "Approved"
-                              : event.isapproved === "P"
+                              : event?.isapproved === "P"
                                 ? "Pending"
-                                : event.isapproved === "C"
+                                : event?.isapproved === "C"
                                   ? "Completed"
                                   : "Rejected"}
                           </span>
@@ -492,27 +495,27 @@ const Dashboard = () => {
 
                         <div className="text-sm text-gray-600 flex items-center">
                           <Clock className="w-4 h-4 mr-2 text-orange-500" />
-                          {moment(event.from_date).format("hh:mm A")} —{" "}
-                          {moment(event.to_date).format("hh:mm A")}
+                          {moment(event?.from_date).format("hh:mm A")} —{" "}
+                          {moment(event?.to_date).format("hh:mm A")}
                         </div>
                         <div className="text-sm text-gray-600 flex items-center">
                           <Calendar className="w-4 h-4 mr-2 text-orange-500" />
-                          {moment(event.from_date).format("DD/MMM/YYYY")} —{" "}
-                          {moment(event.to_date).format("DD/MMM/YYYY ")}
+                          {moment(event?.from_date).format("DD/MMM/YYYY")} —{" "}
+                          {moment(event?.to_date).format("DD/MMM/YYYY ")}
                         </div>
 
                         {(event.teams).length > 0 && (
                           <div className="flex items-center text-sm text-gray-600">
                             <Users className="w-4 h-4 mr-2 text-orange-500" />
                             <span className="font-medium mr-1">Teams:</span>
-                            {event.teams.map((t) => t.name).join(", ")}
+                            {event?.teams.map((t) => t.name).join(", ")}
                           </div>
                         )}
                         {(event.members).length > 0 && (
                           <div className="flex items-center text-sm text-gray-600">
                             <Users className="w-4 h-4 mr-2 text-orange-500" />
                             <span className="font-medium mr-1">Members:</span>
-                            {event.members.map((m) => m.full_name).join(", ")}
+                            {event?.members.map((m) => m.full_name).join(", ")}
                           </div>
                         )}
 
@@ -522,7 +525,7 @@ const Dashboard = () => {
                           <span className="font-medium mr-1">Venue:</span>
 
                           <div className="flex flex-col">
-                            {event.locations.map((loc, index) => (
+                            {event?.locations.map((loc, index) => (
                               <p
                                 key={index}
                                 className="line-clamp-2"
@@ -532,7 +535,16 @@ const Dashboard = () => {
                             ))}
                           </div>
                         </div>
-
+                        <div className="flex justify-end items-center gap-4 space-y-2 ">
+                          {user && (["Admin", "Manager", "Master"].includes(user?.role) || data?.isorganizer === "A") && (
+                            <button
+                              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow hover:shadow-lg text-sm cursor-pointer"
+                              onClick={() => handleAddSteps(event)}
+                            >
+                              Add Task
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -553,31 +565,26 @@ const Dashboard = () => {
           setSelectedEvent={setSelectedEvent}
           fetchAllData={fetchAllData}
         />
-      )
-      }
-      {
-        showAddSteps && (
-          <StepsModal
-            show={showAddSteps}
-            setShow={setShowAddSteps}
-            Data={selectedEvent}
-            Member={data}
-            setSelectedEvent={setSelectedEvent}
-            fetchAllData={fetchAllData}
-          />
-        )
-      }
-      {
-        showUpdate && (
-          <UpdateStep
-            show={showUpdate}
-            setShow={setShowUpdate}
-            Data={selectedEvent}
-            User={user}
-            fetchAllData={fetchAllData}
-          />
-        )
-      }
+      )}
+      {showAddSteps && (
+        <StepsModal
+          show={showAddSteps}
+          setShow={setShowAddSteps}
+          Data={selectedEvent}
+          Member={data}
+          setSelectedEvent={setSelectedEvent}
+          fetchAllData={fetchAllData}
+        />
+      )}
+      {showUpdate && (
+        <UpdateStep
+          show={showUpdate}
+          setShow={setShowUpdate}
+          Data={selectedEvent}
+          User={user}
+          fetchAllData={fetchAllData}
+        />
+      )}
     </>
   )
 }

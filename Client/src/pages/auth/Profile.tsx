@@ -1,15 +1,31 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
-import { User, Mail, CheckCircle, IdCard, Phone, Shield, Zap, Sparkles, ChevronDown, ChevronUp, Users } from 'lucide-react';
+import { User, Mail, CheckCircle, Phone, Shield, Zap, Sparkles, ChevronDown, ChevronUp, Users } from 'lucide-react';//IdCard
 import { Link } from 'react-router-dom';
 import { getTeamMembers } from '../../services/auth/authApi';
 import { getUserFromStorage } from '../../helper/cryptoUser';
 
+export interface TeamInfo {
+  team_id: number;
+  team_name: string;
+  manager_id: number;
+}
+
+export interface MemberTeams {
+  mem_id: number;
+  mem_name: string;
+  user_id: number;
+  teams: TeamInfo[];
+}
+
+export interface TeamMembersResponse {
+  teams: MemberTeams[];
+}
+
 const Profile: React.FC = () => {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<TeamMembersResponse[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showTeams, setShowTeams] = useState(false);
-
   const userData = getUserFromStorage();
 
   useEffect(() => {
@@ -17,12 +33,10 @@ const Profile: React.FC = () => {
       if (showTeams) {
         setIsLoading(true);
         try {
-          const body = {
-            userId: userData?.id || 0
-          };
+          const body = { userId: userData?.id || 0 };
           const response: any = await getTeamMembers(body);
           if (response) {
-            setData(response.teams);
+            setData(response?.teams || []);
           }
         } catch (error) {
           console.error("Failed to fetch team data", error);
@@ -81,11 +95,6 @@ const Profile: React.FC = () => {
     </div>
   );
 
-  const formatName = (name: string) => {
-    if (!name) return '';
-    return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
-  };
-
   return (
     <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
@@ -114,14 +123,14 @@ const Profile: React.FC = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 {userData?.firstName} {userData?.lastName}
               </h2>
-              <div className="inline-flex items-center px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-medium mb-4 border border-green-200">
+              <div className="inline-flex items-center px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-medium mb-4 border border-green-200" hidden>
                 <CheckCircle className="w-4 h-4 mr-2" />
                 Verified Account
               </div>
             </div>
 
             {/* Feature Icons */}
-            <div className="mt-2 pt-6 border-t border-gray-100">
+            <div className="mt-2 pt-6 border-t border-gray-100" hidden>
               <div className="flex justify-center space-x-6">
                 <div className="text-center group">
                   <div className="p-4 bg-purple-50 rounded-2xl inline-flex group-hover:bg-purple-100 group-hover:scale-110 transition-all duration-300">
@@ -157,10 +166,10 @@ const Profile: React.FC = () => {
             <InfoItem label="Phone Number" value={userData?.phone} icon={Phone} />
           </InfoCard>
 
-          <InfoCard icon={IdCard} title="Account Information">
+          {/* <InfoCard icon={IdCard} title="Account Information">
             <InfoItem label="User ID" value={userData?.id} icon={IdCard} />
             <InfoItem label="Account Role" value={userData?.role} icon={Shield} />
-          </InfoCard>
+          </InfoCard> */}
 
           {/* Teams Card */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-300">
@@ -198,43 +207,32 @@ const Profile: React.FC = () => {
                   </div>
                 ) : data.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto pr-2">
-                    {data.map((team: any) =>
-                      team.members.map((member: any) => {
-                        const firstName = formatName(member.full_name?.split(' ')[0] || '');
-                        const lastName = formatName(member.full_name?.split(' ').slice(1).join(' ') || '');
-                        const fullName = `${firstName} ${lastName}`.trim();
-                        const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`;
-
-                        return (
-                          <div
-                            key={`${team.team_id}-${member.mem_id}`}
-                            className="bg-linear-to-br from-white to-gray-50 border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-all duration-300 hover:border-purple-300 group"
-                          >
-                            <div className="flex items-center mb-3">
-                              <div className="w-8 h-8 bg-linear-to-br from-orange-500 to-purple-600 rounded-full flex items-center justify-center mr-3 shadow-md group-hover:scale-105 transition-transform duration-300">
-                                <span className="text-white font-bold text-sm">
-                                  {initials}
-                                </span>
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h4 className="text-base font-semibold text-gray-900 truncate">
-                                  {fullName}
-                                </h4>
-                              </div>
-                            </div>
-
-                            <div className="space-y-2">
-                              <div className="flex items-center justify-between">
-                                <span className="text-xs font-medium text-gray-600">Team:</span>
-                                <span className="text-xs font-semibold text-purple-600 bg-purple-50 px-2 py-1 rounded-full">
-                                  {team.team_name}
-                                </span>
-                              </div>
-                            </div>
+                    {data.map((item: any, index: number) => (
+                      <div key={index} className="bg-linear-to-br from-white to-gray-50 border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-all duration-300 hover:border-purple-300 group" >
+                        <div className="flex items-center mb-3">
+                          <div className="w-8 h-8 bg-linear-to-br from-orange-500 to-purple-600 rounded-full flex items-center justify-center mr-3 shadow-md group-hover:scale-105 transition-transform duration-300">
+                            <span className="text-white font-bold text-sm">
+                              #{item?.mem_id}
+                            </span>
                           </div>
-                        );
-                      })
-                    )}
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-base font-semibold text-gray-900 truncate">
+                              {item?.mem_name}
+                            </h4>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          {item?.teams?.map((team: any) => (
+                            <div key={team?.team_id} className="flex items-center justify-between">
+                              <span className="text-xs font-medium text-gray-600">Team:</span>
+                              <span className="text-xs font-semibold text-purple-600 bg-purple-50 px-2 py-1 rounded-full">
+                                {team?.team_name}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ) : (
                   <div className="text-center py-8">
@@ -250,7 +248,7 @@ const Profile: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

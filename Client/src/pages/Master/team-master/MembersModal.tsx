@@ -129,10 +129,10 @@ const MembersModal: FC<Props> = ({ show, setShow }) => {
                       <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                         ID
                       </th>
-                      <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                         Name
                       </th>
-                      <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                         Action
                       </th>
                     </tr>
@@ -140,23 +140,20 @@ const MembersModal: FC<Props> = ({ show, setShow }) => {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filteredMembers?.map((member) => {
                       return (
-                        <tr
-                          key={member?.mem_id}
-                          className="hover:bg-gray-50 transition-colors duration-150 "
-                        >
+                        <tr key={member?.mem_id} className="hover:bg-gray-50 transition-colors duration-150">
                           <td className="px-4 py-2 whitespace-nowrap text-center">
                             <span className="text-sm text-gray-900">
                               {member?.mem_id}
                             </span>
                           </td>
-                          <td className="px-4 py-2 whitespace-nowrap text-center">
+                          <td className="px-4 py-2 whitespace-nowrap text-left">
                             <div className="flex flex-col">
                               <span className="text-sm text-gray-900">
                                 {member?.first_name} {member?.middle_name} {member?.last_name}
                               </span>
                             </div>
                           </td>
-                          <td className="px-4 py-2 whitespace-nowrap text-center">
+                          <td className="px-4 py-2 whitespace-nowrap text-left">
                             <button
                               onClick={() => handleSelect(member)}
                               className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer text-orange-600 bg-orange-50 border border-orange-200 hover:bg-orange-100"

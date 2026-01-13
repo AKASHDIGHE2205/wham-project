@@ -159,7 +159,7 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
     formData?.append("Time", currentTime);
     formData?.append("punchDate", punchDate);
     formData?.append("eventDate", body.eventDate.toString());
-    formData?.append("userId", body.memId.toString());
+    formData?.append("memId", body.memId.toString());
     formData?.append("stepId", body.stepId.toString());
     formData?.append("taskId", body.taskId.toString());
     formData?.append("attenddesc", body.attenddesc);
@@ -251,7 +251,7 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
                   <button
                     type="button"
                     onClick={handlePunchIn}
-                    disabled={isGettingLocation}
+                    disabled={(loading) || (isGettingLocation)}
                     className="px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-lg hover:shadow transition duration-300 flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed disabled:bg-green-300"
                   >
                     {isGettingLocation ? (

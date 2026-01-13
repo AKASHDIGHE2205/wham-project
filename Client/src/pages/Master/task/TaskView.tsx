@@ -68,7 +68,7 @@ const TaskView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-orange-50/30 p-2 sm:p-6">
+    <div className="min-h-screen bg-orange-50/30 p-2 sm:p-6 border border-orange-300 rounded-md m-1">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
@@ -137,25 +137,25 @@ const TaskView = () => {
         {/* Tasks Table */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full divide-y divide-gray-200 text-center">
+            <table className="w-full min-w-[500px] divide-y divide-gray-200 p-4">
               <thead className="bg-linear-to-r from-purple-50 to-orange-50">
                 <tr>
                   <th className="px-3 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     ID
                   </th>
-                  <th className="px-3 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Name
                   </th>
-                  <th className="px-3 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Step Name
                   </th>
-                  <th className="px-3 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider hidden sm:table-cell">
+                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden">
                     Description
                   </th>
-                  <th className="px-3 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-3 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Action
                   </th>
                 </tr>
@@ -174,13 +174,13 @@ const TaskView = () => {
                 ) : currentItems.length > 0 ? (
                   currentItems.map((task: Task) => (
                     <tr key={task.id} className="hover:bg-orange-50 transition-colors duration-150">
-                      <td className="px-3 py-3 text-sm text-gray-900 whitespace-nowrap">{task.id}</td>
-                      <td className="px-3 py-3 text-sm text-gray-900">{task.task_name}</td>
-                      <td className="px-3 py-3 text-sm text-gray-900">{task.step_name}</td>
-                      <td className="px-3 py-3 text-sm text-gray-900 hidden sm:table-cell">
+                      <td className="px-3 py-3 text-left text-sm text-gray-900 whitespace-nowrap">{task.id}</td>
+                      <td className="px-3 py-3 text-left text-sm text-gray-900">{task.task_name}</td>
+                      <td className="px-3 py-3 text-left text-sm text-gray-900">{task.step_name}</td>
+                      <td className="px-3 py-3 text-left text-sm text-gray-900 hidden">
                         {task.task_desc}
                       </td>
-                      <td className="px-3 py-3 text-sm text-gray-900 whitespace-nowrap">
+                      <td className="px-3 py-3 text-left text-sm text-gray-900 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${task.status === 'active' ? 'bg-green-100 text-green-800' :
                           task.status === 'inactive' ? 'bg-red-100 text-red-800' :
                             task.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
@@ -189,7 +189,7 @@ const TaskView = () => {
                           {task.status}
                         </span>
                       </td>
-                      <td className="px-3 py-3 whitespace-nowrap">
+                      <td className="px-3 py-3 text-left whitespace-nowrap">
                         <button
                           type="button"
                           onClick={() => handleEdit(task)}

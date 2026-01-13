@@ -127,7 +127,7 @@ const ViewMedia: FC<Props> = ({ show, setShow, selectedEvent }) => {
   const totalPhotos = allPhotos?.length;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+    <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
       <div className="bg-white rounded-2xl w-full max-w-6xl max-h-[85vh] overflow-hidden shadow-2xl border border-gray-200 animate-in slide-in-from-bottom-4 duration-300 flex flex-col">
         {/* Modal Header - Reduced padding */}
         <div className="flex items-center justify-between p-4 bg-linear-to-r from-gray-50 to-white border-b border-gray-100 shrink-0">

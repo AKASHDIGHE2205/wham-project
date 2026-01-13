@@ -181,10 +181,10 @@ const ReportView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-orange-50/30 border border-orange-300 m-1 rounded-md">
       <div className="max-w-6xl mx-auto p-4">
         {/* Filter Card - Compact */}
-        <div className="bg-white rounded-xl shadow-sm border border-orange-400 p-5 mb-6">
+        <div className="bg-white rounded-xl shadow-sm border border-orange-200 p-5 mb-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <div className="p-2 bg-linear-to-r from-indigo-500 to-purple-500 rounded-lg">
@@ -278,7 +278,7 @@ const ReportView = () => {
                   const hasMoreTasks = eventDetails?.details.length > 2;
 
                   return (
-                    <div key={event?.id} className="bg-orange-50 rounded-xl shadow-sm border border-orange-400 overflow-hidden">
+                    <div key={event?.id} className="bg-white rounded-xl shadow-sm border border-orange-200 overflow-hidden">
                       {/* Event Header  */}
                       <div className="p-5 border border-gray-200 rounded-lg m-1">
                         <div className="flex  sm:items-start justify-between gap-3">

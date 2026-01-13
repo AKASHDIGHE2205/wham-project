@@ -245,7 +245,6 @@ const Navbar = () => {
                       }
                       onClick={closeAllMenus}
                     >
-                      <span className="text-lg">📅</span>
                       <span className="font-medium group-hover:translate-x-1 transition-transform duration-200">
                         Report 1
                       </span>

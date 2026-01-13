@@ -66,7 +66,7 @@ const StepView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-orange-50/30 p-2 sm:p-6">
+    <div className="min-h-screen bg-orange-50/30 p-2 sm:p-6 border border-orange-300 rounded-md m-1">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
@@ -135,22 +135,22 @@ const StepView = () => {
         {/* Steps Table */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[600px] divide-y divide-gray-200 p-4">
+            <table className="w-full min-w-[500px] divide-y divide-gray-200 p-4">
               <thead className="bg-linear-to-r from-purple-50 to-orange-50">
                 <tr>
                   <th className="px-2 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     ID
                   </th>
-                  <th className="px-2 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Name
                   </th>
-                  <th className="px-2 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Description
                   </th>
-                  <th className="px-2 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-2 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Action
                   </th>
                 </tr>
@@ -158,7 +158,7 @@ const StepView = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-4 text-gray-500">
+                    <td colSpan={5} className="text-left py-4 text-gray-500">
                       <div className="flex justify-center items-center text-orange-600 gap-2">
                         <div className="animate-spin h-6 w-6 border-4 border-orange-600 border-t-transparent rounded-full"></div>
                         <span className=''>Loading...</span>
@@ -168,11 +168,11 @@ const StepView = () => {
                 ) : currentItems?.length > 0 ? (
                   currentItems?.map((step: Steps) => (
                     <tr key={step?.id} className="hover:bg-orange-50 transition-colors duration-150">
-                      <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-900">{step?.id}</td>
-                      <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-900">{step?.step_name}</td>
-                      <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-900">{step?.step_desc}</td>
-                      <td className="px-2 py-2 text-center text-sm text-gray-900">{step?.status === 'A' ? "Active" : "Inactive"}</td>
-                      <td className="px-3 py-2 text-center whitespace-nowrap">
+                      <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-gray-900">{step?.id}</td>
+                      <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-gray-900">{step?.step_name}</td>
+                      <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-gray-900">{step?.step_desc}</td>
+                      <td className="px-2 py-2 text-left text-sm text-gray-900">{step?.status === 'A' ? "Active" : "Inactive"}</td>
+                      <td className="px-3 py-2 text-left whitespace-nowrap">
                         <button
                           type="button"
                           onClick={() => handleEdit(step)}

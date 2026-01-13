@@ -28,24 +28,17 @@ export const registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const insertUserSQL = `
-          INSERT INTO users 
-           (first_name, middle_name,last_name, password, email, phone, role) 
-          VALUES (?, ?, ?, ?, ?, ?,'User')
-        `;
+          INSERT INTO users (first_name, middle_name,last_name, password, email, phone, role) VALUES (?, ?, ?, ?, ?, ?,'User')
+          `;
 
-        db.query(insertUserSQL,
-          [firstName, middleName, lastName, hashedPassword, email, phone],
-          (insertErr, insertResults) => {
-            if (insertErr) {
-              console.error("Insert error:", insertErr);
-              return res.status(500).json({ message: "Error while registering user" });
-            }
-
-            return res.status(201).json({
-              message: "User registered successfully ✅",
-              userId: insertResults.insertId,
-            });
+        db.query(insertUserSQL, [firstName, middleName, lastName, hashedPassword, email, phone], (insertErr, insertResults) => {
+          if (insertErr) {
+            console.error("Insert error:", insertErr);
+            return res.status(500).json({ message: "Error while registering user" });
           }
+
+          return res.status(201).json({ message: "User registered successfully ✅", userId: insertResults.insertId, });
+        }
         );
 
       } catch (hashErr) {
@@ -66,11 +59,12 @@ export const loginUser = (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required." });
+      return res.status(400).json({ message: "Please fill all required fields.", });
     }
 
-    const sql = `SELECT * FROM users WHERE email = ?`;
-    db.query(sql, [email], async (err, results) => {
+    const sql = `SELECT * FROM users WHERE email = ? OR phone = ? LIMIT 1`;
+
+    db.query(sql, [email, email], async (err, results) => {
       if (err) {
         console.error("Database error:", err);
         return res.status(500).json({ message: "Internal server error" });
@@ -88,9 +82,7 @@ export const loginUser = (req, res) => {
       }
 
       const token = jwt.sign(
-        { userId: user.id, email: user.email, role: user.role },
-        process.env.JWT_SECRET || SECRET_KEY,
-        { expiresIn: "1h" }
+        { userId: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET || SECRET_KEY, { expiresIn: "1h" }
       );
 
       return res.status(200).json({
@@ -113,8 +105,8 @@ export const loginUser = (req, res) => {
   }
 };
 
-//GET TEAM MEMBERS
-export const getTeamMembers = (req, res) => {
+//GET TEAM MEMBERS updated on 12/01/2026
+export const getTeamMembers_old = (req, res) => {
   const { userId } = req.body;
 
   // STEP 1: Get member IDs for this user
@@ -190,6 +182,88 @@ export const getTeamMembers = (req, res) => {
   });
 };
 
+export const getTeamMembers = (req, res) => {
+  const { userId } = req.body;
+
+  // STEP 1: Get member IDs for this user
+  const sql1 = `
+    SELECT mem_id 
+    FROM mst_members 
+    WHERE user_id = ?
+  `;
+
+  db.query(sql1, [userId], (err, memberResults) => {
+    if (err) return res.status(500).json({ message: "Internal server error" });
+
+    if (memberResults.length === 0) {
+      return res.status(404).json({ message: "No member found for this user" });
+    }
+
+    const memberIds = memberResults.map(m => m.mem_id);
+
+    // STEP 2: Get teams user belongs to
+    const sql2 = `
+      SELECT DISTINCT t.id AS team_id, t.name AS team_name, t.manager_id
+      FROM mst_team t
+      JOIN team_members tm ON tm.team_id = t.id
+      WHERE tm.member_id IN (?)
+    `;
+
+    db.query(sql2, [memberIds], (err, teamResults) => {
+      if (err) return res.status(500).json({ message: "Internal server error" });
+
+      if (teamResults.length === 0) {
+        return res.status(200).json({ teams: [] });
+      }
+
+      const teamIds = teamResults.map(t => t.team_id);
+
+      // STEP 3: Get members of those teams (excluding logged-in user)
+      const sql3 = `
+        SELECT
+          m.mem_id,
+          CONCAT(m.first_name, ' ', m.middle_name, ' ', m.last_name) AS mem_name,
+          m.user_id,
+          tm.team_id
+        FROM team_members tm
+        JOIN mst_members m ON m.mem_id = tm.member_id
+        WHERE tm.team_id IN (?)
+          AND m.user_id <> ?
+      `;
+
+      db.query(sql3, [teamIds, userId], (err, memberResults) => {
+        if (err) return res.status(500).json({ message: "Internal server error" });
+
+        // 🔁 STEP 4: Transform data to MEMBER → TEAMS format
+        const memberMap = {};
+
+        memberResults.forEach(member => {
+          if (!memberMap[member.mem_id]) {
+            memberMap[member.mem_id] = {
+              mem_id: member.mem_id,
+              mem_name: member.mem_name,
+              user_id: member.user_id,
+              teams: []
+            };
+          }
+
+          const team = teamResults.find(t => t.team_id === member.team_id);
+          if (team) {
+            memberMap[member.mem_id].teams.push({
+              team_id: team.team_id,
+              team_name: team.team_name,
+              manager_id: team.manager_id
+            });
+          }
+        });
+
+        return res.status(200).json({
+          teams: Object.values(memberMap)
+        });
+      });
+    });
+  });
+};
 
 export const sendOtp = async (req, res) => {
   try {

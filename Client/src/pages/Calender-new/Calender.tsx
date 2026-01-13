@@ -145,9 +145,9 @@ const Calendar: React.FC<CalendarProps> = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-orange-50/30">
+    <div className="min-h-screen flex flex-col bg-orange-50/30 border border-orange-300 m-1 rounded-md">
       {/* HEADER — NO CHANGES */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 sm:p-6 border-b border-orange-100 bg-linear-to-r from-white to-orange-50/30">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 sm:p-6 border-b border-orange-100">
         {/* HEADER SECTION */}
         <div className="flex items-center justify-between sm:justify-start space-x-4 sm:space-x-6">
           <div className="flex items-center space-x-2 sm:space-x-3">

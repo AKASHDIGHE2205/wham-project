@@ -30,7 +30,8 @@ const StepModal: FC<Props> = ({ show, setShow }) => {
     fetchData();
   }, [])
   const filteredData = data.filter((item: Steps) =>
-    item.step_name.toLowerCase().includes(search.toLowerCase())
+    item?.id?.toString()?.toLowerCase()?.includes(search?.toString()?.toLowerCase()) ||
+    item?.step_name?.toLowerCase().includes(search?.toLowerCase())
   )
 
   if (!show) return null;
@@ -90,10 +91,10 @@ const StepModal: FC<Props> = ({ show, setShow }) => {
                 <th className="px-3 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   ID
                 </th>
-                <th className="px-3 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Name
                 </th>
-                <th className="px-3 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Action
                 </th>
               </tr>
@@ -112,8 +113,8 @@ const StepModal: FC<Props> = ({ show, setShow }) => {
                 filteredData.map((step: Steps) => (
                   <tr key={step.id} className="hover:bg-gray-50 transition-colors duration-150">
                     <td className="px-3 py-3 text-center text-sm text-gray-900">{step.id}</td>
-                    <td className="px-3 py-3 text-center text-sm text-gray-900">{step.step_name}</td>
-                    <td className="px-3 py-3 text-center">
+                    <td className="px-3 py-3 text-left text-sm text-gray-900">{step.step_name}</td>
+                    <td className="px-3 py-3 text-left">
                       <button
                         type="button"
                         className="inline-flex items-center px-3 py-1.5 text-xs sm:text-sm font-medium text-orange-600 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-all duration-200 cursor-pointer"

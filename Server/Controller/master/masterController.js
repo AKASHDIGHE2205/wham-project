@@ -652,8 +652,9 @@ export const getAllSidebarMembers_old = (req, res) => {
 };
 
 export const getAllSidebarMembers = (req, res) => {
-  const { from_date, to_date, memId, role } = req.body;
+  const { from_date, to_date, userId, role } = req.body;
   const adminRoles = ["Admin", "Master", "Manager"];
+
   if (!from_date || !to_date) {
     return res.status(400).json({ message: "from_date and to_date required" });
   }
@@ -694,7 +695,7 @@ export const getAllSidebarMembers = (req, res) => {
     const params = [to_date, from_date, to_date, from_date];
 
     if (limitToMemId) {
-      membersSql += " AND m.mem_id = ? ";
+      membersSql += " AND m.user_id = ? ";
       params.push(limitToMemId);
     }
 
@@ -777,9 +778,11 @@ export const getAllSidebarMembers = (req, res) => {
   if (adminRoles.includes(role)) {
     fetchData();
   }
+
   else if (role === "User") {
-    fetchData(memId);
+    fetchData(userId);
   }
+
   else {
     return res.status(403).json({ message: "Unauthorized role" });
   }

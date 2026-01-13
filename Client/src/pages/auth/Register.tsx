@@ -140,18 +140,17 @@ const Register: React.FC = () => {
               <div
                 className="w-16 h-16 bg-linear-to-br from-orange-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg"
                 data-aos="zoom-in"
-                data-aos-delay="200"
               >
                 <User className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2" data-aos="fade-up" data-aos-delay="300">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 Create Your <span className="text-orange-600">Account</span>
               </h2>
             </div>
 
             {/* Form */}
             <form className="space-y-6" onSubmit={handleSubmit}>
-              <div className="space-y-6" data-aos="fade-up" data-aos-delay="600">
+              <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-black">First Name<span className='text-red-600'>*</span></label>
@@ -255,7 +254,7 @@ const Register: React.FC = () => {
               </div>
 
               {/* Passwords */}
-              <div className="space-y-6" data-aos="fade-up" data-aos-delay="600">
+              <div className="space-y-6">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-black">Password<span className='text-red-600'>*</span></label>
                   <div className="relative group">

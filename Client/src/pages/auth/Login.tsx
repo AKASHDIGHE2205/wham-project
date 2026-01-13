@@ -121,11 +121,10 @@ const Login: React.FC = () => {
               <div
                 className="w-16 h-16 bg-linear-to-br from-orange-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg"
                 data-aos="zoom-in"
-                data-aos-delay="200"
               >
                 <User className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2" data-aos="fade-up" data-aos-delay="300">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 Sign In to <span className="text-orange-600">Your Account</span>
               </h2>
             </div>
@@ -135,19 +134,19 @@ const Login: React.FC = () => {
               <div className="space-y-6">
                 {/* Email Field */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Email Address <span className='text-red-600'>*</span> </label>
+                  <label className="text-sm font-medium text-gray-700">Email/Mobile <span className='text-red-600'>*</span> </label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Mail className="h-5 w-5 text-gray-400" />
                     </div>
                     <input
-                      type="email"
+                      type="text"
                       name='email'
                       onChange={handleChange}
                       value={inputs.email}
                       required
                       className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
-                      placeholder="Enter your email"
+                      placeholder="Enter your email/mobile"
                     />
                   </div>
                 </div>
