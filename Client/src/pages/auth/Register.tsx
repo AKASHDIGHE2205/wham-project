@@ -74,9 +74,9 @@ const Register: React.FC = () => {
       {/* Left Side - Updated Platform Overview */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-linear-to-br from-purple-900 to-black">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-64 h-64 border-2 border-orange-400 rounded-full" />
-          <div className="absolute bottom-20 right-20 w-48 h-48 border-2 border-yellow-400 rounded-full" />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 border-2 border-purple-400 rounded-full" />
+          <div className="absolute top-20 left-20 w-64 h-64 border-2 border-orange-400 rounded-full animate-bounce" />
+          <div className="absolute bottom-20 right-20 w-48 h-48 border-2 border-yellow-400 rounded-full animate-bounce" />
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 border-2 border-purple-400 rounded-full animate-bounce" />
         </div>
 
         <div className="relative z-10 flex flex-col justify-center items-center w-full p-12 text-white">
@@ -119,8 +119,8 @@ const Register: React.FC = () => {
                 { text: "Centralized Dashboard with activity overview", color: "text-purple-400" },
                 { text: "Smart Scheduling with calendar integration", color: "text-orange-400" },
                 { text: "Media Gallery for all your files", color: "text-orange-300" }
-              ].map((feature, index) => (
-                <div key={feature.text} className="flex items-center space-x-3" data-aos="fade-right" data-aos-delay={800 + index * 100}>
+              ].map((feature) => (
+                <div key={feature.text} className="flex items-center space-x-3">
                   <div className={`w-2 h-2 rounded-full ${feature.color.replace("text", "bg")}`} />
                   <span className="text-gray-300 text-lg">{feature.text}</span>
                 </div>

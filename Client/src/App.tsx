@@ -4,11 +4,12 @@ import Calender from './pages/Calender-new/Calender';
 import { lazy, Suspense, useEffect } from 'react';
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from './store/store';
 import Loadings from './components/Loadings';
 import DefaultLayout from './layout/DefaultLayout';
 import Logout from './pages/auth/Logout';
+import { authFinished, setUser, verifyAndLoadUser } from './feature/authSlice';
 
 const Login = lazy(() => import('./pages/auth/Login'));
 const Register = lazy(() => import('./pages/auth/Register'));
@@ -25,7 +26,22 @@ const TaskView = lazy(() => import('./pages/Master/task/TaskView'));
 const StepView = lazy(() => import('./pages/Master/steps/StepView'));
 
 function App() {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch();
+  const { isAuthenticated, isAuthLoading } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const verified = await verifyAndLoadUser();
+
+      if (verified.isAuthenticated) {
+        dispatch(setUser({ user: verified.user, token: verified.token }));
+      } else {
+        dispatch(authFinished());
+      }
+    };
+
+    initAuth();
+  }, [dispatch]);
 
   useEffect(() => {
     AOS.init({
@@ -35,6 +51,9 @@ function App() {
     });
   }, []);
 
+  if (isAuthLoading) {
+    return <Loadings />;
+  }
   return (
     <BrowserRouter>
       {isAuthenticated ? (
@@ -59,7 +78,6 @@ function App() {
 
               {/*Report Routes */}
               <Route path='/report/report1' element={<ReportView />} />
-
 
               {/*Profile Routes */}
               <Route path="/auth/profile" element={<Profile />} />

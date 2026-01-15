@@ -230,6 +230,7 @@ const UpdateStep: FC<UpdateStepProps> = ({ show, setShow, Data, User, fetchAllDa
                   <option value="P">Progress</option>
                   <option value="S">Start</option>
                   <option value="C">Complete</option>
+                  <option value="D">Delete</option>
                 </select>
               </div>
             </div>

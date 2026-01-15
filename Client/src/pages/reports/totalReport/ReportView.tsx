@@ -280,7 +280,7 @@ const ReportView = () => {
                   return (
                     <div key={event?.id} className="bg-white rounded-xl shadow-sm border border-orange-200 overflow-hidden">
                       {/* Event Header  */}
-                      <div className="p-5 border border-gray-200 rounded-lg m-1">
+                      <div className="p-2 border border-gray-200 rounded-lg m-1">
                         <div className="flex  sm:items-start justify-between gap-3">
                           <div className="flex-1">
                             <div className="flex items-center gap-3">
@@ -294,9 +294,9 @@ const ReportView = () => {
                             <div className="flex flex-col items-start gap-3 text-sm text-gray-600 ml-11">
                               <div className="flex items-center gap-1">
                                 <CalendarDays className="w-3.5 h-3.5 text-orange-500" />
-                                <span>{moment(event?.from_date).format("DD/MMM/YYYY")} - {moment(event?.to_date).format("DD/MMM/YYYY")}</span>
+                                <span>{moment(event?.from_date).format("DD/MMM/YYYY")}-{formatTime(event?.from_date)} to {moment(event?.to_date).format("DD/MMM/YYYY")}-{formatTime(event?.to_date)}</span>
                               </div>
-                              <div className="flex items-center gap-1">
+                              <div className="flex items-center gap-1" hidden>
                                 <Clock className="w-3.5 h-3.5 text-orange-500" />
                                 <span>{formatTime(event?.from_date)} - {formatTime(event?.to_date)}</span>
                               </div>
@@ -326,7 +326,7 @@ const ReportView = () => {
                       </div>
 
                       {/* Merged Details Grid  */}
-                      <div className="p-5 border border-gray-200 rounded-lg m-1">
+                      <div className="p-2 border border-gray-200 rounded-lg m-1">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                           {/* Location & Team Info Card */}
                           <div className="space-y-4">
@@ -373,20 +373,21 @@ const ReportView = () => {
                                 <div className="space-y-3">
                                   {/* Teams Section with Vertical Scroll */}
                                   {eventDetails?.teams?.length > 0 && (
-                                    <div>
-                                      <div className="text-xs text-gray-900 mb-1">Assigned Teams</div>
-                                      <div className="max-h-24 overflow-y-auto pr-2"> {/* Added vertical scroll */}
-                                        <div className="flex flex-wrap gap-1.5">
-                                          {eventDetails?.teams?.map((team, index) => (
-                                            <span
-                                              key={index}
-                                              className="px-2 py-1 bg-purple-50 text-purple-700 rounded text-xs font-medium border border-purple-100 truncate"
-                                            >
-                                              {team?.team_name}
-                                            </span>
-                                          ))}
+                                    <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
+                                      {eventDetails?.teams?.map((team, index) => (
+                                        <div key={index} className="p-3 bg-orange-50 rounded-lg">
+                                          <div className="flex items-start gap-2">
+                                            <div className="w-6 h-6 rounded bg-blue-200 flex items-center justify-center shrink-0">
+                                              <span className="text-xs font-medium text-blue-900">{index + 1}</span>
+                                            </div>
+                                            <div className="flex-1 ">
+                                              <div className="flex items-center gap-2 mt-1 text-xs text-orange-500 ">
+                                                <span>{team?.team_name}</span>
+                                              </div>
+                                            </div>
+                                          </div>
                                         </div>
-                                      </div>
+                                      ))}
                                     </div>
                                   )}
 
@@ -414,7 +415,7 @@ const ReportView = () => {
                           </div>
 
                           {/* Tasks Section */}
-                          {eventDetails?.details.length > 0 && (
+                          {eventDetails?.details.length > 0 ? (
                             <div className="border border-gray-200 p-2 rounded-lg">
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-2">
@@ -487,6 +488,10 @@ const ReportView = () => {
                                   </button>
                                 )}
                               </div>
+                            </div>
+                          ) : (
+                            <div className="border border-gray-200 p-2 rounded-lg">
+                              <span>No Task assigned to.</span>
                             </div>
                           )}
                         </div>

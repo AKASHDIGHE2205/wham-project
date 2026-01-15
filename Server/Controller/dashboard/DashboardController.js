@@ -429,12 +429,17 @@ export const getActiveTasks = (req, res) => {
   });
 }
 
-export const addAttendence = async (req, res) => {
+export const addAttendence_old13012026 = async (req, res) => {
   try {
     const { eventId, Time, punchDate, eventDate, stepId, taskId, memId, location, attenddesc } = req.body;
     const file = req.file;
     let locationObj = typeof location === "string" ? JSON.parse(location) : location;
-    console.log(req.body);
+
+    const getMemDetails = `
+                          SELECT CONCAT(first_name,' ',middle_name,' ', last_name)
+                          FROM mst_members
+                  WHERE mem_id = ?
+                          `;
 
     const dbQuery = (sql, params = []) => {
       return new Promise((resolve, reject) => {
@@ -497,6 +502,166 @@ export const addAttendence = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
+
+export const addAttendence = async (req, res) => {
+  try {
+    const {
+      eventId,
+      Time,
+      punchDate,
+      eventDate,
+      stepId,
+      taskId,
+      memId,
+      location,
+      attenddesc
+    } = req.body;
+
+    const file = req.file;
+    const locationObj = typeof location === "string" ? JSON.parse(location) : location;
+
+    // DB helper
+    const dbQuery = (sql, params = []) => {
+      return new Promise((resolve, reject) => {
+        db.query(sql, params, (error, results) => {
+          if (error) reject(error);
+          else resolve(results);
+        });
+      });
+    };
+
+    /* -----------------------------------
+       STEP 1: CHECK DUPLICATE ATTENDANCE
+    ------------------------------------ */
+    const checkQuery = `
+      SELECT 1
+      FROM event_media
+      WHERE event_id = ?
+        AND mem_id = ?
+        AND event_date = ?
+        AND step_id = ?
+        AND task_id = ?
+        AND punch_date = ?
+      LIMIT 1
+    `;
+
+    const alreadyAttended = await dbQuery(checkQuery, [
+      eventId,
+      memId,
+      eventDate,
+      stepId,
+      taskId,
+      punchDate
+    ]);
+
+    if (alreadyAttended.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "You have already attended this task."
+      });
+    }
+
+    /* -----------------------------------
+       STEP 2: GET MEMBER NAME
+    ------------------------------------ */
+    const getMemDetails = `
+      SELECT CONCAT(first_name,' ',middle_name,' ',last_name) AS full_name
+      FROM mst_members
+      WHERE mem_id = ?
+    `;
+
+    const memResult = await dbQuery(getMemDetails, [memId]);
+
+    const memNameRaw = memResult[0]?.full_name || "unknown";
+
+    // sanitize name for folder
+    const memName = memNameRaw
+      .replace(/\s+/g, "_")
+      .replace(/[^a-zA-Z0-9_]/g, "");
+
+    /* -----------------------------------
+       STEP 3: FILE UPLOAD & SAVE
+    ------------------------------------ */
+    let savePath = null;
+    let mediaSrNo = null;
+
+    if (file) {
+      const yearMonth = `${new Date().getFullYear()}${String(
+        new Date().getMonth() + 1
+      ).padStart(2, "0")}`;
+
+      const memberFolder = `${memId}_${memName}`;
+      const uploadPath = path.join("uploads", yearMonth, memberFolder);
+
+      await fs.ensureDir(uploadPath);
+
+      const fileName = `${Date.now()}_${file.originalname}`;
+      savePath = path.posix.join(uploadPath.replace(/\\/g, "/"), fileName);
+
+      await sharp(file.buffer)
+        .jpeg({ quality: 40 })
+        .toFile(savePath);
+
+      /* -----------------------------------
+         STEP 4: INSERT DB RECORD
+      ------------------------------------ */
+      const mediaMaxResult = await dbQuery(
+        "SELECT COALESCE(MAX(sr_no), 0) + 1 AS next_id FROM event_media"
+      );
+
+      mediaSrNo = mediaMaxResult[0].next_id;
+
+      const mediaQuery = `
+        INSERT INTO event_media
+        (
+          sr_no,
+          event_id,
+          in_time,
+          punch_date,
+          event_date,
+          media_path,
+          address,
+          lat,
+          lng,
+          media_desc,
+          mem_id,
+          step_id,
+          task_id
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+
+      await dbQuery(mediaQuery, [
+        mediaSrNo,
+        eventId,
+        Time,
+        punchDate,
+        eventDate,
+        savePath,
+        locationObj?.address ?? null,
+        locationObj?.latitude ?? null,
+        locationObj?.longitude ?? null,
+        attenddesc,
+        memId,
+        stepId,
+        taskId
+      ]);
+    }
+
+    return res.json({
+      success: true,
+      message: "Attendance added successfully!"
+    });
+
+  } catch (error) {
+    console.error("Attendance Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -717,13 +882,13 @@ export const getEventForAttend = async (req, res) => {
       LEFT JOIN event_member em ON eh.id = em.event_id
       LEFT JOIN event_team et ON eh.id = et.event_id
       LEFT JOIN event_dt AS a ON a.event_id = eh.id 
-         AND a.event_date = eh.event_date
+                AND a.event_date = eh.event_date
       LEFT JOIN mst_steps AS b ON a.step_no = b.id
       LEFT JOIN mst_tasks AS c ON a.task_id = c.id
       WHERE eh.isdeleted = 'N'
-        AND a.status != 'C'
-        AND CURDATE() BETWEEN DATE(eh.from_date) AND DATE(eh.to_date)
-        ${roleCondition}
+            AND a.status NOT IN ('D', 'C')
+            AND CURDATE() BETWEEN DATE(eh.from_date) AND DATE(eh.to_date)
+            ${roleCondition}
       ORDER BY eh.from_date ASC, eh.created_at DESC
     `;
 

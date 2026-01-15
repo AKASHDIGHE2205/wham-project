@@ -2,7 +2,11 @@ import db from '../../db.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import axios from 'axios';
-const SECRET_KEY = "Malpani@2025";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const SECRET_KEY = process.env.SECRET_KEY || "Malpani@2025";
 
 // REGISTER USER
 export const registerUser = async (req, res) => {
@@ -431,39 +435,6 @@ export const updatePassword = async (req, res) => {
   } catch (error) {
     console.error("Password reset error:", error);
     return res.status(500).json({ success: false, message: "Something went wrong while resetting password", });
-  }
-};
-
-export const validateToken = async (req, res) => {
-  try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-
-    if (!token) {
-      return res.status(401).json({ valid: false, message: 'No token provided' });
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || SECRET_KEY);
-
-    // Check if user still exists in database
-    const checkUserSQL = `SELECT id, email, first_name, last_name, role FROM users WHERE id = ?`;
-    db.query(checkUserSQL, [decoded.userId], (err, results) => {
-      if (err || results.length === 0) {
-        return res.status(401).json({ valid: false, message: 'User not found' });
-      }
-
-      return res.status(200).json({
-        valid: true,
-        user: {
-          id: results[0].id,
-          firstName: results[0].first_name,
-          lastName: results[0].last_name,
-          email: results[0].email,
-          role: results[0].role
-        }
-      });
-    });
-  } catch (error) {
-    return res.status(401).json({ valid: false, message: 'Invalid token' });
   }
 };
 
