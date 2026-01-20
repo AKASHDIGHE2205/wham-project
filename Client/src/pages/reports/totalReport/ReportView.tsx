@@ -302,8 +302,8 @@ const ReportView = () => {
                               </div>
                             </div>
                           </div>
-                          <div className="text-sm text-gray-500">
-                            <span
+                          <div className="text-sm text-gray-900">
+                            Status : <span
                               className={`px-2 py-1 rounded text-xs font-medium
                                           ${event?.isapproved === 'A' ? 'bg-green-100 text-green-700' : ''}
                                           ${event?.isapproved === 'C' ? 'bg-blue-100 text-blue-700' : ''}
@@ -335,7 +335,6 @@ const ReportView = () => {
                               <div className="border border-gray-200 p-2 rounded-lg">
                                 <div className="flex items-center justify-between gap-2 mb-2">
                                   <div className="flex gap-2"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1B43BA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-map-pin-check-icon lucide-map-pin-check"><path d="M19.43 12.935c.357-.967.57-1.955.57-2.935a8 8 0 0 0-16 0c0 4.993 5.539 10.193 7.399 11.799a1 1 0 0 0 1.202 0 32.197 32.197 0 0 0 .813-.728" /><circle cx="12" cy="10" r="3" /><path d="m16 18 2 2 4-4" /></svg>
-
                                     <h4 className="text-sm font-semibold text-gray-700">Locations</h4>
                                   </div>
                                   <span className="text-xs flex items-center justify-center text-center bg-blue-100 text-blue-700 border-blue-100 rounded-3xl p-1">
@@ -366,9 +365,14 @@ const ReportView = () => {
                             {/* Teams & Members Section */}
                             {(eventDetails?.teams.length > 0 || eventDetails?.members.length > 0) && (
                               <div className="border border-gray-200 p-2 rounded-lg">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <UsersRound className="w-4 h-4 text-purple-500" />
-                                  <h4 className="text-sm font-semibold text-gray-700">Teams & Members</h4>
+                                <div className="flex justify-between items-center gap-2 mb-2">
+                                  <span className="flex gap-2 justify-center items-center">
+                                    <UsersRound className="w-4 h-4 text-purple-500" />
+                                    <h4 className="text-sm font-semibold text-gray-700">Assigned Teams</h4>
+                                  </span>
+                                  <span className="text-xs flex items-center justify-center text-center bg-blue-100 text-blue-700 border-blue-100 rounded-3xl p-1">
+                                    {eventDetails?.teams.length} {eventDetails?.teams.length === 1 ? 'team' : 'teams'}
+                                  </span>
                                 </div>
                                 <div className="space-y-3">
                                   {/* Teams Section with Vertical Scroll */}
@@ -394,8 +398,16 @@ const ReportView = () => {
                                   {/* Members Section with Vertical Scroll */}
                                   {eventDetails?.members?.length > 0 && (
                                     <div>
-                                      <div className="text-xs text-gray-900 mb-1">Assigned Members</div>
-                                      <div className="max-h-24 overflow-y-auto pr-2"> {/* Added vertical scroll */}
+                                      <div className="flex justify-between items-center">
+                                        <div className="flex gap-2 justify-center items-center">
+                                          <UsersRound className="w-4 h-4 text-purple-500" />
+                                          <span className="text-sm font-semibold text-gray-700">Assigned Members</span>
+                                        </div>
+                                        <span className="text-xs flex items-center justify-center text-center bg-blue-100 text-blue-700 border-blue-100 rounded-3xl p-1">
+                                          {eventDetails?.members.length} {eventDetails?.members.length === 1 ? 'member' : 'members'}
+                                        </span>
+                                      </div>
+                                      <div className="max-h-24 overflow-y-auto pr-2">
                                         <div className="flex flex-wrap gap-1.5">
                                           {eventDetails?.members.map((member, index) => (
                                             <span
@@ -498,7 +510,7 @@ const ReportView = () => {
                       </div>
 
                       {/* Duration Summary */}
-                      <div className="p-4 bg-gray-50 border-t border-gray-100">
+                      <div className="py-1 px-4 bg-gray-50 border-t border-gray-100">
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-gray-600">Event Duration:</span>
                           <span className="font-medium text-orange-600">

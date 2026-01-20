@@ -8,7 +8,7 @@ import { Toaster } from 'react-hot-toast'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Toaster />
+    <Toaster position="top-right" reverseOrder={false} />
     <Provider store={store}>
       <App />
     </Provider>

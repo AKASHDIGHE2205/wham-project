@@ -63,7 +63,7 @@ const Profile: React.FC = () => {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">User Not Found</h2>
           <p className="text-gray-600 mb-6">Please log in to continue</p>
           <Link
-            to="/auth/login"
+            to="/auth/log-out"
             className="inline-flex items-center justify-center px-6 py-3 bg-linear-to-r from-orange-500 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
           >
             Go to Login

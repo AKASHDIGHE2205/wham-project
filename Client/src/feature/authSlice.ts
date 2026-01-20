@@ -112,7 +112,7 @@ export const authSlice = createSlice({
 
       const encryptedData1 = CryptoJS.AES.encrypt(
         JSON.stringify(data?.user || data),
-        secretKey
+        secretKey,
       ).toString();
 
       Cookies.set("token", data?.token, {

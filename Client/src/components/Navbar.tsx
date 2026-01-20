@@ -59,201 +59,205 @@ const Navbar = () => {
                 Home
               </NavLink>
             </div>
-
-            {/* Dashboard Mobile */}
-            <div className="border-b border-gray-100">
-              <NavLink
-                to={'/dashboard'}
-                className={({ isActive }) =>
-                  `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
-                    ? 'bg-orange-100 text-orange-600'
-                    : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'}`
-                }
-              >
-                <ActivityIcon size={16} />
-                Dashboard
-              </NavLink>
-            </div>
-
-            {/* Master Dropdown */}
             {(user?.role === 'Master' || user?.role === 'Admin' || user?.role === 'Manager') && (
-              <div className="relative">
-                <button
-                  onClick={() => handleDropdownToggle('Master')}
-                  className={`flex items-center space-x-1 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === 'Master'
-                    ? 'bg-orange-50 text-orange-600 border border-orange-200'
-                    : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
-                    }`}
-                >
-                  <ShieldCheck size={16} />
-                  Master
-                  <svg
-                    className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'Master' ? 'rotate-180' : ''
-                      }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+              <>
+                {/* Dashboard Mobile */}
+                <div className="border-b border-gray-100">
+                  <NavLink
+                    to={'/dashboard'}
+                    className={({ isActive }) =>
+                      `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                        ? 'bg-orange-100 text-orange-600'
+                        : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'}`
+                    }
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
+                    <ActivityIcon size={16} />
+                    Dashboard
+                  </NavLink>
+                </div>
 
-                {activeDropdown === 'Master' && (
-                  <div className="absolute top-full left-0 mt-2 w-40 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
-
-                    <NavLink
-                      to="/master/team-view"
-                      className={({ isActive }) =>
-                        `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-     ${isActive
-                          ? 'bg-orange-100 text-orange-600 font-medium'
-                          : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                      }
-                      onClick={closeAllMenus}
+                {/* Master Dropdown */}
+                {(user?.role === 'Master' || user?.role === 'Admin' || user?.role === 'Manager') && (
+                  <div className="relative">
+                    <button
+                      onClick={() => handleDropdownToggle('Master')}
+                      className={`flex items-center space-x-1 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === 'Master'
+                        ? 'bg-orange-50 text-orange-600 border border-orange-200'
+                        : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
+                        }`}
                     >
-                      <Users size={16} />
-                      Team
-                    </NavLink>
+                      <ShieldCheck size={16} />
+                      Master
+                      <svg
+                        className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'Master' ? 'rotate-180' : ''
+                          }`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
 
-                    <NavLink
-                      to="/master/view-members"
-                      className={({ isActive }) =>
-                        `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    {activeDropdown === 'Master' && (
+                      <div className="absolute top-full left-0 mt-2 w-40 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+
+                        <NavLink
+                          to="/master/team-view"
+                          className={({ isActive }) =>
+                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
      ${isActive
-                          ? 'bg-orange-100 text-orange-600 font-medium'
-                          : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                      }
-                      onClick={closeAllMenus}
-                    >
-                      <User size={16} />
-                      Member
-                    </NavLink>
+                              ? 'bg-orange-100 text-orange-600 font-medium'
+                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                          }
+                          onClick={closeAllMenus}
+                        >
+                          <Users size={16} />
+                          Team
+                        </NavLink>
 
-                    <NavLink
-                      to="/master/view-steps"
-                      className={({ isActive }) =>
-                        `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                        <NavLink
+                          to="/master/view-members"
+                          className={({ isActive }) =>
+                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
      ${isActive
-                          ? 'bg-orange-100 text-orange-600 font-medium'
-                          : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                      }
-                      onClick={closeAllMenus}
-                    >
-                      <Layers size={16} />
-                      Steps
-                    </NavLink>
+                              ? 'bg-orange-100 text-orange-600 font-medium'
+                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                          }
+                          onClick={closeAllMenus}
+                        >
+                          <User size={16} />
+                          Member
+                        </NavLink>
 
-                    <NavLink
-                      to="/master/view-tasks"
-                      className={({ isActive }) =>
-                        `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                        <NavLink
+                          to="/master/view-steps"
+                          className={({ isActive }) =>
+                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
      ${isActive
-                          ? 'bg-orange-100 text-orange-600 font-medium'
-                          : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                      }
-                      onClick={closeAllMenus}
-                    >
-                      <CheckSquare size={16} />
-                      Tasks
-                    </NavLink>
+                              ? 'bg-orange-100 text-orange-600 font-medium'
+                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                          }
+                          onClick={closeAllMenus}
+                        >
+                          <Layers size={16} />
+                          Steps
+                        </NavLink>
 
+                        <NavLink
+                          to="/master/view-tasks"
+                          className={({ isActive }) =>
+                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+     ${isActive
+                              ? 'bg-orange-100 text-orange-600 font-medium'
+                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                          }
+                          onClick={closeAllMenus}
+                        >
+                          <CheckSquare size={16} />
+                          Tasks
+                        </NavLink>
+
+                      </div>
+                    )}
                   </div>
                 )}
-              </div>
+
+                {/* Calender Mobile */}
+                <div className="border-b border-gray-100">
+                  <NavLink
+                    to={'/calender'}
+                    className={({ isActive }) =>
+                      `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                        ? 'bg-orange-100 text-orange-600'
+                        : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'}`
+                    }
+                  >
+                    <Calendar size={16} />
+                    Calender
+                  </NavLink>
+                </div>
+
+                {/* Transaction Dropdown */}
+                <div className="relative hidden">
+                  <button
+                    onClick={() => handleDropdownToggle('Transaction')}
+                    className={`flex items-center space-x-1 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === 'Transaction'
+                      ? 'bg-orange-50 text-orange-600 border border-orange-200'
+                      : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
+                      }`}
+                  >
+                    Transaction
+                    <svg
+                      className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'Transaction' ? 'rotate-180' : ''
+                        }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                    {activeDropdown === 'Transaction' && (
+                      <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                        <Link
+                          to="/calender"
+                          className="flex items-center space-x-3 px-2 py-1 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200 group gap-2"
+                          onClick={closeAllMenus}
+                        >
+                          <Calendar size={16} />
+                          Calendar
+                        </Link>
+                      </div>
+                    )}
+                  </button>
+                </div>
+
+                {/* Reports Dropdown */}
+                <div className="relative ">
+                  <button
+                    onClick={() => handleDropdownToggle('Reports')}
+                    className={`flex items-center space-x-1 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === 'Reports'
+                      ? 'bg-orange-50 text-orange-600 border border-orange-200'
+                      : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
+                      }`}
+                  >
+                    <FileBarChart size={16} />
+                    Reports
+                    <svg
+                      className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'Reports' ? 'rotate-180' : ''
+                        }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                    {activeDropdown === 'Reports' && (
+                      <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                        <NavLink
+                          to="report/report1"
+                          className={({ isActive }) =>
+                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+     ${isActive
+                              ? 'bg-orange-100 text-orange-600 font-medium'
+                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                          }
+                          onClick={closeAllMenus}
+                        >
+                          <span className="font-medium group-hover:translate-x-1 transition-transform duration-200">
+                            Report 1
+                          </span>
+                        </NavLink>
+                      </div>
+                    )}
+                  </button>
+
+                </div>
+              </>
             )}
 
-            {/* Calender Mobile */}
-            <div className="border-b border-gray-100">
-              <NavLink
-                to={'/calender'}
-                className={({ isActive }) =>
-                  `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
-                    ? 'bg-orange-100 text-orange-600'
-                    : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'}`
-                }
-              >
-                <Calendar size={16} />
-                Calender
-              </NavLink>
-            </div>
-
-            {/* Transaction Dropdown */}
-            <div className="relative hidden">
-              <button
-                onClick={() => handleDropdownToggle('Transaction')}
-                className={`flex items-center space-x-1 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === 'Transaction'
-                  ? 'bg-orange-50 text-orange-600 border border-orange-200'
-                  : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
-                  }`}
-              >
-                Transaction
-                <svg
-                  className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'Transaction' ? 'rotate-180' : ''
-                    }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-                {activeDropdown === 'Transaction' && (
-                  <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
-                    <Link
-                      to="/calender"
-                      className="flex items-center space-x-3 px-2 py-1 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200 group gap-2"
-                      onClick={closeAllMenus}
-                    >
-                      <Calendar size={16} />
-                      Calendar
-                    </Link>
-                  </div>
-                )}
-              </button>
-            </div>
-
-            {/* Reports Dropdown */}
-            <div className="relative ">
-              <button
-                onClick={() => handleDropdownToggle('Reports')}
-                className={`flex items-center space-x-1 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === 'Reports'
-                  ? 'bg-orange-50 text-orange-600 border border-orange-200'
-                  : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
-                  }`}
-              >
-                <FileBarChart size={16} />
-                Reports
-                <svg
-                  className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'Reports' ? 'rotate-180' : ''
-                    }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-                {activeDropdown === 'Reports' && (
-                  <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
-                    <NavLink
-                      to="report/report1"
-                      className={({ isActive }) =>
-                        `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-     ${isActive
-                          ? 'bg-orange-100 text-orange-600 font-medium'
-                          : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                      }
-                      onClick={closeAllMenus}
-                    >
-                      <span className="font-medium group-hover:translate-x-1 transition-transform duration-200">
-                        Report 1
-                      </span>
-                    </NavLink>
-                  </div>
-                )}
-              </button>
-
-            </div>
 
           </div>
 
@@ -366,186 +370,12 @@ const Navbar = () => {
                 </NavLink>
               </div>
 
-              {/* Dashboard Mobile */}
-              <div className="border-b border-gray-100 pb-2">
-                <NavLink
-                  to={'/dashboard'}
-                  className={({ isActive }) =>
-                    `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
-                      ? 'bg-orange-100 text-orange-600'
-                      : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                  }
-                  onClick={handleMobileLinkClick}
-                >
-                  <span className='flex justify-center items-center gap-2 font-medium'>
-                    <ActivityIcon size={16} />
-                    Dashboard
-                  </span>
-                </NavLink>
-              </div>
-
-              {/* Master Mobile */}
               {(user?.role === 'Master' || user?.role === 'Admin' || user?.role === 'Manager') && (
-                <div className="border-b border-gray-100 pb-2">
-                  <button
-                    onClick={() => handleDropdownToggle('mobile-Master')}
-                    className={`flex justify-between w-full items-center space-x-1 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === 'mobile-Master'
-                      ? 'bg-orange-50 text-orange-600 border border-orange-200'
-                      : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
-                      }`}
-                  ><div className='flex justify-center items-center gap-2'>
-                      <ShieldCheck size={16} />
-                      Master
-                    </div>
-                    <svg
-                      className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'mobile-Master' ? 'rotate-180' : ''
-                        }`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-
-                  {activeDropdown === 'mobile-Master' && (
-                    <div className="mt-2 ml-4 space-y-1">
-                      <NavLink
-                        to="/master/team-view"
-                        className={({ isActive }) =>
-                          `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
-                            ? 'bg-orange-100 text-orange-600'
-                            : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                        }
-                        onClick={handleMobileLinkClick}
-                      >
-                        <Users size={16} />
-                        Team
-                      </NavLink>
-                      <NavLink
-                        to="/master/view-members"
-                        className={({ isActive }) =>
-                          `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
-                            ? 'bg-orange-100 text-orange-600'
-                            : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                        }
-                        onClick={handleMobileLinkClick}
-                      >
-                        <User size={16} />
-                        Member
-                      </NavLink>
-                      <NavLink
-                        to="/master/view-steps"
-                        className={({ isActive }) =>
-                          `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
-                            ? 'bg-orange-100 text-orange-600'
-                            : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                        }
-                        onClick={handleMobileLinkClick}
-                      >
-                        <Layers size={16} />
-                        Steps
-                      </NavLink>
-                      <NavLink
-                        to="/master/view-tasks"
-                        className={({ isActive }) =>
-                          `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
-                            ? 'bg-orange-100 text-orange-600'
-                            : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                        }
-                        onClick={handleMobileLinkClick}
-                      >
-                        <CheckSquare size={16} />
-                        Task
-                      </NavLink>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Calender Mobile */}
-              <div className="border-b border-gray-100 pb-2">
-                <NavLink
-                  to={'/calender'}
-                  className={({ isActive }) =>
-                    `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
-                      ? 'bg-orange-100 text-orange-600'
-                      : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                  }
-                  onClick={handleMobileLinkClick}
-                >
-                  <span className=' font-medium flex justify-center items-center gap-2'>
-                    <Calendar size={16} />
-                    Calender
-                  </span>
-                </NavLink>
-              </div>
-
-              {/* Transaction Mobile */}
-              <div className="border-b border-gray-100 pb-2 hidden">
-                <button
-                  onClick={() => handleDropdownToggle('mobile-Transaction')}
-                  className="flex items-center justify-between w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors duration-200"
-                >
-                  <span className="font-medium">Transaction</span>
-                  <svg
-                    className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'mobile-Transaction' ? 'rotate-180' : ''
-                      }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                {activeDropdown === 'mobile-Transaction' && (
-                  <div className="mt-2 ml-4 space-y-1">
-                    <Link
-                      to="/calender"
-                      className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-colors duration-200"
-                      onClick={handleMobileLinkClick}
-                    >
-                      <span className='font-medium flex justify-center items-center gap-2'>
-                        <Calendar size={16} />
-                        Calendar
-                      </span>
-                    </Link>
-                  </div>
-                )}
-              </div>
-
-              {/* Reports Mobile */}
-              <div className="border-b border-gray-100 pb-2 ">
-                <button
-                  onClick={() => handleDropdownToggle('mobile-Reports')}
-                  className={`flex justify-between w-full items-center space-x-1 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === 'mobile-Reports'
-                    ? 'bg-orange-50 text-orange-600 border border-orange-200'
-                    : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
-                    }`}
-                ><div className='flex justify-center items-center gap-2'>
-                    <FileBarChart size={16} />
-                    Report
-                  </div>
-                  <svg
-                    className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'mobile-Reports' ? 'rotate-180' : ''
-                      }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                {activeDropdown === 'mobile-Reports' && (
-                  <div className="mt-2 ml-4 space-y-1">
+                <>
+                  {/* Dashboard Mobile */}
+                  <div className="border-b border-gray-100 pb-2">
                     <NavLink
-                      to="/report/report1"
+                      to={'/dashboard'}
                       className={({ isActive }) =>
                         `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
                     ${isActive
@@ -554,11 +384,189 @@ const Navbar = () => {
                       }
                       onClick={handleMobileLinkClick}
                     >
-                      <span>Report 1</span>
+                      <span className='flex justify-center items-center gap-2 font-medium'>
+                        <ActivityIcon size={16} />
+                        Dashboard
+                      </span>
                     </NavLink>
                   </div>
-                )}
-              </div>
+
+                  {/* Master Mobile */}
+                  {(user?.role === 'Master' || user?.role === 'Admin' || user?.role === 'Manager' || user?.role === 'User') && (
+                    <div className="border-b border-gray-100 pb-2">
+                      <button
+                        onClick={() => handleDropdownToggle('mobile-Master')}
+                        className={`flex justify-between w-full items-center space-x-1 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === 'mobile-Master'
+                          ? 'bg-orange-50 text-orange-600 border border-orange-200'
+                          : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
+                          }`}
+                      ><div className='flex justify-center items-center gap-2'>
+                          <ShieldCheck size={16} />
+                          Master
+                        </div>
+                        <svg
+                          className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'mobile-Master' ? 'rotate-180' : ''
+                            }`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+
+                      {activeDropdown === 'mobile-Master' && (
+                        <div className="mt-2 ml-4 space-y-1">
+                          <NavLink
+                            to="/master/team-view"
+                            className={({ isActive }) =>
+                              `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                                ? 'bg-orange-100 text-orange-600'
+                                : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                            }
+                            onClick={handleMobileLinkClick}
+                          >
+                            <Users size={16} />
+                            Team
+                          </NavLink>
+                          <NavLink
+                            to="/master/view-members"
+                            className={({ isActive }) =>
+                              `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                                ? 'bg-orange-100 text-orange-600'
+                                : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                            }
+                            onClick={handleMobileLinkClick}
+                          >
+                            <User size={16} />
+                            Member
+                          </NavLink>
+                          <NavLink
+                            to="/master/view-steps"
+                            className={({ isActive }) =>
+                              `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                                ? 'bg-orange-100 text-orange-600'
+                                : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                            }
+                            onClick={handleMobileLinkClick}
+                          >
+                            <Layers size={16} />
+                            Steps
+                          </NavLink>
+                          <NavLink
+                            to="/master/view-tasks"
+                            className={({ isActive }) =>
+                              `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                                ? 'bg-orange-100 text-orange-600'
+                                : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                            }
+                            onClick={handleMobileLinkClick}
+                          >
+                            <CheckSquare size={16} />
+                            Task
+                          </NavLink>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Calender Mobile */}
+                  <div className="border-b border-gray-100 pb-2">
+                    <NavLink
+                      to={'/calender'}
+                      className={({ isActive }) =>
+                        `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                          ? 'bg-orange-100 text-orange-600'
+                          : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                      }
+                      onClick={handleMobileLinkClick}
+                    >
+                      <span className=' font-medium flex justify-center items-center gap-2'>
+                        <Calendar size={16} />
+                        Calender
+                      </span>
+                    </NavLink>
+                  </div>
+
+                  {/* Transaction Mobile */}
+                  <div className="border-b border-gray-100 pb-2 hidden">
+                    <button
+                      onClick={() => handleDropdownToggle('mobile-Transaction')}
+                      className="flex items-center justify-between w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors duration-200"
+                    >
+                      <span className="font-medium">Transaction</span>
+                      <svg
+                        className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'mobile-Transaction' ? 'rotate-180' : ''
+                          }`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {activeDropdown === 'mobile-Transaction' && (
+                      <div className="mt-2 ml-4 space-y-1">
+                        <Link
+                          to="/calender"
+                          className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-colors duration-200"
+                          onClick={handleMobileLinkClick}
+                        >
+                          <span className='font-medium flex justify-center items-center gap-2'>
+                            <Calendar size={16} />
+                            Calendar
+                          </span>
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Reports Mobile */}
+                  <div className="border-b border-gray-100 pb-2 ">
+                    <button
+                      onClick={() => handleDropdownToggle('mobile-Reports')}
+                      className={`flex justify-between w-full items-center space-x-1 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === 'mobile-Reports'
+                        ? 'bg-orange-50 text-orange-600 border border-orange-200'
+                        : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
+                        }`}
+                    ><div className='flex justify-center items-center gap-2'>
+                        <FileBarChart size={16} />
+                        Report
+                      </div>
+                      <svg
+                        className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'mobile-Reports' ? 'rotate-180' : ''
+                          }`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {activeDropdown === 'mobile-Reports' && (
+                      <div className="mt-2 ml-4 space-y-1">
+                        <NavLink
+                          to="/report/report1"
+                          className={({ isActive }) =>
+                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                              ? 'bg-orange-100 text-orange-600'
+                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                          }
+                          onClick={handleMobileLinkClick}
+                        >
+                          <span>Report 1</span>
+                        </NavLink>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Mobile User Menu - Fixed at bottom */}

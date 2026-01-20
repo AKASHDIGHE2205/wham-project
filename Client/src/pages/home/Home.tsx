@@ -69,15 +69,17 @@ const Home = () => {
               Your command center for planning, executing, and tracking successful missions.
               Where great ideas become extraordinary achievements.
             </p>
-            <div className="flex justify-center gap-4">
-              <Link
-                to="/dashboard"
-                className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-70 transition-colors flex items-center gap-2"
-              >
-                <Rocket className="w-5 h-5" />
-                Launch Dashboard
-              </Link>
-            </div>
+            {(user?.role === 'Master' || user?.role === 'Admin' || user?.role === 'Manager' || user?.role === 'User') && (
+              <div className="flex justify-center gap-4">
+                <Link
+                  to="/dashboard"
+                  className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-70 transition-colors flex items-center gap-2"
+                >
+                  <Rocket className="w-5 h-5" />
+                  Launch Dashboard
+                </Link>
+              </div>
+            )}
           </div>
         </div>
 
