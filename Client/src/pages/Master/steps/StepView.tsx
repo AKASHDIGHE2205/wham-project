@@ -4,6 +4,7 @@ import CustomPagination from "../../../helper/CustomPagination";
 import { Plus, Search } from "lucide-react";
 import AddStep from "./AddStep";
 import UpdateStep from "./UpdateStep";
+import DataLoading from "../../../components/DataLoading";
 
 export interface Steps {
   id: number;
@@ -14,7 +15,8 @@ export interface Steps {
 
 const StepView = () => {
   const [data, setData] = useState<Steps[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [totalItems, setTotalItems] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -25,18 +27,27 @@ const StepView = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await getAllSteps();
+      const response = await getAllSteps({
+        search: searchTerm,
+        page: currentPage,
+        limit: itemsPerPage,
+      });
       setData(response.steps || []);
+      setTotalItems(response.total || 0);
     } catch (error) {
-      console.error("Error fetching tasks:", error);
+      console.error("Error fetching steps:", error);
       setData([]);
     } finally {
       setLoading(false);
     }
   }
   useEffect(() => {
-    fetchData();
-  }, [])
+    const timer = setTimeout(() => {
+      fetchData();
+    }, 500); // Debounce time of 500ms
+    return () => clearTimeout(timer);
+
+  }, [searchTerm, currentPage, itemsPerPage]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -51,14 +62,6 @@ const StepView = () => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
   }
-
-  const filteredItems = data?.filter((item: Steps) => {
-    return item.step_name.toLowerCase().includes(searchTerm.toLowerCase());
-  });
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredItems?.slice(indexOfFirstItem, indexOfLastItem);
 
   const handleEdit = (step: Steps) => {
     setSelectedStep(step);
@@ -85,11 +88,14 @@ const StepView = () => {
               </div>
               <input
                 type="text"
-                placeholder="Search step by name..."
+                placeholder="Search step..."
                 className="block w-full pl-9 sm:pl-10 pr-3 py-2 sm:py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 text-sm sm:text-base"
                 value={searchTerm}
                 onChange={handleSearchChange}
               />
+              <button className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-orange-600 cursor-pointer font-bold" onClick={() => setSearchTerm("")}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+              </button>
             </div>
 
             {/* Controls Container */}
@@ -159,14 +165,11 @@ const StepView = () => {
                 {loading ? (
                   <tr>
                     <td colSpan={5} className="text-left py-4 text-gray-500">
-                      <div className="flex justify-center items-center text-orange-600 gap-2">
-                        <div className="animate-spin h-6 w-6 border-4 border-orange-600 border-t-transparent rounded-full"></div>
-                        <span className=''>Loading...</span>
-                      </div>
+                      <DataLoading />
                     </td>
                   </tr>
-                ) : currentItems?.length > 0 ? (
-                  currentItems?.map((step: Steps) => (
+                ) : data?.length > 0 ? (
+                  data?.map((step: Steps) => (
                     <tr key={step?.id} className="hover:bg-orange-50 transition-colors duration-150">
                       <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-gray-900">{step?.id}</td>
                       <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-gray-900">{step?.step_name}</td>
@@ -201,7 +204,7 @@ const StepView = () => {
         <div className="mt-2">
           <CustomPagination
             itemPerPage={itemsPerPage}
-            data={filteredItems}
+            totalItems={totalItems}
             handlePageChange={handlePageChange}
             currentPage={currentPage}
           />

@@ -69,19 +69,19 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setInputs(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  }
 
   const removeSelectedMember = (id: number) => {
     setSelectedMembers(prev => prev.filter(member => member.id !== id));
-  };
+  }
 
   const removeSelectedTeam = (id: number) => {
     setSelectedTeams(prev => prev.filter(team => team.id !== id));
-  };
+  }
 
   const removeSelectedLocation = (id: number) => {
     setSelectedLocations(prev => prev.filter(location => location.id !== id));
-  };
+  }
 
   const handleAddLocation = (location: { lat: number; lng: number; address: string }) => {
     const newLocation: SelectedLocation = {
@@ -90,7 +90,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
     };
     setSelectedLocations(prev => [...prev, newLocation]);
     setShowLocation(false);
-  };
+  }
 
   const user = getUserFromStorage();
 
@@ -172,13 +172,16 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
     if (response) {
       handleCancel();
     }
-  };
+  }
 
+  const today = new Date().toISOString().split('T')[0];
 
-  const disabled = Event?.isapproved === 'C' || Event?.isapproved === 'A' || !['Master', 'Admin', 'Manager'].includes(Role);
-
+  const disabled = (Event?.isapproved === 'C' || Event?.isapproved === 'A' || !['Master', 'Admin', 'Manager'].includes(Role))
+    && Event?.event_date < today;
+  // const disabled = Event?.isapproved === 'C' || Event?.isapproved === 'A' || !['Master', 'Admin', 'Manager'].includes(Role)
 
   if (!isShow) return null;
+
   return (
     <>
       <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
@@ -553,12 +556,14 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                     type="button"
                     className="px-6 py-2 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-700 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm flex items-center gap-2 cursor-pointer"
                     onClick={handleDelete}
+                    disabled={disabled}
                   >
                     Delete
                   </button>
                   <button
                     type="submit"
                     className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm flex items-center gap-2 cursor-pointer"
+                    disabled={disabled}
                   >
                     Update
                   </button>

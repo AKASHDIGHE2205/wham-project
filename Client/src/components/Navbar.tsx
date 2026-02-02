@@ -59,7 +59,7 @@ const Navbar = () => {
                 Home
               </NavLink>
             </div>
-            {(user?.role === 'Master' || user?.role === 'Admin' || user?.role === 'Manager') && (
+            {(user?.role === 'Master' || user?.role === 'Admin' || user?.role === 'Manager' || user?.role === 'User') && (
               <>
                 {/* Dashboard Mobile */}
                 <div className="border-b border-gray-100">
@@ -258,7 +258,6 @@ const Navbar = () => {
               </>
             )}
 
-
           </div>
 
           {/* User Profile - Right */}
@@ -370,7 +369,7 @@ const Navbar = () => {
                 </NavLink>
               </div>
 
-              {(user?.role === 'Master' || user?.role === 'Admin' || user?.role === 'Manager') && (
+              {(user?.role === 'Master' || user?.role === 'Admin' || user?.role === 'Manager' || user?.role === 'User') && (
                 <>
                   {/* Dashboard Mobile */}
                   <div className="border-b border-gray-100 pb-2">

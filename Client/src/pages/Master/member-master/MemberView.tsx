@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { getAllMembers } from "../../../services/master/masterApi";
 import CustomPagination from '../../../helper/CustomPagination';
 import { Link } from "react-router-dom";
+import DataLoading from "../../../components/DataLoading";
 
 export interface Team {
   id: number;
@@ -25,16 +26,22 @@ export interface Member {
 
 const MemberView = () => {
   const [data, setData] = useState<Member[]>([]);
+  const [totalItems, setTotalItems] = useState(0);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await getAllMembers();
+      const response = await getAllMembers({
+        search,
+        page: currentPage,
+        limit: itemsPerPage
+      });
       setData(response?.members || []);
+      setTotalItems(response?.total || 0);
     } catch (error) {
       console.log(error);
     } finally {
@@ -43,25 +50,16 @@ const MemberView = () => {
   }
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    const timer = setTimeout(() => {
+      fetchData();
+    }, 500); // Debounce time of 500ms
+    return () => clearTimeout(timer);
+  }, [search, currentPage, itemsPerPage]);
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-
-  const filterData = data?.filter((item: Member) =>
-    item?.mem_id.toString().toLowerCase().includes(search.toString().toLowerCase()) ||
-    item?.mem_name.toLowerCase().includes(search.toLowerCase()) ||
-    item?.address.toLowerCase().includes(search.toLowerCase()) ||
-    item?.designation.toLowerCase().includes(search.toLowerCase()) ||
-    item?.mobile.toLocaleLowerCase().toLowerCase().includes(search.toLocaleLowerCase().toLowerCase()) ||
-    item?.email.toLocaleLowerCase().toLowerCase().includes(search.toLocaleLowerCase().toLowerCase()) ||
-    item?.teams.some(team => team.name.toLowerCase().includes(search.toLowerCase()))
-  ).slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <div className="min-h-screen bg-orange-50/30 border border-orange-300 m-1 rounded-md p-2 sm:p-6">
@@ -84,10 +82,14 @@ const MemberView = () => {
               </div>
               <input
                 type="text"
-                placeholder="Search members by name, address, or team..."
+                placeholder="Search member..."
                 className="block w-full pl-9 sm:pl-10 pr-3 py-2 sm:py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 text-sm sm:text-base"
                 onChange={(e) => setSearch(e.target.value)}
+                value={search}
               />
+              <button className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-orange-600 cursor-pointer font-bold" onClick={() => setSearch("")}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+              </button>
             </div>
 
             {/* Controls Container */}
@@ -163,14 +165,11 @@ const MemberView = () => {
                 {loading ? (
                   <tr>
                     <td colSpan={7} className="text-center py-4">
-                      <div className="flex justify-center items-center text-orange-600 gap-2">
-                        <div className="animate-spin h-6 w-6 border-4 border-orange-600 border-t-transparent rounded-full"></div>
-                        <span className=''>Loading...</span>
-                      </div>
+                      <DataLoading />
                     </td>
                   </tr>
-                ) : filterData?.length > 0 ? (
-                  filterData?.map((item) => (
+                ) : data?.length > 0 ? (
+                  data?.map((item) => (
                     <tr key={item?.mem_id} className="hover:bg-orange-50 transition-colors duration-150">
                       <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-black">{item?.mem_id}</td>
                       <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-black">{item?.mem_name}</td>
@@ -221,7 +220,7 @@ const MemberView = () => {
         <div className="mt-2">
           <CustomPagination
             itemPerPage={itemsPerPage}
-            data={data}
+            totalItems={totalItems}
             handlePageChange={handlePageChange}
             currentPage={currentPage}
           />

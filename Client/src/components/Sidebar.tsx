@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { getAllSidebarMembers } from '../services/master/masterApi';
 import { getUserFromStorage } from '../helper/cryptoUser';
+import { useNavigate } from 'react-router-dom';
 
 export interface Team {
   id: number;
@@ -42,7 +43,7 @@ const Sidebar = () => {
   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
   const [fromDate] = useState(formatDate(firstDayOfMonth));
   const [toDate] = useState(formatDate(tomorrow));
-
+  const navigate = useNavigate();
   const fetchData = async () => {
     setLoading(true)
     const body = {
@@ -64,6 +65,7 @@ const Sidebar = () => {
     } finally {
       setLoading(false)
     }
+    navigate("/");
   }
 
   useEffect(() => {
@@ -103,6 +105,7 @@ const Sidebar = () => {
               </span>
             </a>
           </div>
+
           {/* Search Section */}
           <div className="p-4 border-b border-gray-100">
             <div className="relative">
@@ -175,20 +178,20 @@ const Sidebar = () => {
                           </h4>
 
                           {/* Stats in single line */}
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="flex items-center gap-1 p-1 bg-gray-100">
+                          <div className="flex items-center gap-1 mb-2">
+                            <div className="flex items-center p-1 bg-gray-100">
                               <span className="text-xs text-black">Total :</span>
                               <span className="text-xs font-bold text-black">
                                 {member?.total_events || 0}
                               </span>
                             </div>
-                            <div className="flex items-center gap-1 p-1 bg-green-100">
-                              <span className="text-xs text-green-700">Done:</span>
+                            <div className="flex items-center p-1 bg-green-100">
+                              <span className="text-xs text-green-700">Complete:</span>
                               <span className="text-xs font-bold text-green-700">
                                 {member?.completed_events || 0}
                               </span>
                             </div>
-                            <div className="flex items-center gap-1 p-1 bg-yellow-100">
+                            <div className="flex items-center p-1 bg-yellow-100">
                               <span className="text-xs text-yellow-700">Pending:</span>
                               <span className="text-xs font-bold text-yellow-700">
                                 {member?.pending_events || 0}

@@ -10,6 +10,7 @@ interface registerData {
   password: string;
   phone: string;
 }
+
 interface loginData {
   email: string;
   password: string;
@@ -24,7 +25,7 @@ export const registerApi = async (data: registerData) => {
     }
   } catch (error: any) {
     toast.error(
-      error.response?.data?.message || "Registration failed. Please try again."
+      error.response?.data?.message || "Registration failed. Please try again.",
     );
     throw error;
   }
@@ -39,7 +40,7 @@ export const loginApi = async (data: loginData) => {
     }
   } catch (error: any) {
     toast.error(
-      error.response?.data?.message || "Login failed. Please try again."
+      error.response?.data?.message || "Login failed. Please try again.",
     );
     throw error;
   }
@@ -54,7 +55,7 @@ export const sendOtp = async (data: any) => {
     }
   } catch (error: any) {
     toast.error(
-      error.response?.data?.message || "failed to send OTP. Please try again."
+      error.response?.data?.message || "failed to send OTP. Please try again.",
     );
     throw error;
   }
@@ -69,7 +70,7 @@ export const getTeamMembers = async (data: any) => {
   } catch (error: any) {
     toast.error(
       error.response?.data?.message ||
-        "failed to fetch team member. Please try again."
+        "failed to fetch team member. Please try again.",
     );
     throw error;
   }
@@ -84,7 +85,7 @@ export const ValidateOtp = async (data: any) => {
     }
   } catch (error: any) {
     toast.error(
-      error.response?.data?.message || "failed to send OTP. Please try again."
+      error.response?.data?.message || "failed to send OTP. Please try again.",
     );
     throw error;
   }
@@ -100,12 +101,12 @@ export const UpdateOtp = async (data: any) => {
   } catch (error: any) {
     toast.error(
       error.response?.data?.message ||
-        "failed to reset password. Please try again."
+        "failed to reset password. Please try again.",
     );
     throw error;
   }
 };
-// authServices.ts
+
 export const verifyTokenApi = async (token: string) => {
   try {
     const response = await axios.get(`${BASE_URL}/auth/verify-token`, {

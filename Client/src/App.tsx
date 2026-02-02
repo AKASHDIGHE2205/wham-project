@@ -51,9 +51,7 @@ function App() {
     });
   }, []);
 
-  if (isAuthLoading) {
-    return <Loadings />;
-  }
+  if (isAuthLoading) return <Loadings />;
   return (
     <BrowserRouter>
       {isAuthenticated ? (

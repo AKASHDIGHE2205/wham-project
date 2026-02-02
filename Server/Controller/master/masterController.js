@@ -1,22 +1,69 @@
 import db from '../../db.js';
 
 export const getAllTeams = (req, res) => {
-  const sql = `SELECT a.id,a.name,a.manager_id,a.description,a.status,
-               CONCAT(b.first_name, ' ', b.middle_name, ' ', b.last_name) AS manager_name
-               FROM mst_team AS a
-               LEFT JOIN mst_members AS b on a.manager_id = b.mem_id
-               `;
+  const { search = "", page = 1, limit = 5 } = req.query;
 
-  db.query(sql, (err, results) => {
+  const pageNum = Number(page);
+  const limitNum = Number(limit);
+  const offset = (pageNum - 1) * limitNum;
+
+  let whereClause = "WHERE 1=1";
+  let params = [];
+
+  // 🔍 Search only on team fields
+  if (search) {
+    whereClause += `
+      AND (
+        a.id LIKE ?
+        OR a.name LIKE ?
+        OR a.description LIKE ?
+      )
+    `;
+    params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+  }
+
+  const countSql = `
+    SELECT COUNT(*) AS total
+    FROM mst_team AS a
+    ${whereClause}
+  `;
+
+  // 📄 Data query (include manager info)
+  const dataSql = `
+    SELECT 
+      a.id,
+      a.name,
+      a.manager_id,
+      a.description,
+      a.status,
+      CONCAT(b.first_name, ' ', IFNULL(b.middle_name,''), ' ', IFNULL(b.last_name,'')) AS manager_name
+    FROM mst_team AS a
+    LEFT JOIN mst_members AS b ON a.manager_id = b.mem_id
+    ${whereClause}
+    LIMIT ? OFFSET ?
+  `;
+
+  db.query(countSql, params, (err, countResult) => {
     if (err) {
-      console.error("Error fetching teams:", err);
-      return res.status(500).json({ message: "Internal server error" });
+      console.error("Count error:", err);
+      return res.status(500).json({ message: "Count error" });
     }
 
-    return res.status(200).json({
-      message: "Teams fetched successfully",
-      teams: results
-    });
+    const total = countResult[0].total;
+
+    db.query(dataSql, [...params, limitNum, offset], (err, results) => {
+      if (err) {
+        console.error("Data error:", err);
+        return res.status(500).json({ message: "Data error" });
+      }
+
+      res.status(200).json({
+        message: "Teams fetched successfully",
+        teams: results,
+        total
+      });
+    }
+    );
   });
 };
 
@@ -72,11 +119,54 @@ export const updateTeam = async (req, res) => {
   });
 };
 
-export const getAllmembers = (req, res) => {
-  const sql = `
+export const getAllMembers = (req, res) => {
+  const { search = "", page = 1, limit = 5 } = req.query;
+  const pageNum = Number(page);
+  const limitNum = Number(limit);
+  const offset = (pageNum - 1) * limitNum;
+
+  let whereClause = "WHERE 1=1";
+  let params = [];
+
+  if (search) {
+    whereClause += `
+      AND (
+        a.first_name LIKE ?
+        OR a.middle_name LIKE ?
+        OR a.last_name LIKE ?
+        OR a.email LIKE ?
+        OR a.mobile LIKE ?
+        OR a.address LIKE ?
+      )
+    `;
+    params.push(`%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`);
+  }
+
+  // 1️⃣ Get total members for pagination
+  const countSql = `
+    SELECT COUNT(*) AS total
+    FROM (
+      SELECT DISTINCT a.mem_id
+      FROM mst_members AS a
+      LEFT JOIN team_members AS b ON b.member_id = a.mem_id
+      LEFT JOIN mst_team AS c ON b.team_id = c.id
+      ${whereClause}
+    ) AS sub
+  `;
+
+  db.query(countSql, params, (err, countResult) => {
+    if (err) {
+      console.error("Count error:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+
+    const total = countResult[0].total;
+
+    // 2️⃣ Fetch member data with teams
+    const dataSql = `
       SELECT 
         a.mem_id,
-        CONCAT(a.first_name, ' ', a.middle_name, ' ', a.last_name) AS mem_name,
+        CONCAT(a.first_name, ' ', IFNULL(a.middle_name,''), ' ', IFNULL(a.last_name,'')) AS mem_name,
         a.mobile,
         a.email,
         a.birth_date,
@@ -89,44 +179,51 @@ export const getAllmembers = (req, res) => {
       FROM mst_members AS a
       LEFT JOIN team_members AS b ON b.member_id = a.mem_id
       LEFT JOIN mst_team AS c ON b.team_id = c.id
-  `;
+      ${whereClause}
+      GROUP BY a.mem_id, b.team_id
+      LIMIT ? OFFSET ?
+    `;
 
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.error("Error:", err);
-      return res.status(500).json({ message: "Internal server error" });
-    }
-
-    // Group by member
-    const membersMap = {};
-
-    results.forEach(row => {
-      if (!membersMap[row.mem_id]) {
-        membersMap[row.mem_id] = {
-          mem_id: row.mem_id,
-          mem_name: row.mem_name,
-          mobile: row.mobile,
-          email: row.email,
-          birth_date: row.birth_date,
-          address: row.address,
-          designation: row.designation,
-          isorganizer: row.isorganizer,
-          status: row.status,
-          teams: []
-        };
+    db.query(dataSql, [...params, limitNum, offset], (err, results) => {
+      if (err) {
+        console.error("Data error:", err);
+        return res.status(500).json({ message: "Internal server error" });
       }
 
-      if (row.team_id) {
-        membersMap[row.mem_id].teams.push({
-          id: row.team_id,
-          name: row.team_name
-        });
-      }
+      // 3️⃣ Group teams per member
+      const membersMap = {};
+      results.forEach(row => {
+        if (!membersMap[row.mem_id]) {
+          membersMap[row.mem_id] = {
+            mem_id: row.mem_id,
+            mem_name: row.mem_name,
+            mobile: row.mobile,
+            email: row.email,
+            birth_date: row.birth_date,
+            address: row.address,
+            designation: row.designation,
+            isorganizer: row.isorganizer,
+            status: row.status,
+            teams: []
+          };
+        }
+
+        if (row.team_id) {
+          membersMap[row.mem_id].teams.push({
+            id: row.team_id,
+            name: row.team_name
+          });
+        }
+      });
+
+      const finalData = Object.values(membersMap);
+
+      res.status(200).json({
+        message: "Members fetched successfully",
+        members: finalData,
+        total
+      });
     });
-
-    const finalData = Object.values(membersMap);
-
-    res.status(200).json({ message: "Members fetched successfully", members: finalData });
   });
 };
 
@@ -270,7 +367,7 @@ export const getMemberDetails = (req, res) => {
 
 export const getUsers = (req, res) => {
   const sql = `
-                SELECT  id,CONCAT(first_name,' ',middle_name ,' ',last_name) AS full_name
+                SELECT  id,CONCAT(first_name,' ',middle_name ,' ',last_name) AS full_name, role
                 FROM users
               `;
   db.query(sql, (err, results) => {
@@ -402,23 +499,55 @@ export const updateMember = (req, res) => {
 };
 
 export const getAllTasks = (req, res) => {
+  const { search = "", page = 1, limit = 5 } = req.query;
+
+  const pageNum = Number(page);
+  const limitNum = Number(limit);
+  const offset = (pageNum - 1) * limitNum;
+
+  let whereClause = "WHERE 1=1";
+  let params = [];
+
+  // 🔍 Search only on task fields
+  if (search) {
+    whereClause += `
+      AND (
+        a.id LIKE ?
+        OR a.task_name LIKE ?
+        OR a.task_desc LIKE ?
+      )
+    `;
+    params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+  }
+
   const sql = `
-                SELECT a.id,a.task_name,a.task_desc,a.step_id,b.step_name,a.status
-                FROM mst_tasks AS a 
-                LEFT JOIN mst_steps AS b ON a.step_id = b.id
-              `;
-  db.query(sql, (err, results) => {
+    SELECT 
+      a.id,
+      a.task_name,
+      a.task_desc,
+      a.step_id,
+      b.step_name,
+      a.status
+    FROM mst_tasks AS a
+    LEFT JOIN mst_steps AS b ON a.step_id = b.id
+    ${whereClause}
+    LIMIT ? OFFSET ?
+  `;
+
+  db.query(sql, [...params, limitNum, offset], (err, results) => {
     if (err) {
       console.error("Error fetching tasks:", err);
       return res.status(500).json({ message: "Internal server error" });
     }
-    return res.status(200).json({
+
+    res.status(200).json({
       message: "Tasks fetched successfully",
-      tasks: results
+      tasks: results,
+      total: results.length
     });
-  }
-  );
-}
+  });
+};
+
 
 export const addTask = (req, res) => {
   const { taskName, description, stepId, status } = req.body;
@@ -505,22 +634,48 @@ export const updateStep = (req, res) => {
 }
 
 export const getAllSteps = (req, res) => {
+  const { search = "", page = 1, limit = 5 } = req.query;
+
+  const pageNum = Number(page);
+  const limitNum = Number(limit);
+  const offset = (pageNum - 1) * limitNum;
+
+  let whereClause = "WHERE 1=1";
+  const params = [];
+
+  // 🔍 Search only if search term is provided
+  if (search) {
+    whereClause += `
+      AND (
+        id LIKE ?
+        OR step_name LIKE ?
+        OR step_desc LIKE ?
+      )
+    `;
+    params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+  }
+
   const sql = `
-                SELECT id,step_name,step_desc,status
-                FROM mst_steps
-              `;
-  db.query(sql, (err, results) => {
+    SELECT id, step_name, step_desc, status
+    FROM mst_steps
+    ${whereClause}
+    LIMIT ? OFFSET ?
+  `;
+
+  db.query(sql, [...params, limitNum, offset], (err, results) => {
     if (err) {
       console.error("Error fetching steps:", err);
       return res.status(500).json({ message: "Internal server error" });
     }
-    return res.status(201).json({
+
+    res.status(200).json({
       message: "Steps fetched successfully",
-      steps: results
+      steps: results,
+      total: results.length
     });
-  }
-  );
-}
+  });
+};
+
 
 export const getAllSidebarMembers_old = (req, res) => {
   const { from_date, to_date, userId, role } = req.body;

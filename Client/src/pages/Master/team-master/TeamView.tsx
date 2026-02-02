@@ -5,6 +5,7 @@ import NewTeam from './NewTeam';
 import { getAllTeams } from '../../../services/master/masterApi';
 import CustomPagination from '../../../helper/CustomPagination';
 import EditTeam from './EditTeam';
+import DataLoading from '../../../components/DataLoading';
 
 interface Teams {
   id: number;
@@ -18,28 +19,38 @@ const TeamView = () => {
   const [showCreate, setShowCreat] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [data, setData] = useState<Teams[]>([]);
+  const [totalItems, setTotalItems] = useState(0);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [selectedTeam, setSelectedTeam] = useState({});
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await getAllTeams();
-      setData(response.teams || []);
+      const response = await getAllTeams({
+        search,
+        page: currentPage,
+        limit: itemsPerPage
+      });
 
+      setData(response.teams || []);
+      setTotalItems(response.total || 0);
     } catch (error) {
       console.log(error);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    const timer = setTimeout(() => {
+      fetchData();
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [search, currentPage, itemsPerPage]);
 
   const handleCreate = () => {
     setShowCreat(true);
@@ -53,15 +64,6 @@ const TeamView = () => {
     setSelectedTeam(data);
     setShowEdit(true);
   }
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-
-  const filterData = data?.filter((item: Teams) =>
-    item?.id.toString().toLowerCase().includes(search.toString().toLowerCase()) ||
-    item?.name.toLowerCase().includes(search.toLowerCase()) ||
-    item?.description.toLowerCase().includes(search.toLowerCase()) ||
-    item?.status.toLowerCase().includes(search.toLowerCase())
-  ).slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <>
@@ -85,10 +87,14 @@ const TeamView = () => {
                 </div>
                 <input
                   type="text"
-                  placeholder="Search teams by name or description..."
+                  placeholder="Search teams..."
                   className="block w-full pl-9 sm:pl-10 pr-3 py-2 sm:py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 text-sm sm:text-base"
                   onChange={(e) => setSearch(e.target.value)}
+                  value={search}
                 />
+                <button className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-orange-600 cursor-pointer font-bold" onClick={() => setSearch("")}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                </button>
               </div>
 
               {/* Controls Container */}
@@ -160,14 +166,11 @@ const TeamView = () => {
                   {loading ? (
                     <tr>
                       <td colSpan={5} className="text-center py-4 text-gray-500">
-                        <div className="flex justify-center items-center text-orange-600 gap-2">
-                          <div className="animate-spin h-6 w-6 border-4 border-orange-600 border-t-transparent rounded-full"></div>
-                          <span className=''>Loading...</span>
-                        </div>
+                        <DataLoading />
                       </td>
                     </tr>
-                  ) : filterData?.length > 0 ? (
-                    filterData?.map((item) => (
+                  ) : data?.length > 0 ? (
+                    data?.map((item) => (
                       <tr key={item?.id} className="hover:bg-gray-50 transition-colors duration-150">
                         <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-900">{item?.id}</td>
                         <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-gray-900">{item?.name}</td>
@@ -210,7 +213,7 @@ const TeamView = () => {
           <div className="mt-2">
             <CustomPagination
               itemPerPage={itemsPerPage}
-              data={data}
+              totalItems={totalItems}
               handlePageChange={handlePageChange}
               currentPage={currentPage}
             />

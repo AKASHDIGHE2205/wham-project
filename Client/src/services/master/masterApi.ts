@@ -16,14 +16,11 @@ export const newTeam = async (data: any) => {
   }
 };
 
-export const getAllTeams = async () => {
-  try {
-    const response = await axios.get(`${BASE_URL}/master/getAllteams`);
-    return response.data;
-  } catch (error: any) {
-    toast.error(error.response?.data?.message || "Failed to fetch teams");
-    console.log(error);
-  }
+export const getAllTeams = async (params: any) => {
+  const response = await axios.get(`${BASE_URL}/master/getAllteams`, {
+    params,
+  });
+  return response.data;
 };
 
 export const updateTeam = async (data: any) => {
@@ -39,9 +36,11 @@ export const updateTeam = async (data: any) => {
   }
 };
 
-export const getAllMembers = async () => {
+export const getAllMembers = async (params: any) => {
   try {
-    const response = await axios.get(`${BASE_URL}/master/getAllmembers`);
+    const response = await axios.get(`${BASE_URL}/master/getAllmembers`, {
+      params,
+    });
     return response.data;
   } catch (error: any) {
     toast.error(error.response?.data?.message || "Failed to fetch teams");
@@ -65,7 +64,7 @@ export const addMember = async (data: any) => {
 export const getMemberDetails = async (id: number | string) => {
   try {
     const response = await axios.get(
-      `${BASE_URL}/master/getmemberDetails/${id}`
+      `${BASE_URL}/master/getmemberDetails/${id}`,
     );
     if (response.status === 200) {
       return response.data;
@@ -103,7 +102,7 @@ export const getAllSidebarMembers = async (data: any) => {
   try {
     const response = await axios.post(
       `${BASE_URL}/master/getAllSidebarMembers`,
-      data
+      data,
     );
     return response.data;
   } catch (error: any) {
@@ -112,9 +111,11 @@ export const getAllSidebarMembers = async (data: any) => {
   }
 };
 
-export const getAllSteps = async () => {
+export const getAllSteps = async (params: any) => {
   try {
-    const response = await axios.get(`${BASE_URL}/master/getAllSteps`);
+    const response = await axios.get(`${BASE_URL}/master/getAllSteps`, {
+      params,
+    });
     return response.data;
   } catch (error: any) {
     toast.error(error.response?.data?.message || "Failed to fetch tasks");
@@ -148,9 +149,11 @@ export const updateStep = async (data: any) => {
   }
 };
 
-export const getAllTasks = async () => {
+export const getAllTasks = async (params: any) => {
   try {
-    const response = await axios.get(`${BASE_URL}/master/getAllTasks`);
+    const response = await axios.get(`${BASE_URL}/master/getAllTasks`, {
+      params,
+    });
     return response.data;
   } catch (error: any) {
     toast.error(error.response?.data?.message || "Failed to fetch tasks");

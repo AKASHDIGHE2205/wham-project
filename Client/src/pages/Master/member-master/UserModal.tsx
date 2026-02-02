@@ -13,6 +13,7 @@ interface Props {
 interface Users {
   id: number;
   full_name: string;
+  role: string;
 }
 
 const UserModal: FC<Props> = ({ show, setShow }) => {
@@ -111,6 +112,9 @@ const UserModal: FC<Props> = ({ show, setShow }) => {
                     User Name
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    Role
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Action
                   </th>
                 </tr>
@@ -133,6 +137,7 @@ const UserModal: FC<Props> = ({ show, setShow }) => {
                     <tr key={item?.id}>
                       <td className="px-4 py-2 whitespace-nowrap">{item?.id}</td>
                       <td className="px-4 py-2 whitespace-nowrap">{item?.full_name}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">{item?.role}</td>
                       <td className="px-4 py-2 whitespace-nowrap">
                         <button
                           type="button"

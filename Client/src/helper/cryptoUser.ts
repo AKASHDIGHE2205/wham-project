@@ -16,7 +16,7 @@ export interface User {
 
 // Update your decryptUser utility to handle the nested structure
 export const decryptUser = <T = any>(
-  encrypted: string | undefined
+  encrypted: string | undefined,
 ): T | null => {
   if (!encrypted) return null;
 
@@ -38,11 +38,11 @@ export const getUserFromStorage = (): User | null => {
   const decryptedData = decryptUser<any>(encryptedData);
 
   // Handle both cases: if user data is nested or direct
-  if (decryptedData?.user) {
-    // If data has nested user object (like your response)
-    return decryptedData.user as User;
-  } else if (decryptedData?.id) {
-    // If data is the user object directly
+  // if (decryptedData?.user) {
+  //   return decryptedData.user as User;
+  // } else
+
+  if (decryptedData?.id) {
     return decryptedData as User;
   }
 
