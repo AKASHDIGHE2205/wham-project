@@ -1,33 +1,35 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import './App.css';
-import Calender from './pages/Calender-new/Calender';
-import { lazy, Suspense, useEffect } from 'react';
+import { BrowserRouter, Route, Routes } from "react-router-dom";//Navigate,
+import { lazy, Suspense, useEffect } from "react";
+import { useDispatch } from "react-redux";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { useDispatch, useSelector } from 'react-redux';
-import type { RootState } from './store/store';
-import Loadings from './components/Loadings';
-import DefaultLayout from './layout/DefaultLayout';
-import Logout from './pages/auth/Logout';
-import { authFinished, setUser, verifyAndLoadUser } from './feature/authSlice';
+import Loadings from "./components/Loadings";
+import DefaultLayout from "./layout/DefaultLayout";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import PublicRoute from "./routes/PublicRoute";
 
-const Login = lazy(() => import('./pages/auth/Login'));
-const Register = lazy(() => import('./pages/auth/Register'));
-const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'));
-const Profile = lazy(() => import('./pages/auth/Profile'));
-const Home = lazy(() => import('./pages/home/Home'));
-const TeamView = lazy(() => import('./pages/Master/team-master/TeamView'));
-const MemberView = lazy(() => import('./pages/Master/member-master/MemberView'));
-const NewMember = lazy(() => import('./pages/Master/member-master/NewMember'));
-const EditMember = lazy(() => import('./pages/Master/member-master/EditMember'));
-const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'));
-const ReportView = lazy(() => import('./pages/reports/totalReport/ReportView'));
-const TaskView = lazy(() => import('./pages/Master/task/TaskView'));
-const StepView = lazy(() => import('./pages/Master/steps/StepView'));
+import { authFinished, setUser, verifyAndLoadUser } from "./feature/authSlice";
+import UsersView from "./pages/Master/users/UsersView";
+import PageNotFound from "./components/PageNotFound";
+
+const Login = lazy(() => import("./pages/auth/Login"));
+const Register = lazy(() => import("./pages/auth/Register"));
+const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"));
+const Profile = lazy(() => import("./pages/auth/Profile"));
+const Home = lazy(() => import("./pages/home/Home"));
+const Dashboard = lazy(() => import("./pages/Dashboard/Dashboard"));
+const Calender = lazy(() => import("./pages/Calender-new/Calender"));
+const TeamView = lazy(() => import("./pages/Master/team-master/TeamView"));
+const MemberView = lazy(() => import("./pages/Master/member-master/MemberView"));
+const NewMember = lazy(() => import("./pages/Master/member-master/NewMember"));
+const EditMember = lazy(() => import("./pages/Master/member-master/EditMember"));
+const StepView = lazy(() => import("./pages/Master/steps/StepView"));
+const TaskView = lazy(() => import("./pages/Master/task/TaskView"));
+const ReportView = lazy(() => import("./pages/reports/totalReport/ReportView"));
+const Logout = lazy(() => import("./pages/auth/Logout"));
 
 function App() {
   const dispatch = useDispatch();
-  const { isAuthenticated, isAuthLoading } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     const initAuth = async () => {
@@ -44,57 +46,55 @@ function App() {
   }, [dispatch]);
 
   useEffect(() => {
-    AOS.init({
-      duration: 800,
-      once: true,
-      easing: "ease-out",
-    });
+    AOS.init({ duration: 800, once: true, easing: "ease-out" });
   }, []);
 
-  if (isAuthLoading) return <Loadings />;
   return (
     <BrowserRouter>
-      {isAuthenticated ? (
-        <Suspense fallback={<Loadings />}>
-          <Routes>
-            <Route path="/" element={<DefaultLayout />}>
+      <Suspense fallback={<Loadings />}>
+        <Routes>
+
+          {/* 🔐 Protected Routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route element={<DefaultLayout />}>
               <Route index element={<Home />} />
-
-              {/*Dashboard Routes */}
               <Route path="/dashboard" element={<Dashboard />} />
-
-              {/*Calender Routes */}
               <Route path="/calender" element={<Calender />} />
 
-              {/*Master Routes */}
+              {/* Master */}
               <Route path="/master/team-view" element={<TeamView />} />
               <Route path="/master/view-members" element={<MemberView />} />
               <Route path="/master/add-member" element={<NewMember />} />
               <Route path="/master/edit-member/:id" element={<EditMember />} />
               <Route path="/master/view-steps" element={<StepView />} />
               <Route path="/master/view-tasks" element={<TaskView />} />
+              <Route path="/master/users-view" element={<UsersView />} />
 
-              {/*Report Routes */}
-              <Route path='/report/report1' element={<ReportView />} />
 
-              {/*Profile Routes */}
+              {/* Reports */}
+              <Route path="/report/report1" element={<ReportView />} />
+
+              {/* Profile */}
               <Route path="/auth/profile" element={<Profile />} />
             </Route>
 
             <Route path="/auth/log-out" element={<Logout />} />
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </Suspense>
-      ) : (
-        <Routes>
-          <Route path="/auth/login" element={<Login />} />
-          <Route path="/auth/register" element={<Register />} />
-          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+          </Route>
 
-          {/* ✅ Fixed redirect */}
-          <Route path="*" element={<Navigate to="/auth/login" />} />
+          {/* 🌐 Public Routes */}
+          <Route element={<PublicRoute />}>
+            <Route path="/auth/login" element={<Login />} />
+            <Route path="/auth/register" element={<Register />} />
+            <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+          </Route>
+
+          {/* 🚫 404 Route - This will catch all unmatched routes */}
+          <Route path="*" element={<PageNotFound />} />
+
+          {/* <Route path="*" element={<Navigate to="/" />} /> */}
+
         </Routes>
-      )}
+      </Suspense>
     </BrowserRouter>
   );
 }

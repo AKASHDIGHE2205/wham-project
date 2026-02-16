@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { getAllSidebarMembers } from '../services/master/masterApi';
 import { getUserFromStorage } from '../helper/cryptoUser';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 
 export interface Team {
   id: number;
@@ -43,7 +43,7 @@ const Sidebar = () => {
   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
   const [fromDate] = useState(formatDate(firstDayOfMonth));
   const [toDate] = useState(formatDate(tomorrow));
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const fetchData = async () => {
     setLoading(true)
     const body = {
@@ -65,7 +65,7 @@ const Sidebar = () => {
     } finally {
       setLoading(false)
     }
-    navigate("/");
+    // navigate("/");
   }
 
   useEffect(() => {
@@ -224,7 +224,7 @@ const Sidebar = () => {
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
           <div className="w-20 h-20 bg-linear-to-br from-red-100 to-orange-100 rounded-full flex items-center justify-center mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-user-lock-icon lucide-user-lock"><circle cx="10" cy="7" r="4" /><path d="M10.3 15H7a4 4 0 0 0-4 4v2" /><path d="M15 15.5V14a2 2 0 0 1 4 0v1.5" /><rect width="8" height="5" x="13" y="16" rx=".899" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-user-lock-icon lucide-user-lock"><circle cx="10" cy="7" r="4" /><path d="M10.3 15H7a4 4 0 0 0-4 4v2" /><path d="M15 15.5V14a2 2 0 0 1 4 0v1.5" /><rect width="8" height="5" x="13" y="16" rx=".899" /></svg>
           </div>
 
           <h3 className="text-lg font-semibold text-gray-800 mb-2">

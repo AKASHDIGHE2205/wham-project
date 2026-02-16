@@ -181,7 +181,7 @@ const ReportView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-orange-50/30 border border-orange-300 m-1 rounded-md">
+    <div className="min-h-screen bg-white border border-orange-300 m-1 rounded-md">
       <div className="max-w-6xl mx-auto p-4">
         {/* Filter Card - Compact */}
         <div className="bg-white rounded-xl shadow-sm border border-orange-200 p-5 mb-6">

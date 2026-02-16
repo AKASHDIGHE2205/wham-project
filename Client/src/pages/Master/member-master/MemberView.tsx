@@ -62,7 +62,7 @@ const MemberView = () => {
 
 
   return (
-    <div className="min-h-screen bg-orange-50/30 border border-orange-300 m-1 rounded-md p-2 sm:p-6">
+    <div className="min-h-screen bg-white border border-orange-300 m-1 rounded-md p-2 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
@@ -88,7 +88,7 @@ const MemberView = () => {
                 value={search}
               />
               <button className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-orange-600 cursor-pointer font-bold" onClick={() => setSearch("")}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
               </button>
             </div>
 

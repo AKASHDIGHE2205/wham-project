@@ -1,6 +1,9 @@
 import express from 'express';
-import { getAllMembers, getAllTeams, newTeam, updateTeam, addMember, getMemberDetails, getUsers, updateMember, getAllSidebarMembers, getAllTasks, getAllSteps, addStep, updateStep, addTask, updateTask } from '../Controller/master/masterController.js';
+import { getAllMembers, getAllTeams, newTeam, updateTeam, addMember, getMemberDetails, getUsers, updateMember, getAllSidebarMembers, getAllTasks, getAllSteps, addStep, updateStep, addTask, updateTask, getAllUsers, activateUser } from '../Controller/master/masterController.js';
 const router = express.Router();
+
+router.get('/getAllUsers', getAllUsers);
+router.post('/activeUser', activateUser);
 
 router.get('/getAllteams', getAllTeams);
 router.post('/add-team', newTeam);

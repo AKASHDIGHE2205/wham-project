@@ -3,6 +3,28 @@ import axios from "axios";
 import { BASE_URL } from "../../constant/Baseurl";
 import toast from "react-hot-toast";
 
+export const getAllUsers = async (params: any) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/master/getAllUsers`, {
+      params,
+    });
+    return response.data;
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || "Failed to fetch users");
+    console.log(error);
+  }
+};
+
+export const activeUser = async (data: any) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/master/activeUser`, data);
+    return response.data;
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || "Failed to update users");
+    console.log(error);
+  }
+};
+
 export const newTeam = async (data: any) => {
   try {
     const response = await axios.post(`${BASE_URL}/master/add-team`, data);
@@ -43,7 +65,7 @@ export const getAllMembers = async (params: any) => {
     });
     return response.data;
   } catch (error: any) {
-    toast.error(error.response?.data?.message || "Failed to fetch teams");
+    toast.error(error.response?.data?.message || "Failed to fetch members");
     console.log(error);
   }
 };

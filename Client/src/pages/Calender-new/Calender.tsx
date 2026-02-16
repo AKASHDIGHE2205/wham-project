@@ -145,7 +145,7 @@ const Calendar: React.FC<CalendarProps> = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-orange-50/30 border border-orange-300 m-1 rounded-md">
+    <div className="min-h-screen flex flex-col bg-white border border-orange-300 m-1 rounded-md">
       {/* HEADER — NO CHANGES */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 sm:p-6 border-b border-orange-100">
         {/* HEADER SECTION */}

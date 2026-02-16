@@ -41,6 +41,7 @@ const StepView = () => {
       setLoading(false);
     }
   }
+
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchData();
@@ -69,7 +70,7 @@ const StepView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-orange-50/30 p-2 sm:p-6 border border-orange-300 rounded-md m-1">
+    <div className="min-h-screen bg-white p-2 sm:p-6 border border-orange-300 rounded-md m-1">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
@@ -94,7 +95,7 @@ const StepView = () => {
                 onChange={handleSearchChange}
               />
               <button className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-orange-600 cursor-pointer font-bold" onClick={() => setSearchTerm("")}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
               </button>
             </div>
 
@@ -144,7 +145,7 @@ const StepView = () => {
             <table className="w-full min-w-[500px] divide-y divide-gray-200 p-4">
               <thead className="bg-linear-to-r from-purple-50 to-orange-50">
                 <tr>
-                  <th className="px-2 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     ID
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">

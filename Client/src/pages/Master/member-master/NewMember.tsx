@@ -77,7 +77,7 @@ const NewMember = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-orange-50/30 border border-orange-300 m-1 rounded-md p-2 sm:p-6">
+      <div className="min-h-screen bg-white border border-orange-300 m-1 rounded-md p-2 sm:p-6">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 transform hover:shadow-md transition-all duration-300">

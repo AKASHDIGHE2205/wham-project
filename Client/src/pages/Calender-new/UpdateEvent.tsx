@@ -173,12 +173,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
       handleCancel();
     }
   }
-
-  const today = new Date().toISOString().split('T')[0];
-
-  const disabled = (Event?.isapproved === 'C' || Event?.isapproved === 'A' || !['Master', 'Admin', 'Manager'].includes(Role))
-    && Event?.event_date < today;
-  // const disabled = Event?.isapproved === 'C' || Event?.isapproved === 'A' || !['Master', 'Admin', 'Manager'].includes(Role)
+  const disabled = (Event?.isapproved === 'C' || Event?.isapproved === 'A' || !['Master', 'Admin', 'Manager'].includes(Role));
 
   if (!isShow) return null;
 
@@ -197,20 +192,13 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
               </div>
               <div>
                 <div className="flex items-center">
-                  <h3 className="text-xl font-semibold text-gray-900 pr-2">Update Event</h3>
-                  <p className="text-sm text-gray-600">{inputs.title}</p>
-                </div>
-                <div className="flex items-center mt-1">
-                  <h3 className="text-sm font-medium text-gray-700 pr-2">Organized by:</h3>
-                  <p className="text-sm text-gray-600">
-                    <span className="text-orange-600">{Event?.organizer_name || ""}</span>
-                  </p>
+                  <h3 className="text-md font-semibold text-gray-900 pr-2">Update Event</h3>
+                  {/* <p className="text-sm text-gray-600">{inputs.title}</p> */}
                 </div>
               </div>
             </div>
             <div className="flex items-center space-x-2">
               {/* Approve Toggle Button */}
-
               <div className="flex items-center space-x-2 mr-4">
                 <span className="text-sm font-medium text-gray-700">Approve</span>
                 <button
@@ -242,6 +230,13 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
             </div>
           </div>
 
+          <div className="flex items-center m1-1 mx-2">
+            <h3 className="text-sm font-medium text-gray-700 pr-2">Organized by:</h3>
+            <p className="text-sm text-gray-600">
+              <span className="text-orange-600">{Event?.organizer_name || ""}</span>
+            </p>
+          </div>
+
           {/* Form */}
           <form className="p-6 space-y-3" onSubmit={handleSubmit} >
             {/* Team & Member Selection */}
@@ -268,7 +263,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                         <button
                           type="button"
                           onClick={() => removeSelectedTeam(item?.id)}
-                          className="text-blue-600 hover:text-blue-800 transition-colors cursor-pointer p-0.5 rounded-full hover:bg-blue-200 disabled:cursor-not-allowed"
+                          className="text-blue-600 hover:text-blue-800 transition-colors cursor-pointer p-0.5 rounded-full hover:bg-blue-200 disabled:cursor-not-allowed disabled:opacity-50"
                           disabled={disabled}
                         >
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -278,6 +273,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                       </span>
                     ))}
                   </div>
+
                 </div>
               )}
 
@@ -476,7 +472,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                           type="button"
                           onClick={() => removeSelectedLocation(location.id)}
                           disabled={disabled}
-                          className="text-green-600 hover:text-green-800 transition-colors cursor-pointer p-1 rounded-full hover:bg-green-200 ml-2 disabled:cursor-not-allowed"
+                          className="text-green-600 hover:text-green-800 transition-colors cursor-pointer p-1 rounded-full hover:bg-green-200 ml-2 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

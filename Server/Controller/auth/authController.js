@@ -9,7 +9,7 @@ dotenv.config();
 const SECRET_KEY = process.env.SECRET_KEY || "Malpani@2025";
 
 // REGISTER USER
-export const registerUser = async (req, res) => {
+export const registerUser_old = async (req, res) => {
   try {
     const { lastName, middleName, firstName, password, email, phone } = req.body;
 
@@ -32,8 +32,7 @@ export const registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const insertUserSQL = `
-          INSERT INTO users (first_name, middle_name,last_name, password, email, phone, role) VALUES (?, ?, ?, ?, ?, ?,'User')
-          `;
+          INSERT INTO users (first_name, middle_name,last_name, password, email, phone, role, is_verified) VALUES (?, ?, ?, ?, ?, ?,'User', 'I')`;
 
         db.query(insertUserSQL, [firstName, middleName, lastName, hashedPassword, email, phone], (insertErr, insertResults) => {
           if (insertErr) {
@@ -57,36 +56,156 @@ export const registerUser = async (req, res) => {
   }
 };
 
+export const registerUser = async (req, res) => {
+  const { firstName, middleName, lastName, password, email, phone } = req.body;
+
+  if (!firstName || !lastName || !password || !email || !phone) {
+    return res.status(400).json({
+      message: "Please fill in all required fields.",
+    });
+  }
+
+  const checkUserSQL = `SELECT id FROM users WHERE email = ? OR phone = ?`;
+
+  db.query(checkUserSQL, [email, phone], async (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+
+    if (results.length > 0) {
+      return res.status(409).json({
+        message: "User already exists with this email or phone.",
+      });
+    }
+
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // 1️⃣ Get connection from pool
+      db.getConnection((connErr, connection) => {
+        if (connErr) {
+          console.error(connErr);
+          return res.status(500).json({ message: "Database connection failed" });
+        }
+
+        // 2️⃣ Start transaction
+        connection.beginTransaction((txErr) => {
+          if (txErr) {
+            connection.release();
+            return res.status(500).json({ message: "Transaction start failed" });
+          }
+
+          // 3️⃣ Insert user
+          const insertUserSQL = `
+            INSERT INTO users
+            (first_name, middle_name, last_name, password, email, phone, role, is_verified)
+            VALUES (?, ?, ?, ?, ?, ?, 'User', 'I')
+          `;
+
+          connection.query(
+            insertUserSQL,
+            [firstName, middleName, lastName, hashedPassword, email, phone],
+            (userErr, userResult) => {
+              if (userErr) {
+                return connection.rollback(() => {
+                  connection.release();
+                  console.error(userErr);
+                  res.status(500).json({ message: "User creation failed" });
+                });
+              }
+
+              const userId = userResult.insertId;
+
+              // 4️⃣ Insert member
+              const insertMemberSQL = `
+                    INSERT INTO mst_members
+                      (mem_id, first_name, middle_name, last_name, mobile, email, designation, isorganizer, user_id, status)
+                      SELECT IFNULL(MAX(mem_id), 0) + 1,?, ?, ?, ?, ?, 'Users', 'N', ?, 'A'
+                      FROM mst_members
+                  `;
+
+              connection.query(
+                insertMemberSQL,
+                [firstName, middleName, lastName, phone, email, userId],
+                (memberErr) => {
+                  if (memberErr) {
+                    return connection.rollback(() => {
+                      connection.release();
+                      console.error(memberErr);
+                      res.status(500).json({ message: "Member creation failed" });
+                    });
+                  }
+
+                  // 5️⃣ Commit
+                  connection.commit((commitErr) => {
+                    if (commitErr) {
+                      return connection.rollback(() => {
+                        connection.release();
+                        res.status(500).json({ message: "Commit failed" });
+                      });
+                    }
+
+                    // 6️⃣ Release connection
+                    connection.release();
+
+                    return res.status(201).json({
+                      message: "User registered successfully ✅",
+                      userId,
+                    });
+                  });
+                }
+              );
+            }
+          );
+        });
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Registration failed" });
+    }
+  });
+};
+
+
 // LOGIN USER
 export const loginUser = (req, res) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Please fill all required fields.", });
+      return res.status(400).json({ message: "Please fill all required fields!", });
     }
 
-    const sql = `SELECT * FROM users WHERE email = ? OR phone = ? LIMIT 1`;
+    const sql = `SELECT * FROM users WHERE (email = ? OR phone = ?) LIMIT 1`;
 
     db.query(sql, [email, email], async (err, results) => {
       if (err) {
         console.error("Database error:", err);
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Login failed. Please contact the system administrator!", });
       }
 
       if (results.length === 0) {
-        return res.status(404).json({ message: "User not found." });
+        return res.status(404).json({ message: "User not found!", });
       }
 
       const user = results[0];
 
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(401).json({ message: "Invalid password." });
+      if (user.is_verified === 'I') {
+        return res.status(403).json({ message: "Your account is temporarily inactive. Please contact the system administrator!", });
       }
 
+      // 🔐 Password check
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ message: "Invalid password!", });
+      }
+
+      // ✅ Login success
       const token = jwt.sign(
-        { userId: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET || SECRET_KEY, { expiresIn: "1d" }
+        { userId: user.id, email: user.email, role: user.role },
+        process.env.JWT_SECRET || SECRET_KEY,
+        { expiresIn: "1d" }
       );
 
       return res.status(200).json({
@@ -105,7 +224,7 @@ export const loginUser = (req, res) => {
     });
   } catch (error) {
     console.error("Unexpected server error:", error);
-    return res.status(500).json({ message: "Unexpected server error" });
+    return res.status(500).json({ message: "Unexpected server error!", });
   }
 };
 
@@ -272,12 +391,11 @@ export const getTeamMembers = (req, res) => {
 export const sendOtp = async (req, res) => {
   try {
     const { mobile } = req.body;
-    const user_name = 't1malpani';
-    const password = 'maplani'
+    const user_name = 'malpanibiz';
+    const password = 'dkhy2271DK';
     const sender = 'MALPNI';
     const entityID = '1201159436561584634';
-    const TemplateID = '1707170609314821433';
-
+    const TemplateID = '1707170609322119024';
     if (!mobile) {
       return res.status(400).json({ message: "Phone number is required" });
     }
@@ -309,7 +427,7 @@ export const sendOtp = async (req, res) => {
       // ------------------------------------
       // 3️⃣ SMS API URL
       // ------------------------------------
-      const smsApiUrl = `https://nimbusit.co.in/api/swsend.asp?username=${user_name}&password=${password}&sender=${sender}&sendto=${mobile}&message=${encodedMessage}&entityID=${entityID}&TemplateID=${TemplateID}`;
+      const smsApiUrl = `https://nimbusit.biz/api/SmsApi/SendSingleApi?UserID=${user_name}&Password=${password}&SenderID=${sender}&Phno=${mobile}&Msg=${encodedMessage}&EntityID=${entityID}&TemplateID=${TemplateID}`;
 
       // ------------------------------------
       // 4️⃣ Send SMS

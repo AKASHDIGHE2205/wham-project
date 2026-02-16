@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, LayoutDashboard, Calendar, MessageSquare, BarChart3, Image } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';//useNavigate
 import toast from 'react-hot-toast';
 import { loginApi } from '../../services/auth/authApi';
 import { useDispatch } from 'react-redux';
@@ -14,6 +14,7 @@ const Login: React.FC = () => {
   });
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
+  // const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -33,6 +34,7 @@ const Login: React.FC = () => {
       setLoading(true);
       const response = await loginApi(body);
       dispatch(login({ data: response }));
+      // navigate("/");
     } catch (error) {
       console.error("Login failed:", error);
     } finally {
@@ -180,13 +182,6 @@ const Login: React.FC = () => {
 
               {/* Remember Me & Forgot Password */}
               <div className="flex items-center justify-between" >
-                <div className="flex items-center hidden">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
-                  />
-                  <label className="ml-2 block text-sm text-gray-700">Remember me</label>
-                </div>
                 <Link
                   to="/auth/forgot-password"
                   className="text-sm text-orange-600 hover:underline font-medium"

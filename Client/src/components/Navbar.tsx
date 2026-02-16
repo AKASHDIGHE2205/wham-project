@@ -103,11 +103,41 @@ const Navbar = () => {
                     {activeDropdown === 'Master' && (
                       <div className="absolute top-full left-0 mt-2 w-40 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
 
+
+                        <NavLink
+                          to="/master/users-view"
+                          className={({ isActive }) =>
+                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                            ${isActive
+                              ? 'bg-orange-100 text-orange-600 font-medium'
+                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                          }
+                          onClick={closeAllMenus}
+                        >
+                          <Users size={16} />
+                          Users
+                        </NavLink>
+
+                        <NavLink
+                          to="/master/view-members"
+                          className={({ isActive }) =>
+                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                            ${isActive
+                              ? 'bg-orange-100 text-orange-600 font-medium'
+                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                          }
+                          onClick={closeAllMenus}
+                        >
+                          <User size={16} />
+                          Member
+                        </NavLink>
+
+
                         <NavLink
                           to="/master/team-view"
                           className={({ isActive }) =>
                             `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-     ${isActive
+                            ${isActive
                               ? 'bg-orange-100 text-orange-600 font-medium'
                               : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
                           }
@@ -118,24 +148,10 @@ const Navbar = () => {
                         </NavLink>
 
                         <NavLink
-                          to="/master/view-members"
-                          className={({ isActive }) =>
-                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-     ${isActive
-                              ? 'bg-orange-100 text-orange-600 font-medium'
-                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                          }
-                          onClick={closeAllMenus}
-                        >
-                          <User size={16} />
-                          Member
-                        </NavLink>
-
-                        <NavLink
                           to="/master/view-steps"
                           className={({ isActive }) =>
                             `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-     ${isActive
+                              ${isActive
                               ? 'bg-orange-100 text-orange-600 font-medium'
                               : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
                           }
@@ -149,7 +165,7 @@ const Navbar = () => {
                           to="/master/view-tasks"
                           className={({ isActive }) =>
                             `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-     ${isActive
+                              ${isActive
                               ? 'bg-orange-100 text-orange-600 font-medium'
                               : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
                           }
@@ -179,41 +195,6 @@ const Navbar = () => {
                     Calender
                   </NavLink>
                 </div>
-
-                {/* Transaction Dropdown */}
-                <div className="relative hidden">
-                  <button
-                    onClick={() => handleDropdownToggle('Transaction')}
-                    className={`flex items-center space-x-1 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === 'Transaction'
-                      ? 'bg-orange-50 text-orange-600 border border-orange-200'
-                      : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
-                      }`}
-                  >
-                    Transaction
-                    <svg
-                      className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'Transaction' ? 'rotate-180' : ''
-                        }`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                    {activeDropdown === 'Transaction' && (
-                      <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
-                        <Link
-                          to="/calender"
-                          className="flex items-center space-x-3 px-2 py-1 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors duration-200 group gap-2"
-                          onClick={closeAllMenus}
-                        >
-                          <Calendar size={16} />
-                          Calendar
-                        </Link>
-                      </div>
-                    )}
-                  </button>
-                </div>
-
                 {/* Reports Dropdown */}
                 <div className="relative ">
                   <button
@@ -236,24 +217,34 @@ const Navbar = () => {
                     </svg>
                     {activeDropdown === 'Reports' && (
                       <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+
+                        {(user?.role === 'Master' || user?.role === 'Admin' || user?.role === 'Manager') && (
+                          <NavLink
+                            to="report/report1"
+                            className={({ isActive }) =>
+                              `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                        ${isActive ? 'bg-orange-100 text-orange-600 font-medium' : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`}
+                            onClick={closeAllMenus}
+                          >
+                            <span className="font-medium group-hover:translate-x-1 transition-transform duration-200">
+                              Report 1
+                            </span>
+                          </NavLink>
+                        )}
                         <NavLink
-                          to="report/report1"
+                          to="report/report2"
                           className={({ isActive }) =>
                             `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-     ${isActive
-                              ? 'bg-orange-100 text-orange-600 font-medium'
-                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                          }
+                        ${isActive ? 'bg-orange-100 text-orange-600 font-medium' : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`}
                           onClick={closeAllMenus}
                         >
                           <span className="font-medium group-hover:translate-x-1 transition-transform duration-200">
-                            Report 1
+                            Report 2
                           </span>
                         </NavLink>
                       </div>
                     )}
                   </button>
-
                 </div>
               </>
             )}
@@ -417,18 +408,19 @@ const Navbar = () => {
                       {activeDropdown === 'mobile-Master' && (
                         <div className="mt-2 ml-4 space-y-1">
                           <NavLink
-                            to="/master/team-view"
+                            to="/master/users-view"
                             className={({ isActive }) =>
                               `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
-                                ? 'bg-orange-100 text-orange-600'
+                            ${isActive
+                                ? 'bg-orange-100 text-orange-600 font-medium'
                                 : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
                             }
-                            onClick={handleMobileLinkClick}
+                            onClick={closeAllMenus}
                           >
                             <Users size={16} />
-                            Team
+                            Users
                           </NavLink>
+
                           <NavLink
                             to="/master/view-members"
                             className={({ isActive }) =>
@@ -442,6 +434,21 @@ const Navbar = () => {
                             <User size={16} />
                             Member
                           </NavLink>
+
+                          <NavLink
+                            to="/master/team-view"
+                            className={({ isActive }) =>
+                              `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                                ? 'bg-orange-100 text-orange-600'
+                                : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                            }
+                            onClick={handleMobileLinkClick}
+                          >
+                            <Users size={16} />
+                            Team
+                          </NavLink>
+
                           <NavLink
                             to="/master/view-steps"
                             className={({ isActive }) =>

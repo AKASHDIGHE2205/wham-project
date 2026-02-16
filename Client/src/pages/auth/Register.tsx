@@ -221,14 +221,14 @@ const Register: React.FC = () => {
                       <Phone className="h-5 w-5 text-gray-400" />
                     </div>
                     <input
-                      type="tel"
+                      type="number"
                       name="phone"
-                      required
                       onChange={handleChange}
                       value={inputs.phone}
                       maxLength={10}
                       className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
                       placeholder="mobile number"
+                      required
                     />
                   </div>
                 </div>

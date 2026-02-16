@@ -10,6 +10,7 @@ import type { Member } from '../Master/member-master/EditMember';
 import { Calendar, BarChart3, Users, Rocket, ChevronRight, Clock, MapPin, Calendar1 } from 'lucide-react';
 import { getActiveEvents, getEventForAttend, getMemberDetailsForDashboard, getUpcomingEvents } from '../../services/dashboard/DashboardApi';
 import { getUserFromStorage } from '../../helper/cryptoUser';
+import Loadings from '../../components/Loadings';
 
 export interface EventMember {
   event_id: number;
@@ -101,26 +102,30 @@ const Dashboard = () => {
     {
       label: 'Active Events',
       value: ActiveEvent?.length || 0,
-      change: '+3',
       icon: Rocket,
       color: 'bg-orange-500',
-      bgcolor: 'bg-orange-100'
+      bgcolor: 'bg-linear-to-r from-orange-100 to-orange-50'
     },
     {
       label: 'Upcoming Events',
       value: upcomingEvent?.length || 0,
-      change: '+5%',
       icon: BarChart3,
       color: 'bg-yellow-500',
-      bgcolor: 'bg-yellow-100'
+      bgcolor: 'bg-linear-to-r from-yellow-100 to-yellow-50'
+    },
+    {
+      label: 'Tasks To Attend',
+      value: attendEvents.length || 0,
+      icon: Users,
+      color: 'bg-green-500',
+      bgcolor: 'bg-linear-to-r from-green-100 to-green-50'
     },
     {
       label: 'Team Members',
       value: teams?.length || 0,
-      change: '+1',
       icon: Users,
       color: 'bg-purple-500',
-      bgcolor: 'bg-purple-100'
+      bgcolor: 'bg-linear-to-r from-purple-100 to-purple-50'
     },
   ];
 
@@ -141,7 +146,7 @@ const Dashboard = () => {
       if (!id) return;
 
       const memberResponse = await getMemberDetailsForDashboard(id);
-      setData(memberResponse?.member || null);
+      setData(memberResponse?.member || []);
 
       const teamsResponse = await getTeamMembers({ userId: id || 0 });
       setTeams(teamsResponse.teams || []);
@@ -186,8 +191,7 @@ const Dashboard = () => {
     return (
       <div className="min-h-screen bg-linear-to-br from-white to-orange-50/30 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+          <Loadings />
         </div>
       </div>
     );
@@ -195,7 +199,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-orange-50/30 border border-orange-300 m-1 rounded-md">
+      <div className="min-h-screen bg-white border border-orange-300 m-1 rounded-md">
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
@@ -217,11 +221,7 @@ const Dashboard = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-600 text-sm font-medium">{stat?.label}</p>
-                    <p className="text-2xl font-bold text-gray-900 mt-1">{stat?.value}</p>
-                    {/* <p className="text-green-500 text-sm font-medium mt-1 flex items-center">
-                      <TrendingUp className="w-4 h-4 mr-1" />
-                      {stat?.change}
-                    </p> */}
+                    <p className="text-2xl font-bold text-gray-900 mt-1">#{stat?.value}</p>
                   </div>
                   <div className={`${stat?.color} p-3 rounded-xl text-white`}>
                     <stat.icon className="w-6 h-6" />
@@ -295,15 +295,15 @@ const Dashboard = () => {
                             </span>
                           </div>
 
-                          <div className="flex items-center text-sm text-gray-600">
+                          <div className="flex items-center text-xs text-gray-600">
                             <Clock className="w-4 h-4 mr-2 text-orange-500" />
                             {moment(event?.from_date).format("hh:mm A")} -{" "}
                             {moment(event?.to_date).format("hh:mm A")}
                           </div>
                           <div className="text-xs text-gray-500">
                             <Calendar1 className="w-4 h-4 mr-2 text-orange-500 inline" />
-                            {moment(event?.from_date).format("DD MMM YYYY")} —{" "}
-                            {moment(event?.to_date).format("DD MMM YYYY")}
+                            {moment(event?.from_date).format("DD/MMM/YYYY")} - {" "}
+                            {moment(event?.to_date).format("DD/MMM/YYYY")}
                           </div>
                           {(event.teams).length > 0 && (
                             <div className="flex items-center text-sm text-gray-600">
@@ -397,8 +397,8 @@ const Dashboard = () => {
                                     : "bg-red-100 text-red-700 border-red-200"
                               }`}>
                               {
-                                event?.dt_status === "P" ? "Progress" :
-                                  event?.dt_status === "S" ? "Start" :
+                                event?.dt_status === "P" ? "In Progress" :
+                                  event?.dt_status === "S" ? "Started" :
                                     event?.dt_status === "C" ? "Completed" : ""
                               }
                             </p>
@@ -415,7 +415,7 @@ const Dashboard = () => {
                                 onClick={() => handleAddAttend(event)}
                                 className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg shadow hover:shadow-lg text-sm cursor-pointer"
                               >
-                                Attend Event
+                                Attend
                               </button>
                             )}
                             {((user?.role === 'Manager' || user?.role === 'Admin' || user?.role === 'Master') && (event?.isapproved === "A")) && (
@@ -423,7 +423,7 @@ const Dashboard = () => {
                                 onClick={() => handleUpdate(event)}
                                 className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow hover:shadow-lg text-sm cursor-pointer"
                               >
-                                Update Task
+                                Update
                               </button>
                             )}
                           </div>

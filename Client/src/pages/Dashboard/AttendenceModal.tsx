@@ -111,10 +111,7 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = event.target;
-    setInputs(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setInputs(prev => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,55 +125,56 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    setLoading(true);
     if (!location || !inputs.media || !inputs.attenddesc) {
-      toast.error('Please Select all required fields!');
+      toast.error('Please select all required fields!');
       return;
     }
-    const currentDate = new Date();
-    const currentTime = currentDate.toLocaleTimeString();
-    const punchDate = currentDate.toISOString().split('T')[0];
+    setLoading(true);
 
-    const body = {
-      eventId: Data?.event_id || 0,
-      eventDate: Data?.event_Date || '',
-      stepId: Data?.step_no || 0,
-      taskId: Data?.task_id || 0,
-      memId: Member?.mem_id || 0,
-      media: inputs.media || "",
-      attenddesc: inputs.attenddesc || "",
-      location: location ? {
-        latitude: location?.lat || 0,
-        longitude: location?.lng || 0,
-        address: location?.address || ""
-      } : null
-    };
+    try {
+      const currentDate = new Date();
+      const formData = new FormData();
 
-    const formData = new FormData();
+      const body = {
+        eventId: Data?.event_id ?? 0,
+        eventDate: Data?.event_Date ?? '',
+        stepId: Data?.step_no ?? 0,
+        taskId: Data?.task_id ?? 0,
+        memId: Member?.mem_id ?? 0,
+        media: inputs.media,
+        attenddesc: inputs.attenddesc,
+        location: {
+          latitude: location.lat ?? 0,
+          longitude: location.lng ?? 0,
+          address: location.address ?? ""
+        }
+      };
 
-    // Convert all values to strings before appending
-    formData?.append("eventId", body.eventId.toString());
-    formData?.append("Time", currentTime);
-    formData?.append("punchDate", punchDate);
-    formData?.append("eventDate", body.eventDate.toString());
-    formData?.append("memId", body.memId.toString());
-    formData?.append("stepId", body.stepId.toString());
-    formData?.append("taskId", body.taskId.toString());
-    formData?.append("attenddesc", body.attenddesc);
-    formData?.append("location", JSON.stringify(body.location));
+      // Append all fields to FormData
+      formData.append("eventId", body.eventId.toString());
+      formData.append("eventDate", body.eventDate);
+      formData.append("Time", currentDate.toLocaleTimeString());
+      formData.append("punchDate", currentDate.toISOString().split('T')[0]);
+      formData.append("memId", body.memId.toString());
+      formData.append("stepId", body.stepId.toString());
+      formData.append("taskId", body.taskId.toString());
+      formData.append("attenddesc", body.attenddesc);
+      formData.append("location", JSON.stringify(body.location));
 
-    // For file, append it directly (it's already a File object)
-    if (body.media && typeof body.media !== 'string') {
-      formData?.append("media", body.media);
+      // Append media if it's a File object
+      if (body.media instanceof File) {
+        formData.append("media", body.media);
+      }
+
+      const response = await addAttendence(formData);
+      if (response) handleClose();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
-
-    const response = await addAttendence(formData);
-    setLoading(false);
-    if (response) {
-      handleClose();
-    }
-
   };
+
 
   if (!show) return null;
 
@@ -205,8 +203,8 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
               </svg>
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900">
-                Attend Event {Data?.title}
+              <h3 className=" text-black font-semibold truncate">
+                Attend Event - {Data?.title}
               </h3>
             </div>
           </div>

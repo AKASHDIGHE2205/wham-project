@@ -58,7 +58,7 @@ const Home = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-orange-50/30 border border-orange-300 m-1 rounded-md">
+      <div className="min-h-screen bg-white border border-orange-300 m-1 rounded-md">
         {/* Hero Section */}
         <div className="max-w-7xl mx-auto px-4 py-1">
           <div className="text-center">
