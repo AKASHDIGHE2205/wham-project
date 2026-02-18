@@ -60,9 +60,7 @@ export const registerUser = async (req, res) => {
   const { firstName, middleName, lastName, password, email, phone } = req.body;
 
   if (!firstName || !lastName || !password || !email || !phone) {
-    return res.status(400).json({
-      message: "Please fill in all required fields.",
-    });
+    return res.status(400).json({ message: "Please fill in all required fields.", });
   }
 
   const checkUserSQL = `SELECT id FROM users WHERE email = ? OR phone = ?`;
@@ -74,9 +72,7 @@ export const registerUser = async (req, res) => {
     }
 
     if (results.length > 0) {
-      return res.status(409).json({
-        message: "User already exists with this email or phone.",
-      });
+      return res.status(409).json({ message: "User already exists with this email or phone.", });
     }
 
     try {
@@ -103,61 +99,50 @@ export const registerUser = async (req, res) => {
             VALUES (?, ?, ?, ?, ?, ?, 'User', 'I')
           `;
 
-          connection.query(
-            insertUserSQL,
-            [firstName, middleName, lastName, hashedPassword, email, phone],
-            (userErr, userResult) => {
-              if (userErr) {
-                return connection.rollback(() => {
-                  connection.release();
-                  console.error(userErr);
-                  res.status(500).json({ message: "User creation failed" });
-                });
-              }
+          connection.query(insertUserSQL, [firstName, middleName, lastName, hashedPassword, email, phone], (userErr, userResult) => {
+            if (userErr) {
+              return connection.rollback(() => {
+                connection.release();
+                console.error(userErr);
+                res.status(500).json({ message: "User creation failed" });
+              });
+            }
 
-              const userId = userResult.insertId;
+            const userId = userResult.insertId;
 
-              // 4️⃣ Insert member
-              const insertMemberSQL = `
+            // 4️⃣ Insert member
+            const insertMemberSQL = `
                     INSERT INTO mst_members
                       (mem_id, first_name, middle_name, last_name, mobile, email, designation, isorganizer, user_id, status)
                       SELECT IFNULL(MAX(mem_id), 0) + 1,?, ?, ?, ?, ?, 'Users', 'N', ?, 'A'
                       FROM mst_members
                   `;
 
-              connection.query(
-                insertMemberSQL,
-                [firstName, middleName, lastName, phone, email, userId],
-                (memberErr) => {
-                  if (memberErr) {
-                    return connection.rollback(() => {
-                      connection.release();
-                      console.error(memberErr);
-                      res.status(500).json({ message: "Member creation failed" });
-                    });
-                  }
+            connection.query(insertMemberSQL, [firstName, middleName, lastName, phone, email, userId], (memberErr) => {
+              if (memberErr) {
+                return connection.rollback(() => {
+                  connection.release();
+                  console.error(memberErr);
+                  res.status(500).json({ message: "Member creation failed" });
+                });
+              }
 
-                  // 5️⃣ Commit
-                  connection.commit((commitErr) => {
-                    if (commitErr) {
-                      return connection.rollback(() => {
-                        connection.release();
-                        res.status(500).json({ message: "Commit failed" });
-                      });
-                    }
-
-                    // 6️⃣ Release connection
+              // 5️⃣ Commit
+              connection.commit((commitErr) => {
+                if (commitErr) {
+                  return connection.rollback(() => {
                     connection.release();
-
-                    return res.status(201).json({
-                      message: "User registered successfully ✅",
-                      userId,
-                    });
+                    res.status(500).json({ message: "Commit failed" });
                   });
                 }
-              );
-            }
-          );
+
+                // 6️⃣ Release connection
+                connection.release();
+
+                return res.status(201).json({ message: "User registered successfully ✅", userId, });
+              });
+            });
+          });
         });
       });
     } catch (error) {
@@ -166,7 +151,6 @@ export const registerUser = async (req, res) => {
     }
   });
 };
-
 
 // LOGIN USER
 export const loginUser = (req, res) => {

@@ -195,6 +195,7 @@ const Navbar = () => {
                     Calender
                   </NavLink>
                 </div>
+
                 {/* Reports Dropdown */}
                 <div className="relative ">
                   <button
@@ -242,6 +243,7 @@ const Navbar = () => {
                             Report 2
                           </span>
                         </NavLink>
+
                       </div>
                     )}
                   </button>
@@ -499,39 +501,6 @@ const Navbar = () => {
                     </NavLink>
                   </div>
 
-                  {/* Transaction Mobile */}
-                  <div className="border-b border-gray-100 pb-2 hidden">
-                    <button
-                      onClick={() => handleDropdownToggle('mobile-Transaction')}
-                      className="flex items-center justify-between w-full px-4 py-3 text-left text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors duration-200"
-                    >
-                      <span className="font-medium">Transaction</span>
-                      <svg
-                        className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'mobile-Transaction' ? 'rotate-180' : ''
-                          }`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-                    {activeDropdown === 'mobile-Transaction' && (
-                      <div className="mt-2 ml-4 space-y-1">
-                        <Link
-                          to="/calender"
-                          className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-colors duration-200"
-                          onClick={handleMobileLinkClick}
-                        >
-                          <span className='font-medium flex justify-center items-center gap-2'>
-                            <Calendar size={16} />
-                            Calendar
-                          </span>
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-
                   {/* Reports Mobile */}
                   <div className="border-b border-gray-100 pb-2 ">
                     <button
@@ -556,8 +525,22 @@ const Navbar = () => {
                     </button>
                     {activeDropdown === 'mobile-Reports' && (
                       <div className="mt-2 ml-4 space-y-1">
+                        {(user?.role === 'Master' || user?.role === 'Admin' || user?.role === 'Manager') && (
+                          <NavLink
+                            to="/report/report1"
+                            className={({ isActive }) =>
+                              `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    ${isActive
+                                ? 'bg-orange-100 text-orange-600'
+                                : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                            }
+                            onClick={handleMobileLinkClick}
+                          >
+                            <span>Report 1</span>
+                          </NavLink>
+                        )}
                         <NavLink
-                          to="/report/report1"
+                          to="/report/report2"
                           className={({ isActive }) =>
                             `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
                     ${isActive
@@ -566,7 +549,7 @@ const Navbar = () => {
                           }
                           onClick={handleMobileLinkClick}
                         >
-                          <span>Report 1</span>
+                          <span>Report 2</span>
                         </NavLink>
                       </div>
                     )}

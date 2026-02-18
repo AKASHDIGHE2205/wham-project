@@ -14,7 +14,6 @@ export interface User {
   token: string;
 }
 
-// Update your decryptUser utility to handle the nested structure
 export const decryptUser = <T = any>(
   encrypted: string | undefined,
 ): T | null => {
@@ -31,25 +30,14 @@ export const decryptUser = <T = any>(
     return null;
   }
 };
-
-// Get user from storage with proper typing
-export const getUserFromStorage = (): User | null => {
+export const getUserFromStorage = (): User | null | any => {
   const encryptedData = Cookies.get("user");
   const decryptedData = decryptUser<any>(encryptedData);
-
-  // Handle both cases: if user data is nested or direct
-  // if (decryptedData?.user) {
-  //   return decryptedData.user as User;
-  // } else
-
   if (decryptedData?.id) {
     return decryptedData as User;
   }
-
   return null;
 };
-
-// Also get the token if needed
 export const getTokenFromStorage = (): string | null => {
   const encryptedData = Cookies.get("user");
   const decryptedData = decryptUser<any>(encryptedData);

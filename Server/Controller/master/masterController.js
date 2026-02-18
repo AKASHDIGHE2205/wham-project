@@ -1010,26 +1010,18 @@ export const getAllUsers = (req, res) => {
 export const activateUser = (req, res) => {
   const { id, status } = req.body;
 
-  const sql = `
-    UPDATE users
-    SET is_verified = ?
-    WHERE id = ?
-  `;
+  const sql = `UPDATE users SET is_verified = ? WHERE id = ?`;
 
   db.query(sql, [status, id], (err, results) => {
     if (err) {
       console.error("Error activating user:", err);
-      return res.status(500).json({
-        message: "Failed to activate the user. Please try again later."
-      });
+      return res.status(500).json({ message: "Failed to update the user. Please try again later." });
     }
 
     if (results.affectedRows === 0) {
-      return res.status(404).json({
-        message: "User not found."
-      });
+      return res.status(404).json({ message: "User not found." });
     }
 
-    return res.status(200).json({ message: "User has been successfully activated!" });
+    return res.status(200).json({ message: `User has been successfully ${status === 'A' ? 'Activated' : 'Deactivated'}!` });
   });
 };

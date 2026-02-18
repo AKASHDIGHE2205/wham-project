@@ -221,7 +221,7 @@ const UsersView = () => {
           </div>
         </div>
 
-        {/* Members Table */}
+        {/* Users Table */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[500px]">
@@ -266,7 +266,7 @@ const UsersView = () => {
                         <div className="flex flex-col gap-1 items-start">
                           <span>{item?.full_name}</span>
                           <div className="self-start">
-                            <span className="text-xs p-0.5 bg-gray-100 rounded-xl font-semibold">
+                            <span className="text-xs py-0.5 px-2 bg-gray-100 rounded-xl font-semibold">
                               <span>User Id : {item?.user_id}</span>
                             </span>
                           </div>

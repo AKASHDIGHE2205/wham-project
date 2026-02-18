@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Rocket, Calendar, Users, Target, Star, Award } from 'lucide-react';
+import { Rocket, Calendar, Users, Target, Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getUserFromStorage } from '../../helper/cryptoUser';
@@ -32,27 +32,6 @@ const Home = () => {
       icon: Target,
       title: "Goal Tracking",
       description: "Set targets and track your progress towards mission success"
-    }
-  ];
-
-  const announcements = [
-    {
-      title: "New Feature Released",
-      content: "Real-time collaboration tools are now available for all teams.",
-      date: "2 hours ago",
-      type: "update"
-    },
-    {
-      title: "System Maintenance",
-      content: "Scheduled maintenance this weekend. Plan your activities accordingly.",
-      date: "1 day ago",
-      type: "maintenance"
-    },
-    {
-      title: "Welcome New Members",
-      content: "We've added 5 new team members to our growing community!",
-      date: "3 days ago",
-      type: "welcome"
     }
   ];
 
@@ -119,87 +98,6 @@ const Home = () => {
             ))}
           </div>
 
-          {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Announcements */}
-            <div className="space-y-8">
-              <div className="flex items-center gap-3 mb-6">
-                <Award className="w-6 h-6 text-orange-500" />
-                <h2 className="text-2xl font-bold text-gray-900">Latest Updates</h2>
-              </div>
-
-              <div className="space-y-4">
-                {announcements.map((announcement, index) => (
-                  <div
-                    key={index}
-                    className="bg-white rounded-xl p-6 border border-orange-100 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {announcement.title}
-                      </h3>
-                      <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                        {announcement.date}
-                      </span>
-                    </div>
-                    <p className="text-gray-600">
-                      {announcement.content}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Quick Actions & Info */}
-            <div className="space-y-8">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Getting Started</h2>
-                <div className="bg-white rounded-2xl p-6 border border-orange-100">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4 p-4 bg-orange-50 rounded-lg">
-                      <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold">
-                        1
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">Plan Your Mission</h3>
-                        <p className="text-sm text-gray-600">Define objectives and set timelines</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 p-4 bg-orange-50 rounded-lg">
-                      <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold">
-                        2
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">Assemble Your Team</h3>
-                        <p className="text-sm text-gray-600">Coordinate with the right people</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 p-4 bg-orange-50 rounded-lg">
-                      <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold">
-                        3
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">Execute & Track</h3>
-                        <p className="text-sm text-gray-600">Monitor progress and achieve goals</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Support Card */}
-              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Need Help?</h3>
-                <p className="text-gray-600 mb-4">
-                  Our support team is here to help you make the most of your mission planning experience.
-                </p>
-                <button className="text-orange-600 font-semibold hover:text-orange-700 transition-colors">
-                  Contact Support →
-                </button>
-              </div>
-
-            </div>
-          </div>
         </div>
       </div>
     </>

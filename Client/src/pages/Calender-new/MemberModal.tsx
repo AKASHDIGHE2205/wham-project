@@ -36,8 +36,8 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
   const [search, setSearch] = useState("");
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
-  const [loadingMembers, setLoadingMembers] = useState(false);
-  const [loadingTeams, setLoadingTeams] = useState(false);
+  const [loadingMembers, setLoadingMembers] = useState(true);
+  const [loadingTeams, setLoadingTeams] = useState(true);
 
   const [activeTab, setActiveTab] = useState<'teams' | 'members'>('teams');
 
@@ -142,17 +142,11 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
     handleClose();
   };
 
-  const filteredMembers = members.filter((m) =>
-    `${m.mem_id} ${m.first_name} ${m.middle_name} ${m.last_name}`
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+  const filteredMembers =
+    members.filter((m) => `${m.mem_id} ${m.first_name} ${m.middle_name} ${m.last_name}`.toLowerCase().includes(search.toLowerCase()));
 
-  const filteredTeams = teams.filter((team) =>
-    `${team.id} ${team.name}`
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+  const filteredTeams =
+    teams.filter((team) => `${team.id} ${team.name}`.toLowerCase().includes(search.toLowerCase()));
 
   const getFullName = (member: Member) => {
     return `${member.first_name} ${member.middle_name ? member.middle_name + ' ' : ''}${member.last_name}`.trim();

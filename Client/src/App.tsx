@@ -11,6 +11,7 @@ import PublicRoute from "./routes/PublicRoute";
 import { authFinished, setUser, verifyAndLoadUser } from "./feature/authSlice";
 import UsersView from "./pages/Master/users/UsersView";
 import PageNotFound from "./components/PageNotFound";
+import AccessDenied from "./components/AccessDenied";
 
 const Login = lazy(() => import("./pages/auth/Login"));
 const Register = lazy(() => import("./pages/auth/Register"));
@@ -48,52 +49,43 @@ function App() {
   useEffect(() => {
     AOS.init({ duration: 800, once: true, easing: "ease-out" });
   }, []);
-
   return (
     <BrowserRouter>
       <Suspense fallback={<Loadings />}>
         <Routes>
-
-          {/* 🔐 Protected Routes */}
+          {/* 🔐 Authenticated */}
           <Route element={<ProtectedRoute />}>
             <Route element={<DefaultLayout />}>
               <Route index element={<Home />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/calender" element={<Calender />} />
 
-              {/* Master */}
-              <Route path="/master/team-view" element={<TeamView />} />
-              <Route path="/master/view-members" element={<MemberView />} />
-              <Route path="/master/add-member" element={<NewMember />} />
-              <Route path="/master/edit-member/:id" element={<EditMember />} />
-              <Route path="/master/view-steps" element={<StepView />} />
-              <Route path="/master/view-tasks" element={<TaskView />} />
-              <Route path="/master/users-view" element={<UsersView />} />
-
-
-              {/* Reports */}
-              <Route path="/report/report1" element={<ReportView />} />
-
-              {/* Profile */}
+              <Route element={<ProtectedRoute allowedRoles={["Master", "Admin", "Manager"]} />}>
+                <Route path="/master/team-view" element={<TeamView />} />
+                <Route path="/master/view-members" element={<MemberView />} />
+                <Route path="/master/add-member" element={<NewMember />} />
+                <Route path="/master/edit-member/:id" element={<EditMember />} />
+                <Route path="/master/view-steps" element={<StepView />} />
+                <Route path="/master/view-tasks" element={<TaskView />} />
+                <Route path="/master/users-view" element={<UsersView />} />
+                <Route path="/report/report1" element={<ReportView />} />
+              </Route>
+              <Route path="/unauthorized" element={<AccessDenied />} />
               <Route path="/auth/profile" element={<Profile />} />
             </Route>
 
             <Route path="/auth/log-out" element={<Logout />} />
           </Route>
 
-          {/* 🌐 Public Routes */}
           <Route element={<PublicRoute />}>
             <Route path="/auth/login" element={<Login />} />
             <Route path="/auth/register" element={<Register />} />
             <Route path="/auth/forgot-password" element={<ForgotPassword />} />
           </Route>
 
-          {/* 🚫 404 Route - This will catch all unmatched routes */}
           <Route path="*" element={<PageNotFound />} />
-
-          {/* <Route path="*" element={<Navigate to="/" />} /> */}
-
         </Routes>
+
       </Suspense>
     </BrowserRouter>
   );
