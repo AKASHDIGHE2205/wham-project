@@ -1,0 +1,10 @@
+{
+  "name": "wham-project",
+  "private": true,
+  "scripts": {
+    "start": "node Server/app.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

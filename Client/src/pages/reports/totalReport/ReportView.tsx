@@ -503,7 +503,7 @@ const ReportView = () => {
                             </div>
                           ) : (
                             <div className="border border-gray-200 p-2 rounded-lg">
-                              <span>No Task assigned to.</span>
+                              <span>No Task assigned.</span>
                             </div>
                           )}
                         </div>
