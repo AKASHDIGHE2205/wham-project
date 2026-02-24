@@ -1,3 +1,214 @@
+// import { type FC, useEffect, useState } from "react";
+// import {
+//   GoogleMap,
+//   Marker,
+//   useJsApiLoader,
+//   Autocomplete,
+// } from "@react-google-maps/api";
+// import { GOOGLE_MAPS_API_KEY } from "../../constant/Baseurl";
+
+// interface Props {
+//   isShow: boolean;
+//   setIsShow: (show: boolean) => void;
+//   onLocationSelect: (location: {
+//     lat: number;
+//     lng: number;
+//     address: string;
+//   }) => void;
+// }
+
+// const containerStyle = {
+//   width: "100%",
+//   height: "400px",
+// };
+
+// const GoogleLocation: FC<Props> = ({
+//   isShow,
+//   setIsShow,
+//   onLocationSelect,
+// }) => {
+//   const [marker, setMarker] = useState<{ lat: number; lng: number } | null>(
+//     null
+//   );
+//   const [selectedAddress, setSelectedAddress] = useState("");
+//   const [mapCenter, setMapCenter] = useState({
+//     lat: 18.5308,
+//     lng: 73.8478,
+//   });
+
+//   const [autocomplete, setAutocomplete] =
+//     useState<google.maps.places.Autocomplete | null>(null);
+
+//   const { isLoaded } = useJsApiLoader({
+//     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+//     libraries: ["places"],
+//   });
+
+//   // Get user current location
+//   useEffect(() => {
+//     if (navigator.geolocation) {
+//       navigator.geolocation.getCurrentPosition(
+//         (pos) => {
+//           setMapCenter({
+//             lat: pos.coords.latitude,
+//             lng: pos.coords.longitude,
+//           });
+//         },
+//         () => console.warn("Location permission denied")
+//       );
+//     }
+//   }, []);
+
+//   // Reverse Geocode
+//   const getAddress = (lat: number, lng: number) => {
+//     const geocoder = new google.maps.Geocoder();
+//     geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+//       if (status === "OK" && results?.[0]) {
+//         setSelectedAddress(results[0].formatted_address);
+//       }
+//     });
+//   };
+
+//   // Map Click Handler
+//   const handleMapClick = (e: google.maps.MapMouseEvent) => {
+//     if (!e.latLng) return;
+
+//     const lat = e.latLng.lat();
+//     const lng = e.latLng.lng();
+
+//     setMarker({ lat, lng });
+//     getAddress(lat, lng);
+//   };
+
+//   // Autocomplete handlers
+//   const onAutoCompleteLoad = (
+//     auto: google.maps.places.Autocomplete
+//   ) => {
+//     setAutocomplete(auto);
+//   };
+
+//   const onPlaceChanged = () => {
+//     if (!autocomplete) return;
+
+//     const place = autocomplete.getPlace();
+//     if (!place.geometry || !place.geometry.location) return;
+
+//     const lat = place.geometry.location.lat();
+//     const lng = place.geometry.location.lng();
+
+//     setMapCenter({ lat, lng });
+//     setMarker({ lat, lng });
+//     setSelectedAddress(place.formatted_address || "");
+//   };
+
+//   const handleAddLocation = () => {
+//     if (marker && selectedAddress) {
+//       onLocationSelect({
+//         lat: marker.lat,
+//         lng: marker.lng,
+//         address: selectedAddress,
+//       });
+//       setMarker(null);
+//       setSelectedAddress("");
+//       setIsShow(false);
+//     }
+//   };
+
+//   const handleClose = () => {
+//     setIsShow(false);
+//     setMarker(null);
+//     setSelectedAddress("");
+//   };
+
+//   if (!isShow) return null;
+
+//   return (
+//     <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-4 z-50">
+//       <div className="bg-white rounded-xl p-6 max-w-2xl w-full shadow-2xl">
+//         <div className="flex justify-between items-center mb-4">
+//           <h2 className="text-2xl font-bold text-gray-800">
+//             Select Location
+//           </h2>
+//           <button
+//             onClick={handleClose}
+//             className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg"
+//           >
+//             ✕
+//           </button>
+//         </div>
+
+//         {isLoaded ? (
+//           <>
+//             {/* Search Box */}
+//             <div className="mb-3">
+//               <Autocomplete
+//                 onLoad={onAutoCompleteLoad}
+//                 onPlaceChanged={onPlaceChanged}
+//               >
+//                 <input
+//                   type="text"
+//                   placeholder="Search location..."
+//                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+//                 />
+//               </Autocomplete>
+//             </div>
+
+//             {/* Map */}
+//             <div className="rounded-lg overflow-hidden border border-gray-300">
+//               <GoogleMap
+//                 mapContainerStyle={containerStyle}
+//                 center={mapCenter}
+//                 zoom={14}
+//                 onClick={handleMapClick}
+//               >
+//                 {marker && <Marker position={marker} />}
+//               </GoogleMap>
+//             </div>
+//           </>
+//         ) : (
+//           <div className="flex items-center justify-center h-40">
+//             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+//           </div>
+//         )}
+
+//         {/* Selected Address */}
+//         <div className="mt-3 p-3 bg-green-100 rounded-lg border border-green-300">
+//           <p className="text-green-700 text-sm">
+//             <strong>Selected Address:</strong>{" "}
+//             {selectedAddress || "Search or click on map"}
+//           </p>
+//           {marker && (
+//             <p className="text-xs text-green-600 mt-1">
+//               Lat: {marker.lat.toFixed(6)}, Lng:{" "}
+//               {marker.lng.toFixed(6)}
+//             </p>
+//           )}
+//         </div>
+
+//         {/* Actions */}
+//         <div className="flex justify-between mt-6">
+//           <button
+//             onClick={handleClose}
+//             className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+//           >
+//             Close
+//           </button>
+
+//           <button
+//             onClick={handleAddLocation}
+//             disabled={!marker}
+//             className="px-6 py-2 bg-indigo-600 text-white rounded-lg disabled:opacity-50 hover:bg-indigo-700"
+//           >
+//             Confirm Location
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default GoogleLocation;
+
 import { type FC, useEffect, useState } from "react";
 import { GoogleMap, Marker, useJsApiLoader, } from "@react-google-maps/api";
 import { GOOGLE_MAPS_API_KEY } from "../../constant/Baseurl";

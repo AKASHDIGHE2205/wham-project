@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { ActivityIcon, Calendar, CheckSquare, FileBarChart, Home, Layers, LogOutIcon, ShieldCheck, User, Users } from "lucide-react";
+import { ActivityIcon, Building, Building2, Calendar, CheckSquare, FileBarChart, Home, Layers, LogOutIcon, ShieldCheck, University, User, Users } from "lucide-react";
 import { getUserFromStorage } from '../helper/cryptoUser';
 
 const Navbar = () => {
@@ -44,7 +44,7 @@ const Navbar = () => {
           {/* Desktop Navigation - Middle */}
           <div className="hidden md:flex items-center space-x-4">
 
-            {/* Home Mobile */}
+            {/* Home Desktop */}
             <div className="border-b border-gray-100">
               <NavLink
                 to={'/'}
@@ -103,6 +103,47 @@ const Navbar = () => {
                     {activeDropdown === 'Master' && (
                       <div className="absolute top-full left-0 mt-2 w-40 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
 
+                        <NavLink
+                          to="/master/view-universities"
+                          className={({ isActive }) =>
+                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                              ${isActive
+                              ? 'bg-orange-100 text-orange-600 font-medium'
+                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                          }
+                          onClick={closeAllMenus}
+                        >
+                          <University size={16} />
+                          University
+                        </NavLink>
+
+                        <NavLink
+                          to="/master/view-colleges"
+                          className={({ isActive }) =>
+                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                              ${isActive
+                              ? 'bg-orange-100 text-orange-600 font-medium'
+                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                          }
+                          onClick={closeAllMenus}
+                        >
+                          <Building size={16} />
+                          College
+                        </NavLink>
+
+                        <NavLink
+                          to="/master/view-departments"
+                          className={({ isActive }) =>
+                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                              ${isActive
+                              ? 'bg-orange-100 text-orange-600 font-medium'
+                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                          }
+                          onClick={closeAllMenus}
+                        >
+                          <Building2 size={16} />
+                          Department
+                        </NavLink>
 
                         <NavLink
                           to="/master/users-view"
@@ -131,7 +172,6 @@ const Navbar = () => {
                           <User size={16} />
                           Member
                         </NavLink>
-
 
                         <NavLink
                           to="/master/team-view"
@@ -180,7 +220,7 @@ const Navbar = () => {
                   </div>
                 )}
 
-                {/* Calender Mobile */}
+                {/* Calender */}
                 <div className="border-b border-gray-100">
                   <NavLink
                     to={'/calender'}
@@ -262,7 +302,7 @@ const Navbar = () => {
                 onClick={() => handleDropdownToggle('user')}
                 className="flex items-center space-x-2 p-1 rounded-full hover:bg-purple-50 transition-colors duration-200 cursor-pointer"
               >
-                <div className="w-8 h-8 bg-linear-to-r from-orange-400 to-purple-500 rounded-full flex items-center justify-center shadow-md">
+                <div className="w-9 h-9 bg-linear-to-r from-indigo-600 to-purple-600 rounded-full flex items-center justify-center shadow-md">
                   {user?.firstName ? (
                     <span className="text-white text-sm font-semibold">
                       {(user?.firstName?.[0] || '').toUpperCase()}
@@ -410,6 +450,48 @@ const Navbar = () => {
                       {activeDropdown === 'mobile-Master' && (
                         <div className="mt-2 ml-4 space-y-1">
                           <NavLink
+                            to="/master/view-universities"
+                            className={({ isActive }) =>
+                              `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                              ${isActive
+                                ? 'bg-orange-100 text-orange-600 font-medium'
+                                : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                            }
+                            onClick={closeAllMenus}
+                          >
+                            <University size={16} />
+                            University
+                          </NavLink>
+
+                          <NavLink
+                            to="/master/view-colleges"
+                            className={({ isActive }) =>
+                              `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                              ${isActive
+                                ? 'bg-orange-100 text-orange-600 font-medium'
+                                : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                            }
+                            onClick={closeAllMenus}
+                          >
+                            <Building size={16} />
+                            College
+                          </NavLink>
+
+                          <NavLink
+                            to="/master/view-departments"
+                            className={({ isActive }) =>
+                              `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                              ${isActive
+                                ? 'bg-orange-100 text-orange-600 font-medium'
+                                : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                            }
+                            onClick={closeAllMenus}
+                          >
+                            <Building2 size={16} />
+                            Department
+                          </NavLink>
+
+                          <NavLink
                             to="/master/users-view"
                             className={({ isActive }) =>
                               `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
@@ -464,6 +546,7 @@ const Navbar = () => {
                             <Layers size={16} />
                             Steps
                           </NavLink>
+
                           <NavLink
                             to="/master/view-tasks"
                             className={({ isActive }) =>
@@ -569,7 +652,7 @@ const Navbar = () => {
                 className="w-full flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors duration-200"
               >
                 <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-linear-to-r from-orange-400 to-purple-500 rounded-full flex items-center justify-center shadow-md">
+                  <div className="w-8 h-8 bg-linear-to-r from-indigo-600 to-purple-600 rounded-full flex items-center justify-center shadow-md">
                     {user?.firstName ? (
                       <span className="text-white text-sm font-semibold">
                         {(user?.firstName?.[0] || '').toUpperCase()}

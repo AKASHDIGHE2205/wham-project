@@ -507,17 +507,7 @@ export const addAttendence_old13012026 = async (req, res) => {
 
 export const addAttendence = async (req, res) => {
   try {
-    const {
-      eventId,
-      Time,
-      punchDate,
-      eventDate,
-      stepId,
-      taskId,
-      memId,
-      location,
-      attenddesc
-    } = req.body;
+    const { eventId, Time, punchDate, eventDate, stepId, taskId, memId, location, attenddesc } = req.body;
 
     const file = req.file;
     const locationObj = typeof location === "string" ? JSON.parse(location) : location;
@@ -547,20 +537,10 @@ export const addAttendence = async (req, res) => {
       LIMIT 1
     `;
 
-    const alreadyAttended = await dbQuery(checkQuery, [
-      eventId,
-      memId,
-      eventDate,
-      stepId,
-      taskId,
-      punchDate
-    ]);
+    const alreadyAttended = await dbQuery(checkQuery, [eventId, memId, eventDate, stepId, taskId, punchDate]);
 
     if (alreadyAttended.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: "You have already attended this task."
-      });
+      return res.status(400).json({ success: false, message: "You have already attended this task." });
     }
 
     /* -----------------------------------
@@ -571,15 +551,11 @@ export const addAttendence = async (req, res) => {
       FROM mst_members
       WHERE mem_id = ?
     `;
-
     const memResult = await dbQuery(getMemDetails, [memId]);
-
     const memNameRaw = memResult[0]?.full_name || "unknown";
 
     // sanitize name for folder
-    const memName = memNameRaw
-      .replace(/\s+/g, "_")
-      .replace(/[^a-zA-Z0-9_]/g, "");
+    const memName = memNameRaw.replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_]/g, "");
 
     /* -----------------------------------
        STEP 3: FILE UPLOAD & SAVE
@@ -588,80 +564,37 @@ export const addAttendence = async (req, res) => {
     let mediaSrNo = null;
 
     if (file) {
-      const yearMonth = `${new Date().getFullYear()}${String(
-        new Date().getMonth() + 1
-      ).padStart(2, "0")}`;
+      const yearMonth = `${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, "0")}`;
 
       const memberFolder = `${memId}_${memName}`;
-      const uploadPath = path.join("uploads", yearMonth, memberFolder);
+      const uploadPath = path.join("uploads/attendance", yearMonth, memberFolder);
 
       await fs.ensureDir(uploadPath);
-
-      const fileName = `${Date.now()}_${file.originalname}`;
+      const fileName = `${new Date().toISOString().split('T')[0].replace(/-/g, '')}_${file.originalname}`;//YYYYMMDD
+      // const fileName = `${new Date().toLocaleDateString('en-GB').replace(/\//g, '')}_${file.originalname}`;//DDMMYYYY
+      // const fileName = `${Date.now()}_${file.originalname}`;//full date
       savePath = path.posix.join(uploadPath.replace(/\\/g, "/"), fileName);
 
-      await sharp(file.buffer)
-        .jpeg({ quality: 40 })
-        .toFile(savePath);
+      await sharp(file.buffer).jpeg({ quality: 40 }).toFile(savePath);
 
       /* -----------------------------------
          STEP 4: INSERT DB RECORD
       ------------------------------------ */
-      const mediaMaxResult = await dbQuery(
-        "SELECT COALESCE(MAX(sr_no), 0) + 1 AS next_id FROM event_media"
-      );
+      const mediaMaxResult = await dbQuery("SELECT COALESCE(MAX(sr_no), 0) + 1 AS next_id FROM event_media");
 
       mediaSrNo = mediaMaxResult[0].next_id;
 
       const mediaQuery = `
-        INSERT INTO event_media
-        (
-          sr_no,
-          event_id,
-          in_time,
-          punch_date,
-          event_date,
-          media_path,
-          address,
-          lat,
-          lng,
-          media_desc,
-          mem_id,
-          step_id,
-          task_id
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `;
+        INSERT INTO event_media (sr_no,event_id,in_time,punch_date,event_date,media_path,address,lat,lng,media_desc,mem_id,step_id,task_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-      await dbQuery(mediaQuery, [
-        mediaSrNo,
-        eventId,
-        Time,
-        punchDate,
-        eventDate,
-        savePath,
-        locationObj?.address ?? null,
-        locationObj?.latitude ?? null,
-        locationObj?.longitude ?? null,
-        attenddesc,
-        memId,
-        stepId,
-        taskId
-      ]);
+      await dbQuery(mediaQuery, [mediaSrNo, eventId, Time, punchDate, eventDate, savePath, locationObj?.address ?? null, locationObj?.latitude ?? null, locationObj?.longitude ?? null, attenddesc, memId, stepId, taskId]);
     }
 
-    return res.json({
-      success: true,
-      message: "Attendance added successfully!"
-    });
+    return res.json({ success: true, message: "Attendance added successfully!" });
 
   } catch (error) {
     console.error("Attendance Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Server Error",
-      error: error.message
-    });
+    return res.status(500).json({ success: false, message: "Server Error", error: error.message });
   }
 };
 

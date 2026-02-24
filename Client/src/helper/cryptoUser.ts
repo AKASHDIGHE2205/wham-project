@@ -12,6 +12,7 @@ export interface User {
   phone: string;
   role: string;
   token: string;
+  isOrganizer: string;
 }
 
 export const decryptUser = <T = any>(

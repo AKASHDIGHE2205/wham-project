@@ -12,6 +12,13 @@ import { authFinished, setUser, verifyAndLoadUser } from "./feature/authSlice";
 import UsersView from "./pages/Master/users/UsersView";
 import PageNotFound from "./components/PageNotFound";
 import AccessDenied from "./components/AccessDenied";
+import UniversityView from "./pages/Master/University/UniversityView";
+import UniversityAdd from "./pages/Master/University/UniversityAdd";
+import UniversityEdit from "./pages/Master/University/UniversityEdit";
+import CollegeView from "./pages/Master/College/CollegeView";
+import CollgeAdd from "./pages/Master/College/CollgeAdd";
+import CollegeEdit from "./pages/Master/College/CollegeEdit";
+import DepartmentView from "./pages/Master/department/DepartmentView";
 
 const Login = lazy(() => import("./pages/auth/Login"));
 const Register = lazy(() => import("./pages/auth/Register"));
@@ -49,6 +56,7 @@ function App() {
   useEffect(() => {
     AOS.init({ duration: 800, once: true, easing: "ease-out" });
   }, []);
+
   return (
     <BrowserRouter>
       <Suspense fallback={<Loadings />}>
@@ -69,6 +77,17 @@ function App() {
                 <Route path="/master/view-tasks" element={<TaskView />} />
                 <Route path="/master/users-view" element={<UsersView />} />
                 <Route path="/report/report1" element={<ReportView />} />
+
+                <Route path="/master/view-universities" element={<UniversityView />} />
+                <Route path="/master/add-university" element={<UniversityAdd />} />
+                <Route path="/master/edit-university/:id" element={<UniversityEdit />} />
+
+                <Route path="/master/view-colleges" element={<CollegeView />} />
+                <Route path="/master/add-college" element={<CollgeAdd />} />
+                <Route path="/master/edit-college/:id" element={<CollegeEdit />} />
+
+                <Route path="/master/view-departments" element={<DepartmentView />} />
+
               </Route>
               <Route path="/unauthorized" element={<AccessDenied />} />
               <Route path="/auth/profile" element={<Profile />} />

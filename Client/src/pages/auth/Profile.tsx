@@ -64,7 +64,7 @@ const Profile: React.FC = () => {
           <p className="text-gray-600 mb-6">Please log in to continue</p>
           <Link
             to="/auth/log-out"
-            className="inline-flex items-center justify-center px-6 py-3 bg-linear-to-r from-orange-500 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
+            className="inline-flex items-center justify-center px-6 py-3 bg-linear-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
           >
             Go to Login
           </Link>
@@ -76,7 +76,7 @@ const Profile: React.FC = () => {
   const InfoCard = ({ icon: Icon, title, children, className = "" }: any) => (
     <div className={`bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-300 ${className}`}>
       <div className="flex items-center mb-4">
-        <div className="w-12 h-12 bg-linear-to-br from-orange-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 shadow-md">
+        <div className="w-12 h-12 bg-linear-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center mr-4 shadow-md">
           <Icon className="w-6 h-6 text-white" />
         </div>
         <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
@@ -112,10 +112,10 @@ const Profile: React.FC = () => {
           {/* Profile Card */}
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-4 text-center relative overflow-hidden">
             {/* Background decoration */}
-            <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-orange-500 to-purple-600"></div>
+            <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-indigo-600 to-purple-600"></div>
 
             <div className="relative z-10">
-              <div className="w-22 h-22 bg-linear-to-br from-orange-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl border-4 border-white">
+              <div className="w-22 h-22 bg-linear-to-br from-indigo-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl border-4 border-white">
                 <span className="text-2xl font-bold text-white">
                   {userData?.firstName?.[0]}{userData?.lastName?.[0]}
                 </span>
@@ -178,7 +178,7 @@ const Profile: React.FC = () => {
               onClick={toggleTeamsView}
             >
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-linear-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 shadow-md">
+                <div className="w-12 h-12 bg-linear-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center mr-4 shadow-md">
                   <Users className="w-6 h-6 text-white" />
                 </div>
                 <div>
@@ -210,7 +210,7 @@ const Profile: React.FC = () => {
                     {data.map((item: any, index: number) => (
                       <div key={index} className="bg-linear-to-br from-white to-gray-50 border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-all duration-300 hover:border-purple-300 group" >
                         <div className="flex items-center mb-3">
-                          <div className="w-8 h-8 bg-linear-to-br from-orange-500 to-purple-600 rounded-full flex items-center justify-center mr-3 shadow-md group-hover:scale-105 transition-transform duration-300">
+                          <div className="w-8 h-8 bg-linear-to-br from-indigo-600 to-purple-600 rounded-full flex items-center justify-center mr-3 shadow-md group-hover:scale-105 transition-transform duration-300">
                             <span className="text-white font-bold text-sm">
                               #{item?.mem_id}
                             </span>

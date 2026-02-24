@@ -155,7 +155,7 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
   return (
     <div className="fixed inset-0 bg-orange-100/10 backdrop-blur-xs flex items-center justify-center p-4 z-50">
       <div
-        className="bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col border border-gray-100"
+        className="bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col border border-gray-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -204,9 +204,9 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
             </div>
 
             <div className="flex flex-wrap gap-2 max-h-32 overflow-auto pr-2">
-              {selectedItems?.map((item) => (
+              {selectedItems?.map((item, index: number) => (
                 <div
-                  key={`${item?.type}-${item?.id}`}
+                  key={index}
                   className={`border rounded-full px-3 py-2 shadow-sm flex items-center gap-2 group hover:shadow-md transition-all duration-200 ${item?.type === 'team'
                     ? 'bg-blue-100 border-blue-200 text-blue-800'
                     : 'bg-orange-100 border-orange-200 text-orange-800'

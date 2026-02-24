@@ -9,6 +9,10 @@ interface Master {
   user_name: string;
   step_id: number;
   step_name: string;
+  university_id: number;
+  university_name: string;
+  clg_id: number;
+  clg_name: string;
 }
 
 const initialState: Master = {
@@ -20,6 +24,10 @@ const initialState: Master = {
   user_name: "",
   step_id: 0,
   step_name: "",
+  university_id: 0,
+  university_name: "",
+  clg_id: 0,
+  clg_name: "",
 };
 
 export const masterSlice = createSlice({
@@ -33,7 +41,7 @@ export const masterSlice = createSlice({
         first_name: string;
         middle_name: string;
         last_name: string;
-      }>
+      }>,
     ) => {
       const { id, first_name, middle_name, last_name } = action.payload;
       state.mem_id = id;
@@ -43,7 +51,7 @@ export const masterSlice = createSlice({
     },
     handleSelectUser: (
       state,
-      action: PayloadAction<{ id: number; name: string }>
+      action: PayloadAction<{ id: number; name: string }>,
     ) => {
       const { id, name } = action.payload;
       state.user_id = id;
@@ -51,14 +59,35 @@ export const masterSlice = createSlice({
     },
     handleSelectStep: (
       state,
-      action: PayloadAction<{ id: number; name: string }>
+      action: PayloadAction<{ id: number; name: string }>,
     ) => {
       const { id, name } = action.payload;
       state.step_id = id;
       state.step_name = name;
     },
+    handleSelectUniversity: (
+      state,
+      action: PayloadAction<{ id: number; name: string }>,
+    ) => {
+      const { id, name } = action.payload;
+      state.university_id = id;
+      state.university_name = name;
+    },
+    handleSelectCollege: (
+      state,
+      action: PayloadAction<{ id: number; name: string }>,
+    ) => {
+      const { id, name } = action.payload;
+      state.clg_id = id;
+      state.clg_name = name;
+    },
   },
 });
-export const { handleSelectMember, handleSelectUser, handleSelectStep } =
-  masterSlice.actions;
+export const {
+  handleSelectMember,
+  handleSelectUser,
+  handleSelectStep,
+  handleSelectUniversity,
+  handleSelectCollege,
+} = masterSlice.actions;
 export default masterSlice.reducer;

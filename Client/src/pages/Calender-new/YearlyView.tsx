@@ -37,7 +37,7 @@ const YearlyView: React.FC<YearlyViewProps> = ({ currentDate, onDateSelect, onSh
   };
 
   return (
-    <div className="h-full overflow-auto bg-linear-to-br from-gray-50 to-blue-50/20 p-3 sm:p-6">
+    <div className="h-full overflow-auto bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 p-3 sm:p-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 max-w-7xl mx-auto">
         {months.map((month: Date) => {
           const isCurrentMonth = month.getMonth() === currentDate.getMonth() &&

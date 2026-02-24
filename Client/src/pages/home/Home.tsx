@@ -37,7 +37,7 @@ const Home = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-white border border-orange-300 m-1 rounded-md">
+      <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 border border-orange-300 m-1 rounded-md">
         {/* Hero Section */}
         <div className="max-w-7xl mx-auto px-4 py-1">
           <div className="text-center">
@@ -52,10 +52,10 @@ const Home = () => {
               <div className="flex justify-center gap-4">
                 <Link
                   to="/dashboard"
-                  className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-70 transition-colors flex items-center gap-2"
+                  className="px-6 py-3 bg-linear-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
                 >
                   <Rocket className="w-5 h-5" />
-                  Launch Dashboard
+                  Go To Dashboard
                 </Link>
               </div>
             )}

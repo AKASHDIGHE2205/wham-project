@@ -97,10 +97,10 @@ const Sidebar = () => {
             onClick={fetchData}
           >
             <a className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-linear-to-br from-orange-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
+              <div className="w-8 h-8 bg-linear-to-br  from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-sm">E</span>
               </div>
-              <span className="text-xl font-bold bg-linear-to-br from-orange-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-linear-to-br  from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 EventTracker
               </span>
             </a>
@@ -151,7 +151,7 @@ const Sidebar = () => {
               <div className="flex flex-col gap-3 p-4">
                 {filteredData.map((member: Member) => {
                   const firstName = formatName(member?.mem_name?.split(' ')[0] || '');
-                  const lastName = formatName(member?.mem_name?.split(' ').slice(1).join(' ') || '');
+                  const lastName = formatName(member?.mem_name?.split(' ').slice(2).join(' ') || '');
                   const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`;
                   const progressPercentage = member?.total_events > 0
                     ? Math.round(((member?.completed_events || 0) / member.total_events) * 100)
@@ -164,7 +164,7 @@ const Sidebar = () => {
                     >
                       <div className="flex items-center gap-3">
                         {/* Avatar */}
-                        <div className="w-10 h-10 bg-linear-to-br from-orange-500 to-purple-600 rounded-full flex items-center justify-center shadow-md shrink-0">
+                        <div className="w-10 h-10 bg-linear-to-br from-indigo-600 to-purple-600 rounded-full flex items-center justify-center shadow-md shrink-0">
                           <span className="text-white font-bold text-sm">
                             {initials}
                           </span>

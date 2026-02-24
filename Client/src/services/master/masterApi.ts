@@ -182,7 +182,6 @@ export const getAllTasks = async (params: any) => {
     console.log(error);
   }
 };
-
 export const addTask = async (data: any) => {
   try {
     const response = await axios.post(`${BASE_URL}/master/add-task`, data);
@@ -195,7 +194,6 @@ export const addTask = async (data: any) => {
     console.log(error);
   }
 };
-
 export const updateTask = async (data: any) => {
   try {
     const response = await axios.put(`${BASE_URL}/master/update-task`, data);
@@ -205,6 +203,172 @@ export const updateTask = async (data: any) => {
     }
   } catch (error: string | any) {
     toast.error(error.response?.data?.message || "Failed to update task");
+    console.log(error);
+  }
+};
+
+export const addUniversity = async (data: any) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/master/addUniversity`, data);
+    if (response.status === 201) {
+      toast.success(
+        response.data.message || "New university added successfully",
+      );
+      return response.data;
+    }
+  } catch (error: string | any) {
+    toast.error(error.response?.data?.message || "Failed to add university");
+    console.log(error);
+  }
+};
+export const getAllUniversities = async (params: any) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/master/getAllUniversities`, {
+      params,
+    });
+    return response.data;
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || "Failed to fetch College");
+    console.log(error);
+  }
+};
+export const getUniversityDetails = async (id: number) => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/master/getUniversityDetails/${id}`,
+    );
+    return response.data;
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || "Failed to fetch college");
+    console.log(error);
+  }
+};
+export const updateUniversity = async (data: any) => {
+  try {
+    const response = await axios.put(
+      `${BASE_URL}/master/update-university`,
+      data,
+    );
+    if (response.status === 200) {
+      toast.success(response.data.message || "University updated successfully");
+      return response.data;
+    }
+  } catch (error: string | any) {
+    toast.error(error.response?.data?.message || "Failed to update university");
+    console.log(error);
+  }
+};
+export const getActiveUniversities = async () => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/master/getActiveUniversities`,
+    );
+    return response.data;
+  } catch (error: any) {
+    toast.error(
+      error.response?.data?.message || "Failed to fetch universities",
+    );
+    console.log(error);
+  }
+};
+
+export const addCollege = async (data: any) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/master/addCollege`, data);
+    if (response.status === 201) {
+      toast.success(response.data.message || "New College added successfully");
+      return response.data;
+    }
+  } catch (error: string | any) {
+    toast.error(error.response?.data?.message || "Failed to add College");
+    console.log(error);
+  }
+};
+export const getAllColleges = async (params: any) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/master/getAllColleges`, {
+      params,
+    });
+    return response.data;
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || "Failed to fetch College");
+    console.log(error);
+  }
+};
+export const getCollegeDetails = async (id: number) => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/master/getCollegeDetails/${id}`,
+    );
+    return response.data;
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || "Failed to fetch college");
+    console.log(error);
+  }
+};
+export const updateCollege = async (data: any) => {
+  try {
+    const response = await axios.put(`${BASE_URL}/master/update-College`, data);
+    if (response.status === 200) {
+      toast.success(response.data.message || "College updated successfully");
+      return response.data;
+    }
+  } catch (error: string | any) {
+    toast.error(error.response?.data?.message || "Failed to update college");
+    console.log(error);
+  }
+};
+
+export const getActiveColleges = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/master/getActiveColleges`);
+    return response.data;
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || "Failed to fetch colleges");
+    throw error;
+  }
+};
+
+export const getAllDepartments = async (params: any) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/master/getAlldepartments`, {
+      params,
+    });
+    return response.data;
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || "Failed to fetch department");
+    console.log(error);
+  }
+};
+export const addDepartment = async (data: any) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/master/add-department`,
+      data,
+    );
+    if (response.status === 201) {
+      toast.success(
+        response.data.message || "New department added successfully",
+      );
+      return response.data;
+    }
+  } catch (error: string | any) {
+    toast.error(error.response?.data?.message || "Failed to add department");
+    console.log(error);
+  }
+};
+export const updateDepartment = async (data: any) => {
+  try {
+    const response = await axios.put(
+      `${BASE_URL}/master/update-department`,
+      data,
+    );
+    if (response.status === 200) {
+      toast.success(response.data.message || "department updated successfully");
+      return response.data;
+    }
+  } catch (error: string | any) {
+    toast.error(error.response?.data?.message || "Failed to update department");
     console.log(error);
   }
 };

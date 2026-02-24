@@ -87,7 +87,7 @@ const DailyView: React.FC<DailyViewProps> = ({
   // Loading state
   if (Loading) {
     return (
-      <div className="h-full bg-white sm:mx-4 my-2 rounded-xl shadow-md overflow-hidden flex items-center justify-center min-h-[500px]">
+      <div className="h-full bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 sm:mx-4 my-2 rounded-xl shadow-md overflow-hidden flex items-center justify-center min-h-[500px]">
         <div className="flex flex-col items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
           <p className="text-gray-600 text-lg">Loading calendar...</p>

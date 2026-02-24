@@ -7,17 +7,21 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-uploads
-dist
-dist-ssr
+# Dependencies & build
+node_modules/
+dist/
+dist-ssr/
 *.local
 
+# Uploads (important)
+uploads/
+# or use absolute path:
+# /uploads/
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*

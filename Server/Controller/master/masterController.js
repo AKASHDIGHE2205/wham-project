@@ -1,4 +1,6 @@
 import db from '../../db.js';
+import fs from "fs";
+import path from "path";
 
 //TEAM CONTROLLER
 export const getAllTeams = (req, res) => {
@@ -73,7 +75,6 @@ export const getAllTeams = (req, res) => {
     );
   });
 };
-
 export const newTeam = async (req, res) => {
   const { name, managerId, description, status } = req.body;
 
@@ -95,7 +96,6 @@ export const newTeam = async (req, res) => {
     });
   });
 };
-
 export const updateTeam = async (req, res) => {
   const { id, name, managerId, description, status } = req.body;
   // Validate required fields (optional)
@@ -274,7 +274,6 @@ export const getAllMembers = (req, res) => {
     );
   });
 };
-
 export const addMember = (req, res) => {
   const { first_name, middle_name, last_name, mobile, email, address, designation, birth_date, isOrganizer, teams, gender } = req.body;
 
@@ -351,7 +350,6 @@ export const addMember = (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
-
 export const getMemberDetails = (req, res) => {
   const { id } = req.params;
 
@@ -412,7 +410,6 @@ export const getMemberDetails = (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
-
 export const getUsers = (req, res) => {
   const sql = `
                 SELECT  id,CONCAT(first_name,' ',middle_name ,' ',last_name) AS full_name, role
@@ -431,7 +428,6 @@ export const getUsers = (req, res) => {
     });
   })
 }
-
 export const updateMember = (req, res) => {
   try {
     const { mem_id, first_name, middle_name, last_name, mobile, email, gender, address, designation, birth_date, isOrganizer, role, user_id, teams } = req.body;
@@ -620,7 +616,6 @@ export const getAllTasks = (req, res) => {
     );
   });
 };
-
 export const addTask = (req, res) => {
   const { taskName, description, stepId, status } = req.body;
   const sql = ` 
@@ -640,7 +635,6 @@ export const addTask = (req, res) => {
   }
   );
 }
-
 export const updateTask = (req, res) => {
   const { taskId, taskName, description, stepId, status } = req.body;
 
@@ -682,7 +676,6 @@ export const addStep = (req, res) => {
     });
   });
 }
-
 export const updateStep = (req, res) => {
   const { id, stepName, description, status } = req.body;
   const sql = `
@@ -705,7 +698,6 @@ export const updateStep = (req, res) => {
   }
   )
 }
-
 export const getAllSteps = (req, res) => {
   const { search = "", page = 1, limit = 5 } = req.query;
 
@@ -906,7 +898,6 @@ export const getAllSidebarMembers = (req, res) => {
     return res.status(403).json({ message: "Unauthorized role" });
   }
 };
-
 export const getAllUsers = (req, res) => {
   const { search = "", page = 1, limit = 5 } = req.query;
 
@@ -966,7 +957,8 @@ export const getAllUsers = (req, res) => {
         role,
         email,
         phone,
-        is_verified
+        is_verified,
+        isorganizer
       FROM users
       ${whereClause}
       ORDER BY id DESC
@@ -1006,13 +998,12 @@ export const getAllUsers = (req, res) => {
     });
   });
 };
-
 export const activateUser = (req, res) => {
-  const { id, status } = req.body;
+  const { user_id, role, is_verified, isorganizer } = req.body;
 
-  const sql = `UPDATE users SET is_verified = ? WHERE id = ?`;
+  const sql = `UPDATE users SET is_verified = ?, role = ?, isorganizer = ? WHERE id = ?`;
 
-  db.query(sql, [status, id], (err, results) => {
+  db.query(sql, [is_verified, role, isorganizer, user_id], (err, results) => {
     if (err) {
       console.error("Error activating user:", err);
       return res.status(500).json({ message: "Failed to update the user. Please try again later." });
@@ -1022,6 +1013,605 @@ export const activateUser = (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    return res.status(200).json({ message: `User has been successfully ${status === 'A' ? 'Activated' : 'Deactivated'}!` });
+    return res.status(200).json({ message: `User has been successfully updated!` });
   });
+};
+
+
+export const addUniversity = async (req, res) => {
+  try {
+    const { name, status, c_by, locations } = req.body;
+    const file = req.file;
+
+    if (!name || !status || !locations) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // ✅ Parse locations array
+    const locationArr = typeof locations === "string" ? JSON.parse(locations) : locations;
+
+    const { address, lat, lng } = locationArr[0];
+    const city = address?.split(",").pop()?.trim() || "";
+
+    // ✅ File save
+    let savedFilePath = null;
+
+    if (file) {
+      const basePath = "D:/Projects/Wham/Server/uploads";
+      const uniFolder = path.join(basePath, "universities");
+
+      if (!fs.existsSync(uniFolder)) {
+        fs.mkdirSync(uniFolder, { recursive: true });
+      }
+
+      const ext = path.extname(file.originalname);
+      const fileName = `${name}_${Date.now()}${ext}`;
+      const fullPath = path.join(uniFolder, fileName);
+
+      fs.writeFileSync(fullPath, file.buffer);
+      savedFilePath = `/uploads/universities/${fileName}`;
+    }
+
+    const sql = `
+      INSERT INTO universities(id, name, address, city, lat, lng, photo, status, c_by, c_at)
+      SELECT IFNULL(MAX(id), 0) + 1,?, ?, ?, ?, ?, ?, ?, ?, NOW()
+      FROM universities
+    `;
+
+    const values = [name, address, city, lat, lng, savedFilePath, status, c_by];
+
+    await db.query(sql, values);
+
+    return res.status(201).json({
+      message: "University added successfully"
+    });
+
+  } catch (error) {
+    console.error("Add University Error:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+export const getAllUniversities = (req, res) => {
+  const { search = "", page = 1, limit = 5 } = req.query;
+
+  const pageNum = Number(page);
+  const limitNum = Number(limit);
+  const offset = (pageNum - 1) * limitNum;
+
+  let whereClause = "WHERE 1=1";
+  const params = [];
+
+  if (search) {
+    whereClause += `
+      AND (
+        id LIKE ?
+        OR name LIKE ?
+        OR city LIKE ?
+        OR address LIKE ?
+      )
+    `;
+    params.push(
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`
+    );
+  }
+
+  // 🔹 Data Query
+  const dataSql = `
+    SELECT id, name, address, city, lat, lng, photo, status, c_by, c_at
+    FROM universities
+    ${whereClause}
+    LIMIT ? OFFSET ?
+  `;
+
+  const countSql = `
+    SELECT COUNT(*) AS total
+    FROM universities
+    ${whereClause}
+  `;
+
+  // 🔹 Get total count first
+  db.query(countSql, params, (countErr, countResult) => {
+    if (countErr) {
+      console.error("University Count Error:", countErr);
+      return res.status(500).json({ message: "Count failed" });
+    }
+
+    const total = countResult[0].total;
+
+    // 🔹 Get paginated data
+    db.query(dataSql, [...params, limitNum, offset], (dataErr, results) => {
+      if (dataErr) {
+        console.error("University Fetch Error:", dataErr);
+        return res.status(500).json({ message: "Data fetch failed" });
+      }
+
+      res.status(200).json({
+        message: "Universities fetched successfully",
+        universities: results,
+        total: total
+      });
+    }
+    );
+  });
+};
+export const getUniversityDetails = (req, res) => {
+  const { id } = req.params;
+
+  const sql = `
+    SELECT id, name, address, city, status, photo, lat, lng
+    FROM universities
+    WHERE id = ?
+  `;
+
+  db.query(sql, [id], (err, results) => {
+    if (err) {
+      console.error("University Fetch Error:", err);
+      return res.status(500).json({ message: "Data fetch failed" });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "University not found" });
+    }
+
+    res.status(200).json(results[0]);
+  });
+};
+export const updateUniversity = (req, res) => {
+  const { id, name, status, locations } = req.body;
+
+  if (!id) {
+    return res.status(400).json({ message: "University id is required" });
+  }
+
+  let locationArr = [];
+
+  try {
+    locationArr = typeof locations === "string" ? JSON.parse(locations) : locations;
+  } catch (e) {
+    return res.status(400).json({ message: "Invalid location format" });
+  }
+
+  if (!Array.isArray(locationArr) || locationArr.length === 0) {
+    return res.status(400).json({ message: "Location data is missing" });
+  }
+
+  const { address = "", lat = null, lng = null } = locationArr[0];
+  const city = address.split(",").pop()?.trim() || "";
+
+  const sql = `
+    UPDATE universities
+    SET name = ?, address = ?, city = ?, lat = ?, lng = ?, status = ?
+    WHERE id = ?
+  `;
+
+  db.query(sql, [name, address, city, lat, lng, status, id], (err, results) => {
+    if (err) {
+      console.error("University Update Error:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: "University not found" });
+    }
+
+    return res.status(200).json({ message: "University updated successfully" });
+  }
+  );
+};
+export const getActiveUniversities = (req, res) => {
+  const dataSql = `
+    SELECT id, name, address, city, lat, lng, photo, status, c_by, c_at
+    FROM universities
+    WHERE status = 'A'
+  `;
+  db.query(dataSql, (Err, Result) => {
+    if (Err) {
+      console.error("University fetch Error:", Err);
+      return res.status(500).json({ message: "Count failed" });
+    }
+    return res.status(200).json({ Result })
+  });
+};
+
+
+export const addCollege = async (req, res) => {
+  try {
+    const { name, status, uniId, totalStudents = 0, c_by, locations } = req.body;
+    const file = req.file;
+
+    if (!name || !status || !uniId || !locations) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const locationArr =
+      typeof locations === "string" ? JSON.parse(locations) : locations;
+
+    if (!Array.isArray(locationArr) || locationArr.length === 0) {
+      return res.status(400).json({ message: "Invalid locations data" });
+    }
+
+    const { address = "", lat = null, lng = null } = locationArr[0];
+
+    // ✅ File save
+    let savedFilePath = null;
+
+    if (file) {
+      const basePath = "D:/Projects/Wham/Server/uploads";
+      const clgFolder = path.join(basePath, "colleges");
+
+      if (!fs.existsSync(clgFolder)) {
+        fs.mkdirSync(clgFolder, { recursive: true });
+      }
+
+      const ext = path.extname(file.originalname);
+      const fileName = `${Date.now()}_${name}${ext}`;
+      const fullPath = path.join(clgFolder, fileName);
+
+      fs.writeFileSync(fullPath, file.buffer);
+      savedFilePath = `/uploads/colleges/${fileName}`;
+    }
+
+    // ✅ IMPORTANT PART (manual clg_id)
+    const sql = `
+      INSERT INTO colleges
+      (
+        clg_id,
+        university_id,
+        clg_name,
+        clg_address,
+        total_students,
+        clg_photo,
+        lat,
+        lng,
+        status,
+        c_at,
+        c_by
+      )
+      SELECT
+        IFNULL(MAX(clg_id), 0) + 1,
+        ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?
+      FROM colleges
+    `;
+
+    const values = [
+      uniId,
+      name,
+      address,
+      totalStudents,
+      savedFilePath,
+      lat,
+      lng,
+      status,
+      c_by
+    ];
+
+    await db.query(sql, values);
+
+    return res.status(201).json({ message: "College added successfully" });
+
+  } catch (error) {
+    console.error("Add College Error:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+export const getAllColleges = (req, res) => {
+  const { search = "", page = 1, limit = 5 } = req.query;
+
+  const pageNum = Number(page);
+  const limitNum = Number(limit);
+  const offset = (pageNum - 1) * limitNum;
+
+  let whereClause = "WHERE 1=1";
+  const params = [];
+
+  if (search) {
+    whereClause += `
+      AND (
+        c.clg_id LIKE ?
+        OR c.clg_name LIKE ?
+        OR c.clg_address LIKE ?
+        OR c.university_id LIKE ?
+        OR u.name LIKE ?
+      )
+    `;
+    params.push(
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`
+    );
+  }
+
+  // 🔹 Data Query
+  const dataSql = `
+    SELECT
+      c.clg_id,
+      c.university_id,
+      c.clg_name AS name,
+      c.clg_address,
+      c.total_students,
+      c.clg_photo AS photo,
+      c.lat,
+      c.lng,
+      c.status,
+      c.c_by,
+      c.c_at,
+      u.name AS university_name
+    FROM colleges AS c
+    LEFT JOIN universities AS u ON c.university_id = u.id
+    ${whereClause}
+    LIMIT ? OFFSET ?
+  `;
+
+  // 🔹 Count Query (same JOIN + filters)
+  const countSql = `
+    SELECT COUNT(*) AS total
+    FROM colleges AS c
+    LEFT JOIN universities AS u ON c.university_id = u.id
+    ${whereClause}
+  `;
+
+  // 🔹 Get total count
+  db.query(countSql, params, (countErr, countResult) => {
+    if (countErr) {
+      console.error("College Count Error:", countErr);
+      return res.status(500).json({ message: "Count failed" });
+    }
+
+    const total = countResult[0].total;
+
+    // 🔹 Get paginated data
+    db.query(
+      dataSql,
+      [...params, limitNum, offset],
+      (dataErr, results) => {
+        if (dataErr) {
+          console.error("College Fetch Error:", dataErr);
+          return res.status(500).json({ message: "Data fetch failed" });
+        }
+
+        res.status(200).json({
+          message: "Colleges fetched successfully",
+          colleges: results,
+          total,
+          page: pageNum,
+          limit: limitNum
+        });
+      }
+    );
+  });
+};
+export const getCollegeDetails = (req, res) => {
+  const { id } = req.params;
+
+  const sql = `
+    SELECT
+      c.clg_id,
+      c.university_id,
+      u.name AS university_name,
+      c.clg_name,
+      c.clg_address,
+      c.total_students,
+      c.clg_photo,
+      c.lat,
+      c.lng,
+      c.status,
+      c.c_by,
+      c.c_at
+    FROM colleges AS c
+    LEFT JOIN universities AS u
+      ON c.university_id = u.id
+    WHERE c.clg_id = ?
+  `;
+
+  db.query(sql, [id], (err, results) => {
+    if (err) {
+      console.error("College Fetch Error:", err);
+      return res.status(500).json({ message: "Data fetch failed" });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "College not found" });
+    }
+
+    res.status(200).json({
+      message: "College details fetched successfully",
+      college: results[0]
+    });
+  });
+};
+export const updateCollege = (req, res) => {
+  const { id, name, status, locations, totalStudents, uniId } = req.body;
+
+  if (!id) {
+    return res.status(400).json({ message: "College id is required" });
+  }
+
+  let locationArr = [];
+
+  try {
+    locationArr = typeof locations === "string" ? JSON.parse(locations) : locations;
+  } catch (e) {
+    return res.status(400).json({ message: "Invalid location format" });
+  }
+
+  if (!Array.isArray(locationArr) || locationArr.length === 0) {
+    return res.status(400).json({ message: "Location data is missing" });
+  }
+
+  const { address = "", lat = null, lng = null } = locationArr[0];
+
+  const sql = `
+    UPDATE colleges
+    SET
+      university_id = ?,
+      clg_name = ?,
+      clg_address = ?,
+      total_students = ?,
+      lat = ?,
+      lng = ?,
+      status = ?
+    WHERE clg_id = ?
+  `;
+
+  db.query(sql, [uniId, name, address, totalStudents, lat, lng, status, id], (err, results) => {
+    if (err) {
+      console.error("College Update Error:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: "College not found" });
+    }
+
+    return res.status(200).json({ message: "College updated successfully" });
+  }
+  );
+};
+export const getActiveColleges = (req, res) => {
+  const dataSql = `
+    SELECT
+      clg_id,
+      clg_name,
+      clg_address,
+      total_students,
+      clg_photo,
+      lat,
+      lng,
+      status,
+      c_by,
+      c_at
+    FROM colleges
+    WHERE status = 'A'
+  `;
+
+  db.query(dataSql, (err, result) => {
+    if (err) {
+      console.error("Get Active Colleges Error:", err);
+      return res.status(500).json({ message: "Failed to fetch colleges" });
+    }
+
+    return res.status(200).json({ success: true, data: result, });
+  });
+};
+
+export const addDepartment = (req, res) => {
+  const { clg_id, dept_name, student_strength, status } = req.body;
+
+  const sql = `
+    INSERT INTO departments (dept_id, clg_id, dept_name, student_strength, status)
+    SELECT IFNULL(MAX(dept_id), 0) + 1, ?, ?, ?, ?
+    FROM departments
+  `;
+
+  db.query(sql, [clg_id, dept_name, student_strength, status], (err, results) => {
+    if (err) {
+      console.error("Error adding department:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+
+    return res.status(201).json({
+      message: "Department added successfully",
+      deptId: results.insertId || null,
+    });
+  }
+  );
+};
+export const getAllDepartments = (req, res) => {
+  const { search = "", page = 1, limit = 5 } = req.query;
+
+  const pageNum = Number(page);
+  const limitNum = Number(limit);
+  const offset = (pageNum - 1) * limitNum;
+
+  let whereClause = "WHERE 1=1";
+  const params = [];
+
+  if (search) {
+    whereClause += `
+      AND (
+        d.dept_id LIKE ?
+        OR d.dept_name LIKE ?
+      )
+    `;
+    params.push(`%${search}%`, `%${search}%`);
+  }
+
+  // 🔹 Data Query with LEFT JOIN
+  const dataSql = `
+    SELECT
+      d.dept_id,
+      d.dept_name,
+      d.student_strength,
+      d.status,
+      d.clg_id,
+      c.clg_name
+    FROM departments d
+    LEFT JOIN colleges c ON d.clg_id = c.clg_id
+    ${whereClause}
+    LIMIT ? OFFSET ?
+  `;
+
+  // 🔹 Count Query
+  const countSql = `
+    SELECT COUNT(*) AS total
+    FROM departments d
+    LEFT JOIN colleges c ON d.clg_id = c.clg_id
+    ${whereClause}
+  `;
+
+  // First get total count
+  db.query(countSql, params, (countErr, countResult) => {
+    if (countErr) {
+      console.error("Count error:", countErr);
+      return res.status(500).json({ message: "Count failed" });
+    }
+
+    const total = countResult[0].total;
+
+    // Then get paginated data
+    db.query(dataSql, [...params, limitNum, offset], (dataErr, results) => {
+      if (dataErr) {
+        console.error("Data fetch error:", dataErr);
+        return res.status(500).json({ message: "Data fetch failed" });
+      }
+
+      return res.status(200).json({
+        message: "Departments fetched successfully",
+        departments: results,
+        total,
+      });
+    }
+    );
+  });
+};
+export const updateDepartment = (req, res) => {
+  const { dept_id, clg_id, dept_name, student_strength, status } = req.body;
+
+  const sql = `
+    UPDATE departments
+    SET clg_id = ?, dept_name = ?, student_strength = ?, status = ?
+    WHERE dept_id = ?
+  `;
+
+  db.query(sql, [clg_id, dept_name, student_strength, status, dept_id], (err, results) => {
+    if (err) {
+      console.error("Error updating department:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: "Department not found" });
+    }
+
+    return res.status(200).json({
+      message: "Department updated successfully",
+      updatedDeptId: dept_id,
+    });
+  }
+  );
 };

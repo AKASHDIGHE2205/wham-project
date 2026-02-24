@@ -13,6 +13,7 @@ export interface EventModalProps {
   selectedDate: Date | null;
   fetchData: () => void;
   Role: string;
+  isorganizer: "Y" | "N";
 }
 
 export interface Team {
@@ -41,7 +42,8 @@ export interface SelectedLocation {
   address: string;
 }
 
-const EventModal: FC<EventModalProps> = ({ isShow, setIsShow, selectedDate, fetchData, Role }) => {
+const EventModal: FC<EventModalProps> = ({ isShow, setIsShow, selectedDate, fetchData, Role, isorganizer }) => {
+  console.log(Role);
 
   const getInitialDates = () => {
     const now = new Date();
@@ -120,6 +122,7 @@ const EventModal: FC<EventModalProps> = ({ isShow, setIsShow, selectedDate, fetc
   }
 
   const user = getUserFromStorage();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -185,10 +188,10 @@ const EventModal: FC<EventModalProps> = ({ isShow, setIsShow, selectedDate, fetc
 
   return (
     <>
-      {(Role === 'Master' || Role === 'Admin' || Role === 'Manager') ? (
+      {(isorganizer === 'Y') ? (
         <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div
-            className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
+            className="bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -505,11 +508,7 @@ const EventModal: FC<EventModalProps> = ({ isShow, setIsShow, selectedDate, fetc
                         className="w-full px-2 py-2 border border-gray-300 rounded-lg focus:border-orange-500 outline-none text-orange-600 placeholder:text-orange-600"
                         placeholder="Select locations..."
                         readOnly
-                        value={
-                          selectedLocations.length > 0
-                            ? `${selectedLocations.length} locations selected`
-                            : ''
-                        }
+                        value={selectedLocations.length > 0 ? `${selectedLocations.length} locations selected` : ''}
                       />
                     </div>
 

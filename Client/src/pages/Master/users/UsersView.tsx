@@ -1,10 +1,9 @@
 import { Search } from "lucide-react"
 import DataLoading from "../../../components/DataLoading"
 import { useEffect, useState } from "react";
-import { activeUser, getAllUsers } from "../../../services/master/masterApi";
+import { getAllUsers } from "../../../services/master/masterApi";
 import CustomPagination from "../../../helper/CustomPagination";
-import { Link } from "react-router-dom";
-import toast from "react-hot-toast";
+import UserEdit from "./UserEdit";
 
 export interface Users {
   user_id: number;
@@ -12,8 +11,8 @@ export interface Users {
   phone: string;
   email: string;
   role: string;
-  status: string;
   is_verified: string
+  isorganizer: string
 }
 
 interface UsersResponse {
@@ -34,6 +33,8 @@ const UsersView = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [loading, setLoading] = useState(true);
+  const [showEdit, setShowEdit] = useState(false);
+  const [selectedUser, setSelectedUser] = useState({});
 
   const fetchData = async () => {
     setLoading(true);
@@ -65,18 +66,9 @@ const UsersView = () => {
     setCurrentPage(pageNumber);
   };
 
-  const handleActive = async (id: number, status: string) => {
-    try {
-      const body = {
-        id: id,
-        status: status
-      }
-      const response = await activeUser(body);
-      toast.success(response.message || "User has been successfully activated!");
-      fetchData();
-    } catch (error) {
-      console.log(error);
-    }
+  const handleEdit = (item: Users) => {
+    setShowEdit(true);
+    setSelectedUser(item);
   }
 
   return (
@@ -245,7 +237,10 @@ const UsersView = () => {
                   <th className="px-2 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-2 py-3 text-center text-xs font-semibold text-gray-900 uppercase tracking-wider hidden">
+                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
+                    Organizer
+                  </th>
+                  <th className="px-2 py-3 text-center text-xs font-semibold text-gray-900 uppercase tracking-wider">
                     Action
                   </th>
                 </tr>
@@ -253,7 +248,7 @@ const UsersView = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-4">
+                    <td colSpan={7} className="text-center py-4">
                       <DataLoading />
                     </td>
                   </tr>
@@ -279,51 +274,35 @@ const UsersView = () => {
                         {item?.phone}
                       </td>
                       <td className="px-2 py-0.5">
-                        <button
-                          onClick={() => {
-                            const status = item?.is_verified === "A" ? "I" : "A";
-                            handleActive(item.user_id, status)
-                          }}
-                          className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors  cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-500 ${item?.is_verified === "A"
-                            ? "bg-green-100 border border-green-300"
-                            : "bg-red-100 border border-red-300"
-                            }`}
-                        >
-                          <span
-                            className={`inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow-sm transition-all ${item?.is_verified === "A"
-                              ? "translate-x-6 text-green-600"
-                              : "translate-x-1 text-red-600"
-                              }`}
-                          >
-                            {item?.is_verified === "A" ? (
-                              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-check">
-                                <polyline points="20 6 9 17 4 12" />
-                              </svg>
-                            ) : (
-                              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x">
-                                <path d="M18 6 6 18" />
-                                <path d="m6 6 12 12" />
-                              </svg>
-                            )}
-                          </span>
-                        </button>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item?.is_verified === 'A' ? 'bg-green-100 text-green-800' : item?.is_verified === 'I' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                          {item?.is_verified === "A" ? "Active" : "In-active"}
+                        </span>
                       </td>
-                      <td className="px-3 py-2 text-center whitespace-nowrap hidden">
-                        <Link
-                          to={``}
+
+                      <td className="px-2 py-0.5">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item?.isorganizer === 'Y' ? 'bg-green-100 text-green-800' : item?.isorganizer === 'N' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                          {item?.isorganizer === "Y" ? "Yes" : "No"}
+                        </span>
+                      </td>
+
+                      <td className="px-3 py-2 text-center whitespace-nowrap">
+                        <button
+                          onClick={() => handleEdit(item)}
                           className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-orange-600 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-all duration-200 cursor-pointer"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-square-pen">
                             <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                             <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" />
                           </svg>
-                        </Link>
+                        </button>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="text-center py-4 text-orange-600">
+                    <td colSpan={7} className="text-center py-4 text-orange-600">
                       No Records Found
                     </td>
                   </tr>
@@ -341,7 +320,9 @@ const UsersView = () => {
             currentPage={currentPage}
           />
         </div>
+
       </div>
+      {showEdit && (<UserEdit Data={selectedUser} show={showEdit} setShow={setShowEdit} fetchData={fetchData} />)}
     </div>
   )
 }

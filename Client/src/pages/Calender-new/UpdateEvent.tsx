@@ -13,6 +13,7 @@ export interface EventModalProps {
   fetchData: () => void;
   Event: any;
   Role: string;
+  isorganizer: "Y" | "N";
 }
 
 export interface EventInterface {
@@ -36,7 +37,8 @@ export interface EventInterface {
   locations: SelectedLocation[];
 }
 
-const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event, Role }) => {
+const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event, Role, isorganizer }) => {
+  console.log(Role);
   const [inputs, setInputs] = useState({
     title: '',
     fromDate: '',
@@ -173,14 +175,14 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
       handleCancel();
     }
   }
-  const disabled = (Event?.isapproved === 'C' || Event?.isapproved === 'A' || !['Master', 'Admin', 'Manager'].includes(Role));
+  const isDisabled = (Event?.isapproved === 'C' || Event?.isapproved === 'A' || isorganizer === 'N');
 
   if (!isShow) return null;
 
   return (
     <>
       <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100">
+        <div className="bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100">
 
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white rounded-t-2xl">
@@ -203,7 +205,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                 <span className="text-sm font-medium text-gray-700">Approve</span>
                 <button
                   type="button"
-                  disabled={disabled}
+                  disabled={isDisabled}
                   onClick={() => setInputs({ ...inputs, isapproved: inputs.isapproved === 'A' ? '' : 'A' })}
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:cursor-not-allowed focus:ring-offset-2 ${inputs.isapproved === 'A' ? 'bg-green-500' : 'bg-gray-200'
                     }`}
@@ -264,7 +266,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                           type="button"
                           onClick={() => removeSelectedTeam(item?.id)}
                           className="text-blue-600 hover:text-blue-800 transition-colors cursor-pointer p-0.5 rounded-full hover:bg-blue-200 disabled:cursor-not-allowed disabled:opacity-50"
-                          disabled={disabled}
+                          disabled={isDisabled}
                         >
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -300,7 +302,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                           type="button"
                           onClick={() => removeSelectedMember(item?.id)}
                           className="text-orange-600 hover:text-orange-800 transition-colors cursor-pointer p-0.5 rounded-full hover:bg-orange-200 disabled:cursor-not-allowed"
-                          disabled={disabled}
+                          disabled={isDisabled}
                         >
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -329,7 +331,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                 <button
                   type="button"
                   onClick={() => setShowMember(true)}
-                  disabled={disabled}
+                  disabled={isDisabled}
                   className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-lg hover:shadow-lg disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 cursor-pointer"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-user-plus-icon lucide-user-plus">
@@ -358,7 +360,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                   name="title"
                   value={inputs?.title}
                   onChange={handleChange}
-                  disabled={disabled}
+                  disabled={isDisabled}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   required
                 />
@@ -377,7 +379,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                     name="fromDate"
                     value={inputs?.fromDate}
                     onChange={handleChange}
-                    disabled={disabled}
+                    disabled={isDisabled}
                     className="w-full px-6 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
                     required
                   />
@@ -393,7 +395,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                     name="toDate"
                     value={inputs?.toDate}
                     onChange={handleChange}
-                    disabled={disabled}
+                    disabled={isDisabled}
                     className="w-full px-6 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
                     required
                   />
@@ -415,7 +417,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                   </div>
                   <select
                     name="isapproved"
-                    // disabled={disabled}
+                    // disabled={isDisabled}
                     className={`
                                w-full pl-10 pr-4 py-2 font-semibold rounded-lg transition-all duration-200
                                focus:outline-none focus:ring-0 border  disabled:cursor-not-allowed
@@ -471,7 +473,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                         <button
                           type="button"
                           onClick={() => removeSelectedLocation(location.id)}
-                          disabled={disabled}
+                          disabled={isDisabled}
                           className="text-green-600 hover:text-green-800 transition-colors cursor-pointer p-1 rounded-full hover:bg-green-200 ml-2 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -492,7 +494,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                   <div className="flex-1">
                     <input
                       type="text"
-                      disabled={disabled}
+                      disabled={isDisabled}
                       className="w-full px-2 py-2 border border-gray-300 rounded-lg focus:border-orange-500 outline-none text-orange-600 placeholder:text-orange-600 disabled:cursor-not-allowed"
                       placeholder="Select locations..."
                       readOnly
@@ -507,7 +509,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                   <button
                     type="button"
                     onClick={() => setShowLocation(true)}
-                    disabled={disabled}
+                    disabled={isDisabled}
                     className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-lg hover:shadow transition duration-300 flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-map-pin-plus-icon lucide-map-pin-plus"><path d="M19.914 11.105A7.298 7.298 0 0 0 20 10a8 8 0 0 0-16 0c0 4.993 5.539 10.193 7.399 11.799a1 1 0 0 0 1.202 0 32 32 0 0 0 .824-.738" /><circle cx="12" cy="10" r="3" /><path d="M16 18h6" /><path d="M19 15v6" /></svg>
@@ -530,7 +532,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
                   name="description"
                   value={inputs?.description}
                   onChange={handleChange}
-                  disabled={disabled}
+                  disabled={isDisabled}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none resize-none transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
               </div>
@@ -546,20 +548,20 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
               >
                 Cancel
               </button>
-              {((Role === "Admin") || (Role === "Master") || (Role === "Manager")) && (
+              {((isorganizer === "Y")) && (
                 <>
                   <button
                     type="button"
                     className="px-6 py-2 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-700 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm flex items-center gap-2 cursor-pointer"
                     onClick={handleDelete}
-                    disabled={disabled}
+                    disabled={isDisabled}
                   >
                     Delete
                   </button>
                   <button
                     type="submit"
                     className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm flex items-center gap-2 cursor-pointer"
-                    disabled={disabled}
+                    disabled={isDisabled}
                   >
                     Update
                   </button>

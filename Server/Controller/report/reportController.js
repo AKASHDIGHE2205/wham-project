@@ -119,8 +119,8 @@ export const report1 = (req, res) => {
       });
     }
 
-    const ids = event_hd.map(e => e.id); // event IDs
-    const dates = event_hd.map(e => e.event_date); // event dates
+    const ids = event_hd.map(e => e.id);
+    const dates = event_hd.map(e => e.event_date);
 
     // 2️⃣ Event Teams
     const sqlTeams = `

@@ -95,8 +95,8 @@ export const registerUser = async (req, res) => {
           // 3️⃣ Insert user
           const insertUserSQL = `
             INSERT INTO users
-            (first_name, middle_name, last_name, password, email, phone, role, is_verified)
-            VALUES (?, ?, ?, ?, ?, ?, 'User', 'I')
+            (first_name, middle_name, last_name, password, email, phone, role, is_verified, isorganizer)
+            VALUES (?, ?, ?, ?, ?, ?, 'User', 'I', 'N')
           `;
 
           connection.query(insertUserSQL, [firstName, middleName, lastName, hashedPassword, email, phone], (userErr, userResult) => {
@@ -203,6 +203,7 @@ export const loginUser = (req, res) => {
           email: user.email,
           phone: user.phone,
           role: user.role,
+          isorganizer: user.isorganizer,
         },
       });
     });
@@ -217,11 +218,7 @@ export const getTeamMembers_old = (req, res) => {
   const { userId } = req.body;
 
   // STEP 1: Get member IDs for this user
-  const sql1 = `
-    SELECT mem_id 
-    FROM mst_members 
-    WHERE user_id = ?
-  `;
+  const sql1 = `SELECT mem_id FROM mst_members WHERE user_id = ?`;
 
   db.query(sql1, [userId], (err, memberResults) => {
     if (err) {
@@ -237,11 +234,11 @@ export const getTeamMembers_old = (req, res) => {
 
     // STEP 2: Find teams this user belongs to
     const sql2 = `
-      SELECT DISTINCT t.id AS team_id, t.name AS team_name, t.description, t.manager_id
-      FROM mst_team t
-      JOIN team_members tm ON tm.team_id = t.id
-      WHERE tm.member_id IN (?)
-    `;
+                    SELECT DISTINCT t.id AS team_id, t.name AS team_name, t.description, t.manager_id
+                    FROM mst_team t
+                    JOIN team_members tm ON tm.team_id = t.id
+                    WHERE tm.member_id IN (?)
+                  `;
 
     db.query(sql2, [memberIds], (err, teamResults) => {
       if (err) {
@@ -257,16 +254,16 @@ export const getTeamMembers_old = (req, res) => {
 
       // STEP 3: Get ALL members of those teams EXCEPT the logged-in user
       const sql3 = `
-        SELECT 
-          tm.team_id,
-          m.mem_id,
-          CONCAT(m.first_name, ' ', m.middle_name, ' ', m.last_name) AS full_name,
-          m.user_id
-        FROM team_members tm
-        JOIN mst_members m ON m.mem_id = tm.member_id
-        WHERE tm.team_id IN (?)
-          AND m.user_id <> ?         -- 🚫 exclude logged-in user
-      `;
+                      SELECT 
+                        tm.team_id,
+                        m.mem_id,
+                        CONCAT(m.first_name, ' ', m.middle_name, ' ', m.last_name) AS full_name,
+                        m.user_id
+                      FROM team_members tm
+                      JOIN mst_members m ON m.mem_id = tm.member_id
+                      WHERE tm.team_id IN (?)
+                        AND m.user_id <> ?         -- 🚫 exclude logged-in user
+                    `;
 
       db.query(sql3, [teamIds, userId], (err, membersResults) => {
         if (err) {

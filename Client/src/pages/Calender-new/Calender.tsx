@@ -47,6 +47,7 @@ const Calendar: React.FC<CalendarProps> = () => {
 
     setCurrentDate(newDate);
   };
+
   const renderCurrentView = () => {
     switch (view) {
       case "daily":
@@ -145,7 +146,7 @@ const Calendar: React.FC<CalendarProps> = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white border border-orange-300 m-1 rounded-md">
+    <div className="min-h-screen flex flex-col bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 border border-orange-300 m-1 rounded-md">
       {/* HEADER — NO CHANGES */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 sm:p-6 border-b border-orange-100">
         {/* HEADER SECTION */}
@@ -236,6 +237,7 @@ const Calendar: React.FC<CalendarProps> = () => {
           selectedDate={selectedData}
           fetchData={fetchData}
           Role={user?.role || ''}
+          isorganizer={user?.isorganizer || ''}
         />
       )}
       {isEditShowModal && (
@@ -245,10 +247,10 @@ const Calendar: React.FC<CalendarProps> = () => {
           fetchData={fetchData}
           Event={editData}
           Role={user?.role || ''}
+          isorganizer={user?.isorganizer || ''}
         />
       )}
     </div>
   );
 };
-
 export default Calendar;
