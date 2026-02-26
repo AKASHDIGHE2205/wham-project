@@ -67,7 +67,7 @@ const DepartmentView = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-orange-600">Department Master</h1>
+            <h1 className="text-xl font-bold text-orange-600">Department List.</h1>
           </div>
         </div>
 
@@ -82,7 +82,7 @@ const DepartmentView = () => {
               <input
                 type="text"
                 placeholder="Search department..."
-                className="block w-full pl-9 sm:pl-10 pr-3 py-2 sm:py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 text-sm sm:text-base"
+                className="block w-full pl-9 sm:pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 text-sm sm:text-base"
                 value={searchTerm}
                 onChange={handleSearchChange}
               />

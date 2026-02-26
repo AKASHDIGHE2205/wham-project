@@ -1,7 +1,33 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { ActivityIcon, Building, Building2, Calendar, CheckSquare, FileBarChart, Home, Layers, LogOutIcon, ShieldCheck, University, User, Users } from "lucide-react";
+import {
+  BarChart3, Bell, BookOpen, CalendarDays, Contact, FileBarChart2, FileText, GraduationCap, HelpCircle, Home, Layers3, LayoutDashboard, LifeBuoy, ListChecks, LogOutIcon, Presentation, School, Settings, University, User, UserCheck, Users, UsersRound, Workflow
+} from "lucide-react";
 import { getUserFromStorage } from '../helper/cryptoUser';
+
+interface NavLinkItem {
+  type: 'link';
+  label: string;
+  path: string;
+  icon: React.ElementType;
+  roles: string[];
+}
+
+interface NavDropdownItem {
+  type: 'dropdown';
+  label: string;
+  icon: React.ElementType;
+  key: string;
+  roles: string[];
+  items: Array<{
+    label: string;
+    path: string;
+    icon: React.ElementType;
+    roles?: string[];
+  }>;
+}
+
+type NavItem = NavLinkItem | NavDropdownItem;
 
 const Navbar = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -23,11 +49,257 @@ const Navbar = () => {
 
   const user = getUserFromStorage();
 
+  const navItems: NavItem[] = [
+    {
+      type: 'link',
+      label: 'Dashboard',
+      path: '/dashboard',
+      icon: LayoutDashboard,
+      roles: ['Master', 'Admin', 'Manager', 'User']
+    },
+    {
+      type: 'dropdown',
+      label: 'University Management',
+      icon: GraduationCap,
+      key: 'University',
+      roles: ['Master', 'Manager'],
+      items: [
+        { label: 'University', path: '/master/view-universities', icon: University },
+        { label: 'College', path: '/master/view-colleges', icon: School },
+        { label: 'Department', path: '/master/view-departments', icon: Layers3 }
+      ]
+    },
+    {
+      type: 'dropdown',
+      label: 'Master',
+      icon: Settings,
+      key: 'Master',
+      roles: ['Master', 'Admin', 'Manager'],
+      items: [
+        { label: 'Users', path: '/master/users-view', icon: Users },
+        { label: 'Member', path: '/master/view-members', icon: UserCheck },
+        { label: 'Team', path: '/master/team-view', icon: UsersRound },
+        { label: 'Steps', path: '/master/view-steps', icon: Workflow },
+        { label: 'Tasks', path: '/master/view-tasks', icon: ListChecks }
+      ]
+    },
+    {
+      type: 'link',
+      label: 'Calendar',
+      path: '/calender',
+      icon: CalendarDays,
+      roles: ['Master', 'Admin', 'Manager', 'User']
+    },
+    // {
+    //   type: 'link',
+    //   label: 'Trainings',
+    //   path: '/trainings',
+    //   icon: Presentation,
+    //   roles: ['Master', 'Admin', 'Manager', 'User']
+    // },
+    // {
+    //   type: 'link',
+    //   label: 'Library',
+    //   path: '/library',
+    //   icon: BookOpen,
+    //   roles: ['Master', 'Admin', 'Manager', 'User']
+    // },
+    {
+      type: 'dropdown',
+      label: 'Reports & Analytics',
+      icon: BarChart3,
+      key: 'Reports',
+      roles: ['Master', 'Admin', 'Manager', 'User'],
+      items: [
+        { label: 'Report 1', path: '/report/report1', icon: FileText, roles: ['Master', 'Admin', 'Manager'] },
+        { label: 'Report 2', path: '/report/report2', icon: FileBarChart2 }
+      ]
+    },
+    // {
+    //   type: 'dropdown',
+    //   label: 'Help',
+    //   icon: LifeBuoy,
+    //   key: 'Help',
+    //   roles: ['Master', 'Admin', 'Manager', 'User'],
+    //   items: [
+    //     { label: 'Help', path: '/help/faq', icon: LifeBuoy },
+    //     { label: 'FAQs', path: '/help/help', icon: HelpCircle },
+    //     { label: 'Contact Manager', path: '/help/contact', icon: Contact }
+    //   ]
+    // }
+  ];
+
+  // Filter items based on user role
+  const getVisibleItems = (): NavItem[] => {
+    return navItems.filter(item =>
+      item?.roles.some(role => user?.role === role)
+    );
+  };
+
+  const renderDesktopNav = () => {
+    return getVisibleItems().map((item) => {
+      if (item?.type === 'link') {
+        return (
+          <div key={item?.label} className="border-b border-gray-100">
+            <NavLink
+              to={item?.path}
+              className={({ isActive }) =>
+                `flex items-center text-sm space-x-1 px-1 py-1 transition-colors duration-200
+                ${isActive
+                  ? 'bg-orange-100 text-orange-600'
+                  : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'}`
+              }
+            >
+              <item.icon size={16} />
+              <span>{item?.label}</span>
+            </NavLink>
+          </div>
+        );
+      }
+
+      if (item?.type === 'dropdown') {
+        return (
+          <div key={item?.label} className="relative">
+            <button
+              onClick={() => handleDropdownToggle(item?.key)}
+              className={`flex items-center text-sm px-1 py-2 gap-1 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === item?.key
+                ? 'bg-orange-50 text-orange-600 border border-orange-200'
+                : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
+                }`}
+            >
+              <item.icon size={16} />
+              <span>{item?.label}</span>
+              <svg
+                className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === item?.key ? 'rotate-180' : ''
+                  }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {activeDropdown === item?.key && (
+              <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50">
+                {item?.items?.map((subItem) => {
+                  // Check if subitem has role restrictions
+                  if (subItem?.roles && !subItem.roles.some(role => user?.role === role)) {
+                    return null;
+                  }
+                  return (
+                    <NavLink
+                      key={subItem?.path}
+                      to={subItem?.path}
+                      className={({ isActive }) =>
+                        `flex items-center text-sm space-x-3 px-2 py-2 transition-colors duration-200 border-b border-gray-100
+                        ${isActive
+                          ? 'bg-orange-100 text-orange-600 font-medium'
+                          : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                      }
+                      onClick={closeAllMenus}
+                    >
+                      <subItem.icon size={16} />
+                      <span>{subItem?.label}</span>
+                    </NavLink>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      }
+      return null;
+    });
+  };
+
+  const renderMobileNav = () => {
+    return getVisibleItems().map((item) => {
+      if (item?.type === 'link') {
+        return (
+          <div key={item?.label} className="border-b border-gray-100 pb-2">
+            <NavLink
+              to={item?.path}
+              className={({ isActive }) =>
+                `flex items-center text-sm space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                ${isActive
+                  ? 'bg-orange-100 text-orange-600'
+                  : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+              }
+              onClick={handleMobileLinkClick}
+            >
+              <span className='font-medium flex justify-center items-center gap-2'>
+                <item.icon size={16} />
+                {item?.label}
+              </span>
+            </NavLink>
+          </div>
+        );
+      }
+
+      if (item?.type === 'dropdown') {
+        const mobileKey = `mobile-${item?.key}`;
+        return (
+          <div key={item?.label} className="border-b border-gray-100 pb-2">
+            <button
+              onClick={() => handleDropdownToggle(mobileKey)}
+              className={`flex justify-between w-full items-center space-x-1 px-4 py-1 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === mobileKey
+                ? 'bg-orange-50 text-orange-600 border border-orange-200'
+                : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
+                }`}
+            >
+              <div className='flex justify-center items-center gap-2'>
+                <item.icon size={16} />
+                {item?.label}
+              </div>
+              <svg
+                className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === mobileKey ? 'rotate-180' : ''
+                  }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {activeDropdown === mobileKey && (
+              <div className="mt-2 ml-4 space-y-1">
+                {item?.items?.map((subItem) => {
+                  if (subItem?.roles && !subItem.roles.some(role => user?.role === role)) {
+                    return null;
+                  }
+                  return (
+                    <NavLink
+                      key={subItem?.path}
+                      to={subItem?.path}
+                      className={({ isActive }) =>
+                        `flex items-center text-sm space-x-3 pl-6 px-2 py-2 border-b border-gray-200 gap-2 transition-colors duration-200
+                        ${isActive
+                          ? 'bg-orange-100 text-orange-600'
+                          : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                      }
+                      onClick={handleMobileLinkClick}
+                    >
+                      <subItem.icon size={16} />
+                      {subItem?.label}
+                    </NavLink>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      }
+      return null;
+    });
+  };
+
   return (
     <nav className="bg-white shadow-lg border-b border-gray-100 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/*Dashboad Menu */}
-        <div className="flex justify-between items-center h-16">
+      <div className="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
+        {/* Dashboard Menu */}
+        <div className="flex justify-between flex-row items-center h-16">
 
           {/* Logo */}
           <div className="shrink-0 items-center block sm:hidden">
@@ -43,320 +315,115 @@ const Navbar = () => {
 
           {/* Desktop Navigation - Middle */}
           <div className="hidden md:flex items-center space-x-4">
-
-            {/* Home Desktop */}
-            <div className="border-b border-gray-100">
+            {/* Home Desktop (hidden) */}
+            <div className="border-b border-gray-100 hidden">
               <NavLink
                 to={'/'}
                 className={({ isActive }) =>
-                  `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
+                  `flex items-center text-sm space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                  ${isActive
                     ? 'bg-orange-100 text-orange-600'
                     : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'}`
                 }
               >
                 <Home size={16} />
-                Home
+                <span>Home</span>
               </NavLink>
             </div>
-            {(user?.role === 'Master' || user?.role === 'Admin' || user?.role === 'Manager' || user?.role === 'User') && (
-              <>
-                {/* Dashboard Mobile */}
-                <div className="border-b border-gray-100">
-                  <NavLink
-                    to={'/dashboard'}
-                    className={({ isActive }) =>
-                      `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
-                        ? 'bg-orange-100 text-orange-600'
-                        : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'}`
-                    }
-                  >
-                    <ActivityIcon size={16} />
-                    Dashboard
-                  </NavLink>
-                </div>
 
-                {/* Master Dropdown */}
-                {(user?.role === 'Master' || user?.role === 'Admin' || user?.role === 'Manager') && (
-                  <div className="relative">
-                    <button
-                      onClick={() => handleDropdownToggle('Master')}
-                      className={`flex items-center space-x-1 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === 'Master'
-                        ? 'bg-orange-50 text-orange-600 border border-orange-200'
-                        : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
-                        }`}
-                    >
-                      <ShieldCheck size={16} />
-                      Master
-                      <svg
-                        className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'Master' ? 'rotate-180' : ''
-                          }`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-
-                    {activeDropdown === 'Master' && (
-                      <div className="absolute top-full left-0 mt-2 w-40 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
-
-                        <NavLink
-                          to="/master/view-universities"
-                          className={({ isActive }) =>
-                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                              ${isActive
-                              ? 'bg-orange-100 text-orange-600 font-medium'
-                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                          }
-                          onClick={closeAllMenus}
-                        >
-                          <University size={16} />
-                          University
-                        </NavLink>
-
-                        <NavLink
-                          to="/master/view-colleges"
-                          className={({ isActive }) =>
-                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                              ${isActive
-                              ? 'bg-orange-100 text-orange-600 font-medium'
-                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                          }
-                          onClick={closeAllMenus}
-                        >
-                          <Building size={16} />
-                          College
-                        </NavLink>
-
-                        <NavLink
-                          to="/master/view-departments"
-                          className={({ isActive }) =>
-                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                              ${isActive
-                              ? 'bg-orange-100 text-orange-600 font-medium'
-                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                          }
-                          onClick={closeAllMenus}
-                        >
-                          <Building2 size={16} />
-                          Department
-                        </NavLink>
-
-                        <NavLink
-                          to="/master/users-view"
-                          className={({ isActive }) =>
-                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                            ${isActive
-                              ? 'bg-orange-100 text-orange-600 font-medium'
-                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                          }
-                          onClick={closeAllMenus}
-                        >
-                          <Users size={16} />
-                          Users
-                        </NavLink>
-
-                        <NavLink
-                          to="/master/view-members"
-                          className={({ isActive }) =>
-                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                            ${isActive
-                              ? 'bg-orange-100 text-orange-600 font-medium'
-                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                          }
-                          onClick={closeAllMenus}
-                        >
-                          <User size={16} />
-                          Member
-                        </NavLink>
-
-                        <NavLink
-                          to="/master/team-view"
-                          className={({ isActive }) =>
-                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                            ${isActive
-                              ? 'bg-orange-100 text-orange-600 font-medium'
-                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                          }
-                          onClick={closeAllMenus}
-                        >
-                          <Users size={16} />
-                          Team
-                        </NavLink>
-
-                        <NavLink
-                          to="/master/view-steps"
-                          className={({ isActive }) =>
-                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                              ${isActive
-                              ? 'bg-orange-100 text-orange-600 font-medium'
-                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                          }
-                          onClick={closeAllMenus}
-                        >
-                          <Layers size={16} />
-                          Steps
-                        </NavLink>
-
-                        <NavLink
-                          to="/master/view-tasks"
-                          className={({ isActive }) =>
-                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                              ${isActive
-                              ? 'bg-orange-100 text-orange-600 font-medium'
-                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                          }
-                          onClick={closeAllMenus}
-                        >
-                          <CheckSquare size={16} />
-                          Tasks
-                        </NavLink>
-
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Calender */}
-                <div className="border-b border-gray-100">
-                  <NavLink
-                    to={'/calender'}
-                    className={({ isActive }) =>
-                      `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
-                        ? 'bg-orange-100 text-orange-600'
-                        : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'}`
-                    }
-                  >
-                    <Calendar size={16} />
-                    Calender
-                  </NavLink>
-                </div>
-
-                {/* Reports Dropdown */}
-                <div className="relative ">
-                  <button
-                    onClick={() => handleDropdownToggle('Reports')}
-                    className={`flex items-center space-x-1 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === 'Reports'
-                      ? 'bg-orange-50 text-orange-600 border border-orange-200'
-                      : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
-                      }`}
-                  >
-                    <FileBarChart size={16} />
-                    Reports
-                    <svg
-                      className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'Reports' ? 'rotate-180' : ''
-                        }`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                    {activeDropdown === 'Reports' && (
-                      <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
-
-                        {(user?.role === 'Master' || user?.role === 'Admin' || user?.role === 'Manager') && (
-                          <NavLink
-                            to="report/report1"
-                            className={({ isActive }) =>
-                              `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                        ${isActive ? 'bg-orange-100 text-orange-600 font-medium' : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`}
-                            onClick={closeAllMenus}
-                          >
-                            <span className="font-medium group-hover:translate-x-1 transition-transform duration-200">
-                              Report 1
-                            </span>
-                          </NavLink>
-                        )}
-                        <NavLink
-                          to="report/report2"
-                          className={({ isActive }) =>
-                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                        ${isActive ? 'bg-orange-100 text-orange-600 font-medium' : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`}
-                          onClick={closeAllMenus}
-                        >
-                          <span className="font-medium group-hover:translate-x-1 transition-transform duration-200">
-                            Report 2
-                          </span>
-                        </NavLink>
-
-                      </div>
-                    )}
-                  </button>
-                </div>
-              </>
-            )}
-
+            {/* Dynamic Desktop Navigation */}
+            {renderDesktopNav()}
           </div>
 
           {/* User Profile - Right */}
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-row items-center space-x-1">
+            {/* Notification Menu */}
+            <div className="relative">
+              <button
+                onClick={() => handleDropdownToggle("notification")}
+                className="flex items-center gap-1 px-1 py-1 rounded-full hover:bg-purple-50 transition cursor-pointer text-gray-700 hover:text-purple-600"
+              >
+                <div className="w-9 h-9 bg-linear-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-md relative">
+                  <Bell className="text-white w-4 h-4" />
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 text-white text-[10px] rounded-full flex items-center justify-center">
+                    {/* 3 */}
+                  </span>
+                </div>
+
+                <svg
+                  className={`w-4 h-4 transition-transform ${activeDropdown === "notification" ? "rotate-180" : ""
+                    }`}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <path d="M19 9l-7 7-7-7" strokeWidth="2" />
+                </svg>
+              </button>
+
+              {/* Notification Dropdown */}
+              {activeDropdown === "notification" && (
+                <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                  <div className="px-4 py-2 font-semibold">Notifications</div>
+                  <div className="px-4 py-2 hover:bg-gray-50">🔔 New user registered</div>
+                  <div className="px-4 py-2 hover:bg-gray-50">📦 Order completed</div>
+                  <div className="px-4 py-2 hover:bg-gray-50">⚠️ Payment pending</div>
+                </div>
+              )}
+            </div>
 
             {/* Desktop User Menu */}
-            <div className="hidden md:block relative">
+            <div className="relative">
               <button
-                onClick={() => handleDropdownToggle('user')}
-                className="flex items-center space-x-2 p-1 rounded-full hover:bg-purple-50 transition-colors duration-200 cursor-pointer"
+                onClick={() => handleDropdownToggle("user")}
+                className="flex items-center gap-1 px-1 py-1 rounded-full hover:bg-purple-50 transition cursor-pointer text-gray-700 hover:text-purple-600"
               >
+                {/* Avatar */}
                 <div className="w-9 h-9 bg-linear-to-r from-indigo-600 to-purple-600 rounded-full flex items-center justify-center shadow-md">
                   {user?.firstName ? (
                     <span className="text-white text-sm font-semibold">
-                      {(user?.firstName?.[0] || '').toUpperCase()}
-                      {(user?.lastName?.[0] || '').toUpperCase()}
+                      {user.firstName[0]}
+                      {user.lastName?.[0]}
                     </span>
                   ) : (
                     <User className="text-white w-4 h-4" />
                   )}
                 </div>
 
+                {/* Welcome Text */}
+                <span className="text-sm font-medium text-gray-700 whitespace-nowrap hidden sm:inline">
+                  Welcome{user?.firstName ? `, ${user.firstName}` : ""}!
+                </span>
+
+                {/* Arrow */}
                 <svg
-                  className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${activeDropdown === 'user' ? 'rotate-180' : ''
+                  className={`w-4 h-4 transition-transform ${activeDropdown === "user" ? "rotate-180" : ""
                     }`}
+                  viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  <path d="M19 9l-7 7-7-7" strokeWidth="2" />
                 </svg>
               </button>
 
-              {/* User Dropdown Menu */}
-              {activeDropdown === 'user' && (
-                <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
-                  <div className="px-4 py-1 border-b border-gray-100">
-                    <p className="text-sm font-semibold text-orange-600">{user?.firstName} {' '} {user?.lastName}</p>
-                    <p className="text-sm text-gray-600 hover:text-gray-700 ">{user?.email}</p>
-                  </div>
+              {/* User Dropdown */}
+              {activeDropdown === "user" && (
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
                   <NavLink
                     to="/auth/profile"
-                    className={({ isActive }) =>
-                      `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
-                        ? 'bg-orange-100 text-orange-600'
-                        : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                    }
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      setActiveDropdown(null);
-                    }}
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-orange-50"
+                    onClick={() => setActiveDropdown(null)}
                   >
-                    <User size={16} />
-                    Profile
+                    <User size={16} /> Profile
                   </NavLink>
+
                   <Link
                     to="/auth/log-out"
-                    className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-orange-50 hover:text-orange-600 rounded-lg gap-2"
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      setActiveDropdown(null);
-                    }}
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-orange-50"
+                    onClick={() => setActiveDropdown(null)}
                   >
-                    <LogOutIcon size={16} />
-                    Logout
+                    <LogOutIcon size={16} /> Logout
                   </Link>
                 </div>
               )}
@@ -374,271 +441,34 @@ const Navbar = () => {
               )}
             </button>
           </div>
-
         </div>
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-100 py-4 bg-white relative z-50">
             {/* Navigation Items with Scroll */}
-            <div className="space-y-2 max-h-[70vh] overflow-y-auto">
-
+            <div className="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto">
               {/* Home Mobile */}
               <div className="border-b border-gray-100 pb-2">
                 <NavLink
                   to={'/'}
                   className={({ isActive }) =>
-                    `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
+                    `flex items-center text-sm space-x-3 px-2 py-1 gap-2 transition-colors duration-200
                     ${isActive
                       ? 'bg-orange-100 text-orange-600'
                       : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
                   }
                   onClick={handleMobileLinkClick}
                 >
-                  <span className=' font-medium flex justify-center items-center gap-2'>
+                  <span className='font-medium flex justify-center items-center gap-2'>
                     <Home size={16} />
                     Home
                   </span>
                 </NavLink>
               </div>
 
-              {(user?.role === 'Master' || user?.role === 'Admin' || user?.role === 'Manager' || user?.role === 'User') && (
-                <>
-                  {/* Dashboard Mobile */}
-                  <div className="border-b border-gray-100 pb-2">
-                    <NavLink
-                      to={'/dashboard'}
-                      className={({ isActive }) =>
-                        `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
-                          ? 'bg-orange-100 text-orange-600'
-                          : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                      }
-                      onClick={handleMobileLinkClick}
-                    >
-                      <span className='flex justify-center items-center gap-2 font-medium'>
-                        <ActivityIcon size={16} />
-                        Dashboard
-                      </span>
-                    </NavLink>
-                  </div>
-
-                  {/* Master Mobile */}
-                  {(user?.role === 'Master' || user?.role === 'Admin' || user?.role === 'Manager' || user?.role === 'User') && (
-                    <div className="border-b border-gray-100 pb-2">
-                      <button
-                        onClick={() => handleDropdownToggle('mobile-Master')}
-                        className={`flex justify-between w-full items-center space-x-1 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === 'mobile-Master'
-                          ? 'bg-orange-50 text-orange-600 border border-orange-200'
-                          : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
-                          }`}
-                      ><div className='flex justify-center items-center gap-2'>
-                          <ShieldCheck size={16} />
-                          Master
-                        </div>
-                        <svg
-                          className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'mobile-Master' ? 'rotate-180' : ''
-                            }`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-
-                      {activeDropdown === 'mobile-Master' && (
-                        <div className="mt-2 ml-4 space-y-1">
-                          <NavLink
-                            to="/master/view-universities"
-                            className={({ isActive }) =>
-                              `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                              ${isActive
-                                ? 'bg-orange-100 text-orange-600 font-medium'
-                                : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                            }
-                            onClick={closeAllMenus}
-                          >
-                            <University size={16} />
-                            University
-                          </NavLink>
-
-                          <NavLink
-                            to="/master/view-colleges"
-                            className={({ isActive }) =>
-                              `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                              ${isActive
-                                ? 'bg-orange-100 text-orange-600 font-medium'
-                                : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                            }
-                            onClick={closeAllMenus}
-                          >
-                            <Building size={16} />
-                            College
-                          </NavLink>
-
-                          <NavLink
-                            to="/master/view-departments"
-                            className={({ isActive }) =>
-                              `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                              ${isActive
-                                ? 'bg-orange-100 text-orange-600 font-medium'
-                                : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                            }
-                            onClick={closeAllMenus}
-                          >
-                            <Building2 size={16} />
-                            Department
-                          </NavLink>
-
-                          <NavLink
-                            to="/master/users-view"
-                            className={({ isActive }) =>
-                              `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                            ${isActive
-                                ? 'bg-orange-100 text-orange-600 font-medium'
-                                : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                            }
-                            onClick={closeAllMenus}
-                          >
-                            <Users size={16} />
-                            Users
-                          </NavLink>
-
-                          <NavLink
-                            to="/master/view-members"
-                            className={({ isActive }) =>
-                              `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
-                                ? 'bg-orange-100 text-orange-600'
-                                : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                            }
-                            onClick={handleMobileLinkClick}
-                          >
-                            <User size={16} />
-                            Member
-                          </NavLink>
-
-                          <NavLink
-                            to="/master/team-view"
-                            className={({ isActive }) =>
-                              `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
-                                ? 'bg-orange-100 text-orange-600'
-                                : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                            }
-                            onClick={handleMobileLinkClick}
-                          >
-                            <Users size={16} />
-                            Team
-                          </NavLink>
-
-                          <NavLink
-                            to="/master/view-steps"
-                            className={({ isActive }) =>
-                              `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
-                                ? 'bg-orange-100 text-orange-600'
-                                : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                            }
-                            onClick={handleMobileLinkClick}
-                          >
-                            <Layers size={16} />
-                            Steps
-                          </NavLink>
-
-                          <NavLink
-                            to="/master/view-tasks"
-                            className={({ isActive }) =>
-                              `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
-                                ? 'bg-orange-100 text-orange-600'
-                                : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                            }
-                            onClick={handleMobileLinkClick}
-                          >
-                            <CheckSquare size={16} />
-                            Task
-                          </NavLink>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Calender Mobile */}
-                  <div className="border-b border-gray-100 pb-2">
-                    <NavLink
-                      to={'/calender'}
-                      className={({ isActive }) =>
-                        `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
-                          ? 'bg-orange-100 text-orange-600'
-                          : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                      }
-                      onClick={handleMobileLinkClick}
-                    >
-                      <span className=' font-medium flex justify-center items-center gap-2'>
-                        <Calendar size={16} />
-                        Calender
-                      </span>
-                    </NavLink>
-                  </div>
-
-                  {/* Reports Mobile */}
-                  <div className="border-b border-gray-100 pb-2 ">
-                    <button
-                      onClick={() => handleDropdownToggle('mobile-Reports')}
-                      className={`flex justify-between w-full items-center space-x-1 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === 'mobile-Reports'
-                        ? 'bg-orange-50 text-orange-600 border border-orange-200'
-                        : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
-                        }`}
-                    ><div className='flex justify-center items-center gap-2'>
-                        <FileBarChart size={16} />
-                        Report
-                      </div>
-                      <svg
-                        className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'mobile-Reports' ? 'rotate-180' : ''
-                          }`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-                    {activeDropdown === 'mobile-Reports' && (
-                      <div className="mt-2 ml-4 space-y-1">
-                        {(user?.role === 'Master' || user?.role === 'Admin' || user?.role === 'Manager') && (
-                          <NavLink
-                            to="/report/report1"
-                            className={({ isActive }) =>
-                              `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
-                                ? 'bg-orange-100 text-orange-600'
-                                : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                            }
-                            onClick={handleMobileLinkClick}
-                          >
-                            <span>Report 1</span>
-                          </NavLink>
-                        )}
-                        <NavLink
-                          to="/report/report2"
-                          className={({ isActive }) =>
-                            `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
-                              ? 'bg-orange-100 text-orange-600'
-                              : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                          }
-                          onClick={handleMobileLinkClick}
-                        >
-                          <span>Report 2</span>
-                        </NavLink>
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
+              {/* Dynamic Mobile Navigation */}
+              {renderMobileNav()}
             </div>
 
             {/* Mobile User Menu - Fixed at bottom */}
@@ -684,14 +514,16 @@ const Navbar = () => {
                     <p className="text-sm font-semibold text-gray-900">
                       {user?.firstName} {user?.lastName}
                     </p>
-                    <p className="text-sm text-gray-500">{user?.email}</p>
+                    <p className="text-xs text-gray-500">
+                      Logged in using <span className="text-orange-500">{user?.email}</span>
+                    </p>
                   </div>
 
                   <NavLink
                     to="/auth/profile"
                     className={({ isActive }) =>
-                      `flex items-center space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                    ${isActive
+                      `flex items-center text-sm space-x-3 px-2 py-2 gap-2 transition-colors duration-200
+                      ${isActive
                         ? 'bg-orange-100 text-orange-600'
                         : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
                     }
@@ -705,7 +537,7 @@ const Navbar = () => {
                   </NavLink>
                   <Link
                     to="/auth/log-out"
-                    className="flex items-center space-x-3 px-4 py-2 text-gray-600 hover:bg-orange-50 hover:text-orange-600 rounded-lg"
+                    className="flex items-center text-sm space-x-3 px-2 py-2 gap-2 transition-colors duration-200 text-gray-600 hover:bg-orange-50 hover:text-orange-600 rounded-lg"
                     onClick={() => {
                       setIsMobileMenuOpen(false);
                       setActiveDropdown(null);
@@ -719,7 +551,6 @@ const Navbar = () => {
             </div>
           </div>
         )}
-
       </div>
 
       {activeDropdown && !isMobileMenuOpen && (

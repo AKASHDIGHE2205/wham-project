@@ -104,7 +104,7 @@ const UniversityAdd = () => {
   return (
     <>
       <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 border border-orange-300 m-1 rounded-md p-2 sm:p-6">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           {/* Header */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 transform hover:shadow-md transition-all duration-300">
             <div className="flex items-center space-x-4">
@@ -114,7 +114,7 @@ const UniversityAdd = () => {
                 </svg>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-orange-600">Add New University</h1>
+                <h1 className="text-xl font-bold text-orange-600">Add New University</h1>
                 <p className="text-orange-500">Create a new university profile</p>
               </div>
             </div>
@@ -125,7 +125,7 @@ const UniversityAdd = () => {
             <form className="space-y-6" onSubmit={handleSubmit}>
               {/* Photo Upload Section */}
               <div className="border-b border-gray-200 pb-4">
-                <h2 className="text-lg font-semibold text-orange-600 mb-4">University Photo</h2>
+                <h2 className="font-semibold text-orange-600 mb-4">University Photo</h2>
                 <div className="flex items-center space-x-6">
                   <div className="shrink-0">
                     {photoPreview ? (
@@ -161,7 +161,7 @@ const UniversityAdd = () => {
 
               {/* Basic Information Section */}
               <div className="border-b border-gray-200 pb-4">
-                <h2 className="text-lg font-semibold text-black mb-4">Basic Information</h2>
+                <h2 className="font-semibold text-black mb-4">Basic Information</h2>
 
                 {/* University Name */}
                 <div className="grid grid-cols-1 gap-4">
@@ -223,7 +223,7 @@ const UniversityAdd = () => {
 
               {/* Addresses Section */}
               <div className="border-b border-gray-200 pb-4">
-                <h2 className="text-lg font-semibold text-black mb-4">Address Information</h2>
+                <h2 className="font-semibold text-black mb-4">Address Information</h2>
 
                 {/* Address Selection */}
                 <div>

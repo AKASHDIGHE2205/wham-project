@@ -70,7 +70,7 @@ const DepartmentAdd: FC<DepartmentAddProps> = ({ show, setShow, fetchData }) => 
     <>
       <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
         <div
-          className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
+          className="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Modal Header */}
@@ -81,7 +81,7 @@ const DepartmentAdd: FC<DepartmentAddProps> = ({ show, setShow, fetchData }) => 
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-900">
+              <h3 className="text-lg font-bold text-gray-900">
                 Create New Department
               </h3>
             </div>

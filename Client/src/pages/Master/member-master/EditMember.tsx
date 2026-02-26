@@ -173,7 +173,7 @@ const EditMember = () => {
   return (
     <>
       <div className="min-h-screen bg-white p-2 sm:p-6">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           {/* Header */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 transform hover:shadow-md transition-all duration-300">
             <div className="flex items-center space-x-4">
@@ -409,7 +409,7 @@ const EditMember = () => {
                   </div>
 
                   {/* Is Organizer */}
-                  <div>
+                  <div hidden>
                     <label className="block text-sm font-medium text-black mb-2">
                       Is Organizer? <span className="text-red-600 font-semibold">*</span>
                     </label>
@@ -536,7 +536,7 @@ const EditMember = () => {
               </div>
 
               {/* User Information Section */}
-              <div className="border-b border-gray-200 pb-4">
+              <div className="border-b border-gray-200 pb-4 hidden">
                 <h2 className="text-lg font-semibold text-black mb-4">User Information</h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -589,8 +589,9 @@ const EditMember = () => {
                         </div>
                         <button
                           type="button"
-                          className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 rounded-lg hover:shadow-lg transition duration-300 flex items-center gap-2 cursor-pointer hidden"
+                          className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 rounded-lg hover:shadow-lg transition duration-300 flex items-center gap-2 cursor-pointer "
                           onClick={() => setShowUser(true)}
+                          hidden
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"

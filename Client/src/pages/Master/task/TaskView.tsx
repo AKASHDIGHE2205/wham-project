@@ -76,12 +76,12 @@ const TaskView = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-orange-600">Tasks Master</h1>
+            <h1 className="text-2xl font-bold text-orange-600">Tasks Master</h1>
           </div>
         </div>
 
         {/* Search and Filter Section */}
-        <div className="bg-white rounded-xl shadow-xs border border-gray-200 p-4 sm:p-6 mb-4">
+        <div className="bg-white rounded-xl shadow-xs border border-gray-200 p-4 mb-4">
           <div className="flex flex-col gap-4 justify-between">
             {/* Search Input - 30% width on large screens */}
             <div className="w-full lg:w-[30%] relative">
@@ -129,7 +129,7 @@ const TaskView = () => {
               {/* Add button */}
               <div className="shrink-0">
                 <button
-                  className="inline-flex items-center justify-center px-4 py-2 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 text-white font-medium rounded-lg hover:shadow-lg transition-all duration-200 shadow-sm cursor-pointer text-sm sm:text-base whitespace-nowrap"
+                  className="inline-flex items-center justify-center px-4 py-2 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 text-white font-medium rounded-lg hover:shadow-lg transition-all duration-200 shadow-sm cursor-pointer text-sm whitespace-nowrap"
                   onClick={() => setShowAdd(true)}
                 >
                   <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />

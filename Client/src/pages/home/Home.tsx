@@ -41,10 +41,8 @@ const Home = () => {
         {/* Hero Section */}
         <div className="max-w-7xl mx-auto px-4 py-1">
           <div className="text-center">
-            <h1 className="text-5xl font-bold mb-6">
-              Welcome to Mission Control
-            </h1>
-            <p className="text-xl mb-2 text-orange-600 max-w-3xl mx-auto">
+            <h1 className="text-3xl font-bold mb-6">Welcome to Mission Control</h1>
+            <p className="text-md mb-2 text-orange-600 max-w-3xl mx-auto">
               Your command center for planning, executing, and tracking successful missions.
               Where great ideas become extraordinary achievements.
             </p>
@@ -69,10 +67,10 @@ const Home = () => {
               <Star className="w-4 h-4" />
               <span className="font-medium">Hello, {user?.firstName}! Ready for your next mission?</span>
             </div>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">
               Transforming Ideas into Impact
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-md text-gray-600 max-w-2xl mx-auto">
               Every great achievement begins with a plan. Our platform helps you turn your
               vision into reality through careful planning, team coordination, and precise execution.
             </p>
@@ -88,7 +86,7 @@ const Home = () => {
                 <div className="w-12 h-12 bg-linear-to-br from-orange-500 to-yellow-500 rounded-xl flex items-center justify-center text-white mb-4">
                   <feature.icon className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <h3 className="text-mg font-semibold text-gray-900 mb-2">
                   {feature.title}
                 </h3>
                 <p className="text-gray-600">

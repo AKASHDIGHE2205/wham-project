@@ -290,7 +290,7 @@ const GoogleLocation: FC<Props> = ({ isShow, setIsShow, onLocationSelect }) => {
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-xl p-6 max-w-2xl w-full shadow-2xl">
         <div className=" flex justify-between">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Select Location</h2>
+          <h2 className="text-lg font-bold text-gray-800 mb-6">Select Location</h2>
           <button
             onClick={() => setIsShow(false)}
             className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer p-2 hover:bg-gray-100 rounded-lg"

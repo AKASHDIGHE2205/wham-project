@@ -77,8 +77,8 @@ const UsersView = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-orange-600">Users Master</h1>
-            <p className="text-orange-400 mt-1 sm:mt-2 text-sm sm:text-base">Manage your organization Users.</p>
+            <h1 className="text-2xl font-bold text-orange-600">Users Master</h1>
+            <p className="text-orange-400 mt-1">Manage your organization Users.</p>
           </div>
         </div>
 

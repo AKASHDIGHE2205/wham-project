@@ -11,7 +11,6 @@ import { Calendar, BarChart3, Users, Rocket, ChevronRight, Clock, MapPin, Calend
 import { getActiveEvents, getEventForAttend, getMemberDetailsForDashboard, getUpcomingEvents } from '../../services/dashboard/DashboardApi';
 import { getUserFromStorage } from '../../helper/cryptoUser';
 import Loadings from '../../components/Loadings';
-import WeeklyViewUI from './WeeklyViewUI';
 
 export interface EventMember {
   event_id: number;
@@ -98,7 +97,6 @@ const Dashboard = () => {
   const [attendEvents, setAttendEvents] = useState<EventForAttend[]>([]);
   const [loading, setLoading] = useState(true);
   const [showUpdate, setShowUpdate] = useState(false);
-  const [currentWeekStart, setCurrentWeekStart] = useState(moment().startOf('week'));
 
   const stats = [
     {
@@ -188,14 +186,6 @@ const Dashboard = () => {
     setShowUpdate(true);
   }
 
-  const handleWeekChange = (direction: 'prev' | 'next') => {
-    setCurrentWeekStart(prev =>
-      direction === 'prev'
-        ? moment(prev).subtract(1, 'week')
-        : moment(prev).add(1, 'week')
-    );
-  };
-
   // Show loading state
   if (loading) {
     return (
@@ -207,9 +197,6 @@ const Dashboard = () => {
     );
   }
 
-  // Combine all events for calendar view
-  const allEvents = [...ActiveEvent, ...upcomingEvent];
-
   return (
     <>
       <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 border border-orange-300 m-1 rounded-md">
@@ -218,59 +205,14 @@ const Dashboard = () => {
 
           {/* Welcome Section */}
           <div className="mb-8">
-            <h1 className="text-md font-bold text-gray-900 mb-2">
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">
               Welcome back, <span className=" text-orange-600">{user?.firstName}</span>
             </h1>
-            <p className="text-gray-600">Ready to plan your next mission? 🚀</p>
-          </div>
-
-          {/* Weekly Calendar Section */}
-          <div className="mb-8 bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
-
-            {/* Header */}
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-linear-to-r">
-              <div>
-                <h2 className="text-sm font-semibold">
-                  Weekly Calendar
-                </h2>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleWeekChange('prev')}
-                  className="p-2 rounded-md bg-white/20 hover:bg-white/30 text-black cursor-pointer"
-                >
-                  <ChevronRight className="w-4 h-4 rotate-180" />
-                </button>
-
-                <button
-                  onClick={() => setCurrentWeekStart(moment().startOf('week'))}
-                  className="px-3 py-1.5 text-xs font-medium bg-linear-to-r from-orange-500 to-orange-500 text-white rounded-md hover:from-orange-600 hover:to-orange-600 transition cursor-pointer"
-                >
-                  Current Week
-                </button>
-
-                <button
-                  onClick={() => handleWeekChange('next')}
-                  className="p-2 rounded-md bg-white/20 hover:bg-white/30 text-black cursor-pointer"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Weekly Calendar */}
-            <div className="p-4 bg-gray-50">
-              <WeeklyViewUI
-                events={allEvents}
-                currentWeekStart={currentWeekStart}
-                onEventClick={(event) => handleAddSteps(event)}
-              />
-            </div>
+            <p className="text-gray-600 text-lg">Ready to plan your next mission? 🚀</p>
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 hid">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {stats?.map((stat, index) => (
               <div
                 key={index}
@@ -295,7 +237,7 @@ const Dashboard = () => {
               {/* Active Events */}
               <div>
                 <div className="px-6 py-4 border-b border-orange-100 flex items-center justify-between">
-                  <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-orange-500" />
                     Active Events
                   </h2>
@@ -320,7 +262,7 @@ const Dashboard = () => {
                       <div className="flex gap-4">
                         {/* Date Badge */}
                         <div className="flex flex-col justify-center items-center w-12 h-12 bg-linear-to-br from-orange-500 to-yellow-500 rounded-xl text-white">
-                          <span className="text-md font-bold">{new Date(event?.from_date).getDate()}</span>
+                          <span className="text-xl font-bold">{new Date(event?.from_date).getDate()}</span>
                           <span className="text-xs uppercase">
                             {new Date(event?.from_date).toLocaleDateString('en', { month: 'short' })}
                           </span>
@@ -414,7 +356,7 @@ const Dashboard = () => {
               {/* Attend Events */}
               <div>
                 <div className="px-6 py-4 border-b border-orange-100 flex items-center justify-between">
-                  <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-orange-500" />
                     Attend Events
                   </h2>
@@ -433,7 +375,7 @@ const Dashboard = () => {
                       <div className="flex gap-2">
                         {/* Date Badge */}
                         <div className="flex flex-col justify-center items-center w-12 h-12 bg-linear-to-br from-orange-500 to-yellow-500 rounded-xl text-white">
-                          <span className="text-md font-bold">{new Date(event?.from_date).getDate()}</span>
+                          <span className="text-xl font-bold">{new Date(event?.from_date).getDate()}</span>
                           <span className="text-xs uppercase">
                             {new Date(event?.from_date).toLocaleDateString('en', { month: 'short' })}
                           </span>
@@ -497,7 +439,7 @@ const Dashboard = () => {
             {/* Upcoming Events */}
             <div className="bg-white rounded-2xl shadow-sm border border-orange-200 overflow-hidden">
               <div className="px-6 py-4 border-b border-orange-100 flex items-center justify-between">
-                <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+                <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-orange-500" />
                   Upcoming Events
                 </h2>
@@ -509,7 +451,7 @@ const Dashboard = () => {
                 </Link>
               </div>
 
-              <div className="p-6 space-y-2">
+              <div className="p-6 space-y-4">
                 {upcomingEvent?.length === 0 && (
                   <p className="text-orange-600">No upcoming events available</p>
                 )
@@ -521,13 +463,13 @@ const Dashboard = () => {
                   >
                     <div className="flex gap-4">
                       <div className="flex flex-col justify-center items-center w-12 h-12 bg-linear-to-br from-orange-500 to-yellow-500 rounded-xl text-white">
-                        <span className="text-md font-bold">{new Date(event?.from_date).getDate()}</span>
+                        <span className="text-xl font-bold">{new Date(event?.from_date).getDate()}</span>
                         <span className="text-xs uppercase">
                           {new Date(event?.from_date).toLocaleDateString("en", { month: "short" })}
                         </span>
                       </div>
 
-                      <div className="flex-1 space-y-1">
+                      <div className="flex-1 space-y-2">
                         <div className="flex justify-between items-start">
                           <h3 className="font-semibold text-gray-900">Title : {event?.title}</h3>
 

@@ -67,8 +67,8 @@ const MemberView = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-orange-600">Member Master</h1>
-            <p className="text-orange-400 mt-1 sm:mt-2 text-sm sm:text-base">Manage your organization members.</p>
+            <h1 className="text-2xl font-bold text-orange-600">Member Master</h1>
+            <p className="text-orange-400 mt-1 text-md">Manage your organization members.</p>
           </div>
         </div>
 
@@ -118,10 +118,10 @@ const MemberView = () => {
               </div>
 
               {/* Add button */}
-              <div className="shrink-0">
+              <div className="shrink-0 hidden">
                 <Link
                   to={"/master/add-member"}
-                  className="inline-flex items-center justify-center px-4 py-2 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 text-white font-medium rounded-lg hover:shadow-lg transition-all duration-200 shadow-sm cursor-pointer text-sm sm:text-base whitespace-nowrap"
+                  className="inline-flex items-center justify-center px-4 py-2 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 text-white font-medium rounded-lg hover:shadow-lg transition-all duration-200 shadow-sm cursor-pointer text-sm whitespace-nowrap"
                 >
                   <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   Add Member

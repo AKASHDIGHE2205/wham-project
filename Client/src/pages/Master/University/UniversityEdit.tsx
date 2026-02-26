@@ -111,7 +111,7 @@ const UniversityEdit = () => {
       <div className="min-h-screen bg-linear-to-br from-indigo-50 via-purple-50 to-pink-50 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
           {/* Header Card */}
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 mb-8 transform hover:shadow-2xl transition-all duration-300">
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 mb-2 transform hover:shadow-2xl transition-all duration-300">
             <div className="flex items-center space-x-4">
               <div className="bg-linear-to-r from-indigo-600 to-purple-600 p-4 rounded-2xl shadow-lg">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -119,7 +119,7 @@ const UniversityEdit = () => {
                 </svg>
               </div>
               <div>
-                <h1 className="text-3xl font-bold bg-linear-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                <h1 className="text-xl font-bold bg-linear-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                   Edit University
                 </h1>
                 <p className="text-gray-500 mt-1">Update university information and details</p>
@@ -130,10 +130,6 @@ const UniversityEdit = () => {
           {/* Main Form Card */}
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
             <form onSubmit={handleSubmit}>
-              {/* Form Header */}
-              <div className="bg-linear-to-r from-indigo-50 to-purple-50 px-8 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-800">University Information</h2>
-              </div>
 
               {/* Form Body */}
               <div className="p-8 space-y-8">
@@ -157,10 +153,6 @@ const UniversityEdit = () => {
                       <div className="absolute -bottom-2 -right-2 bg-green-400 h-6 w-6 rounded-full border-4 border-white"></div>
                     </div>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-700">University Photo</h3>
-                    <p className="text-xs text-gray-500 mt-1">Current university image</p>
-                  </div>
                 </div>
 
                 {/* Basic Information Grid */}
@@ -182,7 +174,7 @@ const UniversityEdit = () => {
                         value={inputs.name}
                         onChange={handleInputChange}
                         placeholder="Enter university name"
-                        className="w-full pl-10 px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 cursor-pointer bg-white"
+                        className="w-full pl-10 px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
                         required
                       />
                     </div>
@@ -203,7 +195,7 @@ const UniversityEdit = () => {
                         name="status"
                         value={inputs.status}
                         onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none"
                         required
                       >
                         <option value="" disabled>Select status</option>
@@ -225,7 +217,7 @@ const UniversityEdit = () => {
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                       Address Information
                     </label>
-                    <div className="flex gap-3">
+                    <div className="flex gap-2">
                       <div className="flex-1">
                         <div className="relative rounded-lg shadow-sm">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -236,7 +228,7 @@ const UniversityEdit = () => {
                           </div>
                           <input
                             type="text"
-                            className="w-full pl-10 px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 cursor-pointer bg-white"
+                            className="w-full pl-10 px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
                             placeholder={selectedLocations.length > 0 ? `${selectedLocations.length} address${selectedLocations.length > 1 ? 'es' : ''} selected` : "No addresses selected"}
                             readOnly
                           />
@@ -245,7 +237,7 @@ const UniversityEdit = () => {
                       <button
                         type="button"
                         onClick={handleLocation}
-                        className="px-6 py-3 bg-linear-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:ring-4 focus:ring-indigo-300 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 whitespace-nowrap"
+                        className="px-4 py-2 bg-linear-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:ring-4 focus:ring-indigo-300 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 whitespace-nowrap"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-list-icon lucide-list">
                           <path d="M3 5h.01" /><path d="M3 12h.01" /><path d="M3 19h.01" /><path d="M8 5h13" /><path d="M8 12h13" /><path d="M8 19h13" />
@@ -317,7 +309,7 @@ const UniversityEdit = () => {
                   type="submit"
                   className="px-6 py-2.5 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:ring-4 focus:ring-indigo-300 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 cursor-pointer"
                 >
-                  Update University
+                  Update
                 </button>
               </div>
             </form>

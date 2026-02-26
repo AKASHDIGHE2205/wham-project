@@ -15,7 +15,7 @@ const NewMember = () => {
     address: "",
     designation: "",
     birth_date: "",
-    isOrganizer: "",
+    isOrganizer: "N", // Default to "No"
     gender: "" // Added gender field
   });
   const [showTeams, setShowTeams] = useState(false);
@@ -318,8 +318,8 @@ const NewMember = () => {
                   </div>
 
                   {/* Is Organizer */}
-                  <div>
-                    <label className="block text-sm font-medium text-black mb-2">
+                  <div hidden>
+                    <label className="block text-sm font-medium text-black mb-2 ">
                       Is Organizer? <span className="text-red-600 font-semibold">*</span>
                     </label>
                     <div className="relative group">
@@ -451,7 +451,7 @@ const NewMember = () => {
               <div className="flex items-center justify-end space-x-3 pt-6">
                 <button
                   type="button"
-                  className="px-6 py-2 text-sm font-medium text-black bg-white border border-gray-300 text-black rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200"
+                  className="px-6 py-2 text-sm font-medium text-black bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200"
                   onClick={handleCancel}
                 >
                   Cancel

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { getAllSidebarMembers } from '../services/master/masterApi';
 import { getUserFromStorage } from '../helper/cryptoUser';
-// import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export interface Team {
   id: number;
@@ -43,9 +43,10 @@ const Sidebar = () => {
   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
   const [fromDate] = useState(formatDate(firstDayOfMonth));
   const [toDate] = useState(formatDate(tomorrow));
-  // const navigate = useNavigate();
+
   const fetchData = async () => {
     setLoading(true)
+    // navigate("/");
     const body = {
       from_date: fromDate,
       to_date: toDate,
@@ -65,7 +66,6 @@ const Sidebar = () => {
     } finally {
       setLoading(false)
     }
-    // navigate("/");
   }
 
   useEffect(() => {
@@ -96,14 +96,14 @@ const Sidebar = () => {
             title='Click to refresh data'
             onClick={fetchData}
           >
-            <a className="flex items-center space-x-2">
+            <Link to={"/"} className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-linear-to-br  from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-sm">E</span>
               </div>
               <span className="text-xl font-bold bg-linear-to-br  from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 EventTracker
               </span>
-            </a>
+            </Link>
           </div>
 
           {/* Search Section */}

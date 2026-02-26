@@ -143,7 +143,7 @@ const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, 
               </svg>
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900">
+              <h3 className="text-md font-bold text-gray-900">
                 Add Steps & Tasks For {Data?.title}
               </h3>
             </div>
@@ -164,7 +164,7 @@ const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, 
               (<>
                 {/* Steps */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-2">
                     Steps <span className="text-orange-600">*</span>
                   </label>
                   <div className="relative group">
@@ -177,7 +177,7 @@ const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, 
                       name="step"
                       onChange={handleStepChange}
                       value={selectedStep}
-                      className="w-full pl-10 px-2 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      className="w-full pl-10 px-2 py-1 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
                       required
                     >
                       <option value="0">Select Step</option>
@@ -196,7 +196,7 @@ const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, 
 
                 {/* Task */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-2">
                     Task <span className="text-orange-600">*</span>
                   </label>
                   <div className="relative group">
@@ -230,7 +230,7 @@ const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, 
 
                 {/* Task Description */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Task Description</label>
+                  <label className="block text-xs font-medium text-gray-700 mb-2">Task Description</label>
                   <div className="relative group">
                     <div className="absolute top-3 left-3 pointer-events-none">
                       <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -250,7 +250,7 @@ const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, 
 
                 {/* Status */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-2">
                     Status <span className="text-orange-600">*</span>
                   </label>
                   <div className="relative group">
@@ -281,14 +281,14 @@ const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, 
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+                  className="px-6 py-2.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-6 py-2.5 text-sm font-medium text-white bg-orange-500 border border-orange-500 rounded-lg hover:bg-orange-600 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+                  className="px-6 py-2.5 text-xs font-medium text-white bg-orange-500 border border-orange-500 rounded-lg hover:bg-orange-600 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
                 >
                   {loading ? 'Submiting' : 'Submit'}
                 </button>
