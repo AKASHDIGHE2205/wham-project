@@ -4,13 +4,15 @@ import sharp from 'sharp';
 import path from 'path';
 
 export const getUpcomingEvents = (req, res) => {
-  const { userId, role, isOrganizer } = req.body;
+  const { userId, role } = req.body;//isOrganizer
   if (!userId) {
     return res.status(400).json({ message: "Missing userId" });
   }
 
   // STEP 1: Get member_id from mst_members
-  const getMemberQuery = `SELECT mem_id FROM mst_members WHERE user_id = ? LIMIT 1`;
+  const getMemberQuery = `
+                          SELECT mem_id, concat(first_name ," ", middle_name ," ", last_name) as organizer_name FROM mst_members WHERE user_id = ? LIMIT 1
+                        `;
 
   db.query(getMemberQuery, [userId], (err, memberData) => {
     if (err) return res.status(500).json({ message: "Internal server error", err });
@@ -20,13 +22,14 @@ export const getUpcomingEvents = (req, res) => {
     }
 
     const memberId = memberData[0].mem_id;
+    const organizerName = memberData[0].organizer_name;
 
     // STEP 2: If User → fetch only their team IDs; If Manager/Admin/Master → skip
     const isPrivileged = ["Master", "Admin", "Manager"].includes(role);
 
     const fetchTeams = () => {
       return new Promise((resolve, reject) => {
-        if (isPrivileged) return resolve([]); // no need to fetch
+        if (isPrivileged) return resolve([]);
 
         const getTeamsQuery = `SELECT team_id FROM team_members WHERE member_id = ?`;
 
@@ -148,6 +151,7 @@ export const getUpcomingEvents = (req, res) => {
             eventsData.forEach(event => {
               eventsMap[event.event_id] = {
                 ...event,
+                organizer_name: organizerName,
                 members: [],
                 teams: [],
                 locations: []
@@ -198,7 +202,7 @@ export const getActiveEvents = (req, res) => {
   }
 
   // STEP 1: Get member_id
-  const getMemberQuery = `SELECT mem_id, isorganizer FROM mst_members WHERE user_id = ? LIMIT 1`;
+  const getMemberQuery = `SELECT mem_id, concat(first_name ," ", middle_name ," ", last_name) as organizer_name, isorganizer FROM mst_members WHERE user_id = ? LIMIT 1`;
 
   db.query(getMemberQuery, [userId], (err, memberData) => {
     if (err) return res.status(500).json({ message: "Internal server error", err });
@@ -208,6 +212,7 @@ export const getActiveEvents = (req, res) => {
     }
 
     const memberId = memberData[0].mem_id;
+    const organizerName = memberData[0].organizer_name;
     const isPrivileged = ["Master", "Admin", "Manager"].includes(role);
 
     // STEP 2 (only needed for USER)
@@ -337,6 +342,7 @@ export const getActiveEvents = (req, res) => {
             eventsData.forEach(event => {
               eventsMap[event.event_id] = {
                 ...event,
+                organizer_name: organizerName,
                 members: [],
                 teams: [],
                 locations: []

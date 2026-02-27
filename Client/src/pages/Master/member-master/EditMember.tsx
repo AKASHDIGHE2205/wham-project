@@ -18,7 +18,7 @@ export interface Member {
   birth_date: string;
   address: string;
   designation: string;
-  isorganizer: string;
+  isorganizer: "Y" | "N";
   gender: string;
   status: string;
   user_id: number;

@@ -53,6 +53,7 @@ export interface UpcomingEvent {
   created_at: string;
   updated_by: number;
   updated_at: string;
+  organizer_name: string;
 
   members: EventMember[];
   teams: EventTeam[];
@@ -74,6 +75,7 @@ export interface EventForAttend {
   created_at: string;
   updated_by: number | null;
   updated_at: string;
+
 
   // Task fields
   sr_no: number | null;
@@ -166,6 +168,7 @@ const Dashboard = () => {
       console.error('Error fetching dashboard data:', error);
     } finally {
       setLoading(false);
+      handleSetCurrentWeek();
     }
   };
 
@@ -195,6 +198,10 @@ const Dashboard = () => {
         : moment(prev).add(1, 'week')
     );
   };
+
+  const handleSetCurrentWeek = () => {
+    setCurrentWeekStart(moment().startOf('week'));
+  }
 
   // Show loading state
   if (loading) {
@@ -244,7 +251,7 @@ const Dashboard = () => {
                 </button>
 
                 <button
-                  onClick={() => setCurrentWeekStart(moment().startOf('week'))}
+                  onClick={() => handleSetCurrentWeek()}
                   className="px-3 py-1.5 text-xs font-medium bg-linear-to-r from-orange-500 to-orange-500 text-white rounded-md hover:from-orange-600 hover:to-orange-600 transition cursor-pointer"
                 >
                   Current Week
@@ -264,7 +271,9 @@ const Dashboard = () => {
               <WeeklyViewUI
                 events={allEvents}
                 currentWeekStart={currentWeekStart}
-                onEventClick={(event) => handleAddSteps(event)}
+                fetchAllData={fetchAllData}
+                Role={user?.role || 'User'}
+                isOrganizer={data?.isorganizer || 'N'}
               />
             </div>
           </div>
@@ -395,7 +404,7 @@ const Dashboard = () => {
                           </div>
 
                           <div className="flex justify-end items-center gap-4 space-y-2 ">
-                            {user && (["Admin", "Manager", "Master"].includes(user?.role) || data?.isorganizer === "A") && (
+                            {user && (["Admin", "Manager", "Master"].includes(user?.role) || user?.isorganizer === "Y") && (
                               <button
                                 className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow hover:shadow-lg text-sm cursor-pointer"
                                 onClick={() => handleAddSteps(event)}
@@ -594,7 +603,7 @@ const Dashboard = () => {
                           </div>
                         </div>
                         <div className="flex justify-end items-center gap-4 space-y-2 ">
-                          {user && (["Admin", "Manager", "Master"].includes(user?.role) || data?.isorganizer === "A") && (
+                          {user && (["Admin", "Manager", "Master"].includes(user?.role) || user?.isorganizer === "Y") && (
                             <button
                               className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow hover:shadow-lg text-sm cursor-pointer"
                               onClick={() => handleAddSteps(event)}

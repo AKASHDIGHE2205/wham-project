@@ -214,17 +214,35 @@ const Calendar: React.FC<CalendarProps> = () => {
 
         {/* VIEW SELECTOR */}
         <div className="flex items-center justify-center">
-          <select
-            value={view}
-            onChange={(e) => setView(e.target.value as CalendarView)}
-            className="appearance-none bg-linear-to-br from-orange-50 to-yellow-50 hover:from-orange-100 hover:to-yellow-100 border border-orange-200 rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-800 hover:text-purple-900 focus:outline-none focus:ring-0 focus:ring-orange-400 focus:bg-white transition-all duration-200 cursor-pointer pr-6 sm:pr-8 shadow-sm hover:shadow-md "
-          >
-            {(['daily', 'weekly', 'monthly', 'yearly'] as CalendarView[]).map(v => (
-              <option key={v} value={v} className="bg-white text-gray-800">
-                {v.charAt(0).toUpperCase() + v.slice(1)}
-              </option>
-            ))}
-          </select>
+          <div className="relative inline-block">
+            <select
+              value={view}
+              onChange={(e) => setView(e.target.value as CalendarView)}
+              className="appearance-none bg-linear-to-br from-orange-50 to-yellow-50 hover:from-orange-100 hover:to-yellow-100 border  border-orange-200 rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-800 hover:text-purple-900 focus:outline-none focus:ring-0 focus:ring-orange-400 focus:bg-white transition-all duration-200 cursor-pointer pr-8 sm:pr-10 shadow-sm hover:shadow-md"
+            >
+              {(['daily', 'weekly', 'monthly', 'yearly'] as CalendarView[]).map(item => (
+                <option key={item} value={item} className="bg-white text-gray-800">
+                  {item.charAt(0).toUpperCase() + item.slice(1)}
+                </option>
+              ))}
+            </select>
+
+            <div className="pointer-events-none absolute inset-y-0 right-2 sm:right-3 flex items-center text-orange-500">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -236,7 +254,6 @@ const Calendar: React.FC<CalendarProps> = () => {
           setIsShow={setIsShowModal}
           selectedDate={selectedData}
           fetchData={fetchData}
-          Role={user?.role || ''}
           isorganizer={user?.isorganizer || ''}
         />
       )}

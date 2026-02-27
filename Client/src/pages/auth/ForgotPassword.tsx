@@ -12,7 +12,7 @@ const ForgotPassword: React.FC = () => {
   const [cPassword, setCPassword] = useState('');
   const [showPass, setShowPass] = useState(false)
   const [otp, setOtp] = useState(0)
-  const [timeLeft, setTimeLeft] = useState(600);
+  const [timeLeft, setTimeLeft] = useState(120);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [loading, setLoading] = useState({
     sendOtp: false,
@@ -25,21 +25,22 @@ const ForgotPassword: React.FC = () => {
 
   // Countdown timer effect
   useEffect(() => {
-    let interval: number;
+    if (!isTimerRunning) return;
 
-    if (isTimerRunning && timeLeft > 0) {
-      interval = window.setInterval(() => {
-        setTimeLeft((prevTime) => prevTime - 1);
-      }, 1000);
-    } else if (timeLeft === 0) {
-      setIsTimerRunning(false);
-      toast.error('OTP has expired. Please request a new one.');
-    }
+    const interval = window.setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setIsTimerRunning(false);
+          toast.error('OTP has expired. Please request a new one.');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
 
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isTimerRunning, timeLeft]);
+    return () => clearInterval(interval);
+  }, [isTimerRunning]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -60,7 +61,7 @@ const ForgotPassword: React.FC = () => {
       const response = await sendOtp(body);
       if (response?.status === 200) {
         setStep(2);
-        setTimeLeft(600);
+        setTimeLeft(120);;
         setIsTimerRunning(true);
       }
     } catch (error) {
@@ -125,7 +126,7 @@ const ForgotPassword: React.FC = () => {
         setMobile([]);
         setOtp(0);
         setPassword('');
-        setTimeLeft(600);
+        setTimeLeft(120);;
         setIsTimerRunning(false);
         setStep(1)
         navigate('/auth/login')
@@ -153,8 +154,8 @@ const ForgotPassword: React.FC = () => {
       }
       const response = await sendOtp(body);
       if (response?.status === 200) {
-        setTimeLeft(600); // Reset to 10 minutes
-        setIsTimerRunning(true); // Start the countdown
+        setTimeLeft(120);
+        setIsTimerRunning(true);
         setOtp(0);
       }
     } catch (error) {

@@ -12,7 +12,6 @@ export interface EventModalProps {
   setIsShow: (show: boolean) => void;
   selectedDate: Date | null;
   fetchData: () => void;
-  Role: string;
   isorganizer: "Y" | "N";
 }
 
@@ -42,9 +41,7 @@ export interface SelectedLocation {
   address: string;
 }
 
-const EventModal: FC<EventModalProps> = ({ isShow, setIsShow, selectedDate, fetchData, Role, isorganizer }) => {
-  console.log(Role);
-
+const EventModal: FC<EventModalProps> = ({ isShow, setIsShow, selectedDate, fetchData, isorganizer }) => {
   const getInitialDates = () => {
     const now = new Date();
 
@@ -637,6 +634,7 @@ const EventModal: FC<EventModalProps> = ({ isShow, setIsShow, selectedDate, fetc
           selectedTeams={selectedTeams}
         />
       )}
+
       {/* {showLocation && (
         <LocationModal
           isShow={showLocation}

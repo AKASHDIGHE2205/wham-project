@@ -68,8 +68,23 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ setSelectedDate, currentDate,
 
   const handleEditEvent = (event: CalendarEvent, e: React.MouseEvent) => {
     e.stopPropagation();
+
+    if (isEventInPast(event)) {
+      return;
+    }
+
     setEditData(event);
     setIsEditShowModal(true);
+  };
+
+  const isEventInPast = (event: CalendarEvent): boolean => {
+    const eventEnd = safeParseDate(event.to_date);
+    if (!eventEnd) return false;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return eventEnd < today;
   };
 
   // Loading state
@@ -77,7 +92,7 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ setSelectedDate, currentDate,
     return (
       <div className="h-full bg-white sm:mx-4 my-2 rounded-xl shadow-md overflow-hidden flex items-center justify-center min-h-[500px]">
         <div className="flex flex-col items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border border-blue-600 mb-4"></div>
           <p className="text-gray-600 text-lg">Loading calendar...</p>
         </div>
       </div>
@@ -99,35 +114,30 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ setSelectedDate, currentDate,
           const isCurrentMonth = isSameMonth(day, currentDate);
           const isSelected = selectedDate && isSameDay(day, selectedDate);
           const dayEvents = getEventsForDate(day);
-
+          const isPast = day < new Date(new Date().setHours(0, 0, 0, 0));
           return (
             <div
               key={idx}
-              className={`relative min-h-[85px] sm:min-h-[100px] p-1 sm:p-2 cursor-pointer group
-                bg-linear-to-br from-white to-gray-50/70 border
-                ${isCurrentMonth ? 'text-gray-700 border-gray-200' : 'text-gray-300 bg-gray-100'}
-                ${isSelected ? 'ring-2 ring-blue-500 shadow-lg' : ''}
-                hover:shadow-lg hover:scale-[1.03] transition-all duration-300`}
+              className={`relative min-h-[85px] sm:min-h-[100px] p-1 sm:p-2 group border bg-white
+              ${isCurrentMonth ? 'text-black border-gray-200' : 'text-gray-300'}
+              ${isSelected ? 'shadow-lg' : ''}
+              ${isPast ? 'cursor-not-allowed opacity-65' : 'cursor-pointer hover:shadow-lg hover:scale-[1.03]'}
+              transition-all duration-300`}
             >
 
-              {isToday(day) && (
-                <div className="absolute inset-0 bg-blue-500/10 rounded-md animate-pulse"></div>
-              )}
+              {isToday(day) && (<div className="absolute inset-0 bg-blue-500/10 border border-blue-500"></div>)}
 
               {/* Date Click */}
               <div
                 className="relative z-10"
-                onClick={() => handleClickDate(day)}
-                title="Click to add event"
+                onClick={() => {
+                  if (!isPast) handleClickDate(day);
+                }}
+                title={isPast ? "Unable to select past date" : "Click to add event"}
               >
-                <div className={`flex items-center justify-center
-                  w-7 h-7 sm:w-8 sm:h-8 rounded-full mx-auto
-                  text-sm sm:text-base font-medium transition-all duration-300
-                  ${isToday(day)
-                    ? "bg-blue-600 text-white shadow-md"
-                    : isCurrentMonth
-                      ? "group-hover:bg-blue-100 group-hover:text-blue-600"
-                      : ""}`}>
+                <div className={`flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full mx-auto text-sm sm:text-base font-medium transition-all duration-300
+                  ${isToday(day) ? "bg-blue-600 text-white shadow-md" : isCurrentMonth ? "group-hover:bg-blue-100 group-hover:text-blue-600" : ""}`}
+                >
                   {format(day, "d")}
                 </div>
               </div>
@@ -137,18 +147,18 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ setSelectedDate, currentDate,
                 {dayEvents?.slice(0, 3)?.map((event, index) => (
                   <div
                     key={index}
-                    className={`text-xs px-1 py-0.5 rounded border truncate cursor-text
-                      ${event?.isapproved === "P"
-                        ? "bg-yellow-100 border-yellow-300 text-yellow-800"
-                        : event?.isapproved === "R"
-                          ? "bg-red-100 border-red-300 text-red-800"
-                          : event?.isapproved === "A"
-                            ? "bg-green-100 border-green-300 text-green-800"
-                            : event?.isapproved === "C"
-                              ? "bg-blue-100 border-blue-300 text-blue-800"
-                              : "bg-gray-100 border-gray-300 text-gray-800"}`}
-                    onClick={(e) => handleEditEvent(event, e)}
-                    title={`Click to edit: ${event?.title}`}
+                    className={`text-xs px-1 py-0.5 rounded border truncate
+                        ${isEventInPast(event) ? 'opacity-85 cursor-not-allowed' : 'cursor-pointer'}
+                        ${event?.isapproved === "P" ? "bg-yellow-100 border-yellow-300 text-yellow-800"
+                        : event?.isapproved === "R" ? "bg-red-100 border-red-300 text-red-800"
+                          : event?.isapproved === "A" ? "bg-green-100 border-green-300 text-green-800"
+                            : event?.isapproved === "C" ? "bg-blue-100 border-blue-300 text-blue-800"
+                              : "bg-gray-100 border-gray-300 text-gray-800"
+                      }`}
+                    onClick={(e) => {
+                      if (!isEventInPast(event)) handleEditEvent(event, e);
+                    }}
+                    title={isEventInPast(event) ? "Past events cannot be edited" : `Click to edit: ${event?.title}`}
                   >
                     <div className='flex justify-between mb-1'>
                       <span className="truncate flex-1 font-semibold flex items-center gap-1">
@@ -164,8 +174,7 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ setSelectedDate, currentDate,
                     <div className="text-[10px] flex justify-between">
                       <div>
                         {moment(event?.from_date).format('DD/MMM')}
-                        {event?.from_date !== event?.to_date &&
-                          ` to ${moment(event?.to_date).format('DD/MMM')}`}
+                        {event?.from_date !== event?.to_date && ` to ${moment(event?.to_date).format('DD/MMM')}`}
                       </div>
                       <div>
                         {moment(event?.from_date).format("HH:mm")} - {moment(event?.to_date).format("HH:mm")}

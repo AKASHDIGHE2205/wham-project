@@ -38,7 +38,6 @@ export interface EventInterface {
 }
 
 const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event, Role, isorganizer }) => {
-  console.log(Role);
   const [inputs, setInputs] = useState({
     title: '',
     fromDate: '',
@@ -175,7 +174,8 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
       handleCancel();
     }
   }
-  const isDisabled = (Event?.isapproved === 'C' || Event?.isapproved === 'A' || isorganizer === 'N');
+  const isDisabled = (Event?.isapproved === 'C' || Event?.isapproved === 'A' || isorganizer === 'N') &&
+    ["Master", "Manager", "User", "Admin"].includes(Role);
 
   if (!isShow) return null;
 
@@ -194,7 +194,7 @@ const UpdateEvent: FC<EventModalProps> = ({ isShow, setIsShow, fetchData, Event,
               </div>
               <div>
                 <div className="flex items-center">
-                  <h3 className="text-md font-semibold text-gray-900 pr-2">Update Event</h3>
+                  <h3 className="text-md font-semibold text-gray-900 pr-2">{isDisabled ? "View Event Details" : "Update Event"}</h3>
                   {/* <p className="text-sm text-gray-600">{inputs.title}</p> */}
                 </div>
               </div>

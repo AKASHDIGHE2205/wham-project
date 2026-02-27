@@ -12,7 +12,7 @@ export interface User {
   phone: string;
   role: string;
   token: string;
-  isOrganizer: string;
+  isOrganizer: string | "Y" | "N";
 }
 
 export const decryptUser = <T = any>(

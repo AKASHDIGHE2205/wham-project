@@ -78,6 +78,8 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
 
   // Handle day click (for all-day events or date selection)
   const handleDayClick = (day: Date) => {
+    if (isPastDate(day)) return;
+
     setSelectedDate(day);
     onDateSelect(day);
     onShowModal(true);
@@ -87,6 +89,9 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
   const handleTimeSlotClick = (day: Date, hour: number) => {
     const selectedDateTime = new Date(day);
     selectedDateTime.setHours(hour, 0, 0, 0);
+
+    if (isPastDate(selectedDateTime)) return;
+
     setSelectedDate(selectedDateTime);
     onDateSelect(selectedDateTime);
     onShowModal(true);
@@ -95,8 +100,31 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
   // Handle event edit (same as MonthlyView)
   const handleEditEvent = (event: CalendarEvent, e: React.MouseEvent) => {
     e.stopPropagation();
+
+    if (isEventInPast(event)) return;
+
     setEditData(event);
     setIsEditShowModal(true);
+  };
+
+  const isEventInPast = (event: CalendarEvent): boolean => {
+    const eventEnd = safeParseDate(event.to_date);
+    if (!eventEnd) return false;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return eventEnd < today;
+  };
+
+  const isPastDate = (date: Date): boolean => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const target = new Date(date);
+    target.setHours(0, 0, 0, 0);
+
+    return target < today;
   };
 
   // Format time from date strings (same as DailyView)
@@ -145,6 +173,7 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
               className={`flex-1 text-center border-l border-gray-200 p-2 sm:p-4 min-h-16
                 transition-all duration-300 hover:bg-blue-50 relative
                 ${isSelected ? "bg-blue-100/60 border-blue-300 shadow-inner" : ""}
+                
               `}
             >
               <div className="text-xs text-gray-500">{format(day, "EEE")}</div>
@@ -153,10 +182,8 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
               <div
                 className={`mx-auto mt-1 rounded-full w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center font-semibold
                   transition-all duration-300 cursor-pointer
-                  ${isToday(day)
-                    ? "bg-blue-600 text-white shadow-md"
-                    : isSelected
-                      ? "bg-blue-200 text-blue-800"
+                  ${isToday(day) ? "bg-blue-600 text-white shadow-md"
+                    : isSelected ? "bg-blue-200 text-blue-800"
                       : "text-gray-800 hover:bg-blue-100"
                   }
                 `}
@@ -171,19 +198,16 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
                 {allDayEvents.map((event, index) => (
                   <div
                     key={index}
-                    className={`text-xs px-1 py-0.5 rounded border truncate cursor-pointer
-                      ${event.isapproved === "P"
-                        ? "bg-yellow-100 border-yellow-300 text-yellow-800"
-                        : event.isapproved === "R"
-                          ? "bg-red-100 border-red-300 text-red-800"
-                          : event.isapproved === "A"
-                            ? "bg-green-100 border-green-300 text-green-800"
-                            : event.isapproved === "C"
-                              ? "bg-blue-100 border-blue-300 text-blue-800"
+                    className={`text-xs px-1 py-0.5 rounded border truncate
+                        ${isEventInPast(event) ? 'opacity-85 cursor-not-allowed' : 'cursor-pointer'}
+                        ${event?.isapproved === "P" ? "bg-yellow-100 border-yellow-300 text-yellow-800"
+                        : event?.isapproved === "R" ? "bg-red-100 border-red-300 text-red-800"
+                          : event?.isapproved === "A" ? "bg-green-100 border-green-300 text-green-800"
+                            : event?.isapproved === "C" ? "bg-blue-100 border-blue-300 text-blue-800"
                               : "bg-gray-100 border-gray-300 text-gray-800"
                       }`}
                     onClick={(e) => handleEditEvent(event, e)}
-                    title={`Click to edit: ${event.title}`}
+                    title={isEventInPast(event) ? 'Past events cannot be edited' : `Click to edit`}
                   >
                     <div className='flex justify-between mb-1'>
                       <span className="truncate flex-1 font-semibold flex items-center gap-1">
@@ -228,19 +252,16 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
             </div>
 
             {/* Grid Cells per Day */}
-            {days.map((day, dayIndex) => {
-              const isSelected = selectedDate && isSameDay(day, selectedDate);
+            {days.map((day) => {
               const hourEvents = getEventsForDateAndHour(day, hour);
 
               return (
                 <div
-                  key={dayIndex}
-                  className={`flex-1 border-l border-gray-200 p-1 sm:p-2 relative
-                    ${isSelected ? "bg-blue-50/20" : ""}
-                    hover:bg-blue-100/30 transition-colors duration-200
-                  `}
-                  onClick={() => handleTimeSlotClick(day, hour)}
-                  title="Click to add event"
+                  className={`flex-1 border-l p-1 sm:p-2 relative
+                  ${isPastDate(day) ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:bg-blue-100/30'}`}
+                  onClick={() => {
+                    if (!isPastDate(day)) handleTimeSlotClick(day, hour);
+                  }}
                 >
                   {/* Today Glow */}
                   {isToday(day) && (

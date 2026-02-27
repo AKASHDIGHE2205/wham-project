@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { format } from 'date-fns';
+import { format, isToday } from 'date-fns';
 import moment from 'moment';
 import type { CalendarEvent } from './MonthlyView';
 
@@ -64,12 +64,18 @@ const DailyView: React.FC<DailyViewProps> = ({
   const handleHourClick = (hour: number) => {
     const selectedDateTime = new Date(currentDate);
     selectedDateTime.setHours(hour, 0, 0, 0);
+
+    if (isPastDate(selectedDateTime)) return;
+
     setSelectedDate(selectedDateTime);
     onShowModal(true);
   };
 
   const handleEditEvent = (event: CalendarEvent, e: React.MouseEvent) => {
     e.stopPropagation();
+
+    if (isEventInPast(event)) return;
+
     setEditData(event);
     setIsEditShowModal(true);
   };
@@ -82,6 +88,26 @@ const DailyView: React.FC<DailyViewProps> = ({
     } catch {
       return "All day";
     }
+  };
+
+  const isPastDate = (date: Date): boolean => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const target = new Date(date);
+    target.setHours(0, 0, 0, 0);
+
+    return target < today;
+  };
+
+  const isEventInPast = (event: CalendarEvent): boolean => {
+    const eventEnd = safeParseDate(event.to_date);
+    if (!eventEnd) return false;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return eventEnd < today;
   };
 
   // Loading state
@@ -109,15 +135,19 @@ const DailyView: React.FC<DailyViewProps> = ({
       <div className="relative max-w-5xl mx-auto p-2 sm:p-4">
         {hours?.map(hour => {
           const hourEvents = getEventsForHour(hour);
-
+          const isPastHour = isPastDate(currentDate) || (isToday(currentDate) && hour < new Date().getHours());
           return (
             <div
               key={hour}
-              className="flex border-b border-gray-100 min-h-16 sm:min-h-20 group transition-all hover:bg-blue-50/40 cursor-pointer"
+              className={`flex border-b min-h-16 sm:min-h-20 group transition-all
+    ${isPastHour ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:bg-blue-50/40'}
+  `}
             >
               <div
                 className="w-16 sm:w-24 p-2 sm:p-4 text-xs sm:text-sm text-gray-600 font-medium border-r border-gray-100 bg-white/70 sticky left-0 z-10"
-                onClick={() => handleHourClick(hour)}
+                onClick={() => {
+                  if (!isPastHour) handleHourClick(hour);
+                }}
               >
                 {hour === 0 ? '12 AM' : hour < 12 ? `${hour} AM` : hour === 12 ? '12 PM' : `${hour - 12} PM`}
               </div>
@@ -129,15 +159,12 @@ const DailyView: React.FC<DailyViewProps> = ({
                 {hourEvents?.map((event) => (
                   <div
                     key={event?.id}
-                    className={`text-xs px-2 py-1 rounded border cursor-pointer hover:shadow-md transition-all duration-200 truncate
-                      ${event?.isapproved === "P"
-                        ? "bg-yellow-100 border-yellow-300 text-yellow-800"
-                        : event?.isapproved === "R"
-                          ? "bg-red-100 border-red-300 text-red-800"
-                          : event?.isapproved === "A"
-                            ? "bg-green-100 border-green-300 text-green-800"
-                            : event?.isapproved === "C"
-                              ? "bg-blue-100 border-blue-300 text-blue-800"
+                    className={`text-xs px-1 py-0.5 rounded border truncate
+                        ${isEventInPast(event) ? 'opacity-85 cursor-not-allowed' : 'cursor-pointer'}
+                        ${event?.isapproved === "P" ? "bg-yellow-100 border-yellow-300 text-yellow-800"
+                        : event?.isapproved === "R" ? "bg-red-100 border-red-300 text-red-800"
+                          : event?.isapproved === "A" ? "bg-green-100 border-green-300 text-green-800"
+                            : event?.isapproved === "C" ? "bg-blue-100 border-blue-300 text-blue-800"
                               : "bg-gray-100 border-gray-300 text-gray-800"
                       }`}
                     onClick={(e) => handleEditEvent(event, e)}

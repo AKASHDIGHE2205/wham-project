@@ -372,67 +372,57 @@ export const getTeamMembers = (req, res) => {
 export const sendOtp = async (req, res) => {
   try {
     const { mobile } = req.body;
+
     const user_name = 'malpanibiz';
     const password = 'dkhy2271DK';
     const sender = 'MALPNI';
     const entityID = '1201159436561584634';
     const TemplateID = '1707170609322119024';
+
     if (!mobile) {
       return res.status(400).json({ message: "Phone number is required" });
     }
 
-    // ------------------------------------
-    // 1️⃣ Check if user exists
-    // ------------------------------------
+    // 1️⃣ Check user exists
     const checkUserSql = "SELECT id FROM users WHERE phone = ?";
     db.query(checkUserSql, [mobile], async (err, results) => {
       if (err) {
         console.error("Error checking user:", err);
-        return res.status(500).json({ message: "Internal server error", error: err });
+        return res.status(500).json({ message: "Internal server error" });
       }
 
       if (results.length === 0) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // ------------------------------------
       // 2️⃣ Generate OTP
-      // ------------------------------------
       const otp = Math.floor(100000 + Math.random() * 900000);
 
-      const message = `Dear SalesSwift user, your OTP for password reset is ${otp}, which is valid for 10 minutes. MALPANI`;
-
-      // URL encode message to avoid breaking the SMS API URL
+      const message = `Dear SalesSwift user, your OTP for password reset is ${otp}, which is valid for 2 minutes. MALPANI`;
       const encodedMessage = encodeURIComponent(message);
 
-      // ------------------------------------
       // 3️⃣ SMS API URL
-      // ------------------------------------
       const smsApiUrl = `https://nimbusit.biz/api/SmsApi/SendSingleApi?UserID=${user_name}&Password=${password}&SenderID=${sender}&Phno=${mobile}&Msg=${encodedMessage}&EntityID=${entityID}&TemplateID=${TemplateID}`;
 
-      // ------------------------------------
       // 4️⃣ Send SMS
-      // ------------------------------------
       try {
         await axios.get(smsApiUrl);
       } catch (smsError) {
-        console.error("SMS Sending Error:", smsError);
-        return res.status(500).json({ message: "Failed to send OTP", error: smsError });
+        console.error("SMS sending error:", smsError);
+        return res.status(500).json({ message: "Failed to send OTP" });
       }
 
-      // ------------------------------------
-      // 5️⃣ Save OTP in DB
-      // ------------------------------------
-      const expiryTime = new Date(Date.now() + 10 * 60 * 1000); // +10 minutes
+      // 5️⃣ Save OTP with **2-minute expiry**
+      const expiryTime = new Date(Date.now() + 2 * 60 * 1000);
 
-      const updateSql = "UPDATE users SET otp_code = ?, otp_expiry = ? WHERE phone = ?";
+      const updateSql =
+        "UPDATE users SET otp_code = ?, otp_expiry = ? WHERE phone = ?";
 
       db.query(updateSql, [otp, expiryTime, mobile], (err2) => {
         if (err2) {
           console.error("Error saving OTP:", err2);
           return res.status(500).json({
             message: "Internal server error while saving OTP",
-            error: err2,
           });
         }
 
@@ -442,12 +432,11 @@ export const sendOtp = async (req, res) => {
         });
       });
     });
-
   } catch (error) {
-    console.error("OTP sending error:", error);
+    console.error("sendOtp error:", error);
     return res.status(500).json({
       success: false,
-      message: "Something went wrong while sending OTP",
+      message: "Something went wrong",
     });
   }
 };

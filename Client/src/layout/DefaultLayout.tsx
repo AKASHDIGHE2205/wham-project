@@ -6,8 +6,8 @@ import Footer from "../components/Footer";
 const DefaultLayout = () => {
   return (
     <div className="flex h-screen">
-      {/* <!-- Sidebar - Hidden on mobile, compact on desktop --> */}
-      <div className="hidden md:block bg-white border-r border-orange-300 h-screen overflow-hidden">
+      {/* Sidebar - Hidden on mobile, sm & md, visible on lg+ */}
+      <div className="hidden lg:block bg-white border-r border-orange-300 h-screen overflow-hidden">
         <Sidebar />
       </div>
 
