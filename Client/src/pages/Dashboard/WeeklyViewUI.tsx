@@ -64,19 +64,11 @@ const WeeklyViewUI: React.FC<WeeklyViewUIProps> = ({ events, currentWeekStart = 
                 </div>
 
                 <div
-                  className={`mx-auto mt-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold
-          ${isToday
-                      ? "bg-orange-500 text-white"
-                      : isPast
-                        ? "text-gray-400 cursor-not-allowed"
-                        : "text-gray-700 hover:bg-blue-100 cursor-pointer"
-                    }
-        `}
-                  onClick={() => {
-                    if (!isPast) {
-                      handleClickDate(date);
-                    }
-                  }}
+                  className={`mx-auto mt-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold cursor-pointer
+                  ${isToday ? "bg-orange-500 text-white"
+                      : isPast ? "text-gray-400 cursor-not-allowed" : "text-gray-700 hover:bg-blue-100 cursor-pointer"
+                    }`}
+                  onClick={() => { if (!isPast) handleClickDate(date) }}
                 >
                   {date.date()}
                 </div>
@@ -144,10 +136,23 @@ const WeeklyViewUI: React.FC<WeeklyViewUIProps> = ({ events, currentWeekStart = 
           })}
         </div>
       </div>
-      {/* ================= VIEW EVENT MODAL ================= */}
-      {viewEvent && selectedEvent && (<UpdateEvent isShow={viewEvent} setIsShow={showViewEvent} fetchData={fetchAllData} Event={selectedEvent} Role={Role} isorganizer={isOrganizer} />)}
-      {/* ================= ADD EVENT MODAL ================= */}
-      {showAdd && (<NewEventModal isShow={showAdd} setIsShow={setShowAdd} selectedDate={selectedDate} fetchData={fetchAllData} isorganizer={isOrganizer} />)}
+      {viewEvent && selectedEvent && (
+        <UpdateEvent
+          isShow={viewEvent}
+          setIsShow={showViewEvent}
+          fetchData={fetchAllData}
+          Event={selectedEvent}
+          Role={Role}
+          isorganizer={isOrganizer}
+        />)}
+      {showAdd && (
+        <NewEventModal
+          isShow={showAdd}
+          setIsShow={setShowAdd}
+          selectedDate={selectedDate}
+          fetchData={fetchAllData}
+          isorganizer={isOrganizer}
+        />)}
     </div>
   );
 };

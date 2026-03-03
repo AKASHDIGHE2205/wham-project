@@ -10,9 +10,7 @@ export const getUpcomingEvents = (req, res) => {
   }
 
   // STEP 1: Get member_id from mst_members
-  const getMemberQuery = `
-                          SELECT mem_id, concat(first_name ," ", middle_name ," ", last_name) as organizer_name FROM mst_members WHERE user_id = ? LIMIT 1
-                        `;
+  const getMemberQuery = `SELECT mem_id FROM mst_members WHERE user_id = ? LIMIT 1`;
 
   db.query(getMemberQuery, [userId], (err, memberData) => {
     if (err) return res.status(500).json({ message: "Internal server error", err });
@@ -22,7 +20,6 @@ export const getUpcomingEvents = (req, res) => {
     }
 
     const memberId = memberData[0].mem_id;
-    const organizerName = memberData[0].organizer_name;
 
     // STEP 2: If User → fetch only their team IDs; If Manager/Admin/Master → skip
     const isPrivileged = ["Master", "Admin", "Manager"].includes(role);
@@ -58,10 +55,12 @@ export const getUpcomingEvents = (req, res) => {
           eh.created_by,
           eh.created_at,
           eh.updated_by,
-          eh.updated_at
+          eh.updated_at,
+          concat(u.first_name ," ", u.middle_name ," ", u.last_name) as organizer_name
         FROM event_hd eh
         LEFT JOIN event_member em ON eh.id = em.event_id
         LEFT JOIN event_team et ON eh.id = et.event_id
+        LEFT JOIN users u ON eh.created_by = u.id
         WHERE eh.isdeleted = 'N'
           AND DATE(eh.from_date) > CURDATE()
       `;
@@ -151,7 +150,6 @@ export const getUpcomingEvents = (req, res) => {
             eventsData.forEach(event => {
               eventsMap[event.event_id] = {
                 ...event,
-                organizer_name: organizerName,
                 members: [],
                 teams: [],
                 locations: []
@@ -202,7 +200,7 @@ export const getActiveEvents = (req, res) => {
   }
 
   // STEP 1: Get member_id
-  const getMemberQuery = `SELECT mem_id, concat(first_name ," ", middle_name ," ", last_name) as organizer_name, isorganizer FROM mst_members WHERE user_id = ? LIMIT 1`;
+  const getMemberQuery = `SELECT mem_id, isorganizer FROM mst_members WHERE user_id = ? LIMIT 1`;
 
   db.query(getMemberQuery, [userId], (err, memberData) => {
     if (err) return res.status(500).json({ message: "Internal server error", err });
@@ -212,7 +210,6 @@ export const getActiveEvents = (req, res) => {
     }
 
     const memberId = memberData[0].mem_id;
-    const organizerName = memberData[0].organizer_name;
     const isPrivileged = ["Master", "Admin", "Manager"].includes(role);
 
     // STEP 2 (only needed for USER)
@@ -245,12 +242,14 @@ export const getActiveEvents = (req, res) => {
           eh.isdeleted,
           eh.approved_by,
           eh.created_by,
+          concat(u.first_name ," ", u.middle_name ," ", u.last_name) as organizer_name,
           eh.created_at,
           eh.updated_by,
           eh.updated_at
         FROM event_hd eh
         LEFT JOIN event_member em ON eh.id = em.event_id
         LEFT JOIN event_team et ON eh.id = et.event_id
+        LEFT JOIN users u ON eh.created_by = u.id
         WHERE eh.isdeleted = 'N'
         AND CURDATE() BETWEEN DATE(eh.from_date) AND DATE(eh.to_date)
       `;
@@ -342,7 +341,6 @@ export const getActiveEvents = (req, res) => {
             eventsData.forEach(event => {
               eventsMap[event.event_id] = {
                 ...event,
-                organizer_name: organizerName,
                 members: [],
                 teams: [],
                 locations: []
@@ -513,12 +511,10 @@ export const addAttendence_old13012026 = async (req, res) => {
 
 export const addAttendence = async (req, res) => {
   try {
-    const { eventId, Time, punchDate, eventDate, stepId, taskId, memId, location, attenddesc } = req.body;
-
+    const { eventId, Time, punchDate, eventDate, stepId, taskId, c_by, location, attenddesc } = req.body;
     const file = req.file;
     const locationObj = typeof location === "string" ? JSON.parse(location) : location;
 
-    // DB helper
     const dbQuery = (sql, params = []) => {
       return new Promise((resolve, reject) => {
         db.query(sql, params, (error, results) => {
@@ -535,7 +531,7 @@ export const addAttendence = async (req, res) => {
       SELECT 1
       FROM event_media
       WHERE event_id = ?
-        AND mem_id = ?
+        AND c_by = ?
         AND event_date = ?
         AND step_id = ?
         AND task_id = ?
@@ -543,7 +539,7 @@ export const addAttendence = async (req, res) => {
       LIMIT 1
     `;
 
-    const alreadyAttended = await dbQuery(checkQuery, [eventId, memId, eventDate, stepId, taskId, punchDate]);
+    const alreadyAttended = await dbQuery(checkQuery, [eventId, c_by, eventDate, stepId, taskId, punchDate]);
 
     if (alreadyAttended.length > 0) {
       return res.status(400).json({ success: false, message: "You have already attended this task." });
@@ -559,8 +555,6 @@ export const addAttendence = async (req, res) => {
     `;
     const memResult = await dbQuery(getMemDetails, [memId]);
     const memNameRaw = memResult[0]?.full_name || "unknown";
-
-    // sanitize name for folder
     const memName = memNameRaw.replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_]/g, "");
 
     /* -----------------------------------
@@ -576,11 +570,8 @@ export const addAttendence = async (req, res) => {
       const uploadPath = path.join("uploads/attendance", yearMonth, memberFolder);
 
       await fs.ensureDir(uploadPath);
-      const fileName = `${new Date().toISOString().split('T')[0].replace(/-/g, '')}_${file.originalname}`;//YYYYMMDD
-      // const fileName = `${new Date().toLocaleDateString('en-GB').replace(/\//g, '')}_${file.originalname}`;//DDMMYYYY
-      // const fileName = `${Date.now()}_${file.originalname}`;//full date
+      const fileName = `${new Date().toISOString().split('T')[0].replace(/-/g, '')}_${file.originalname}`;
       savePath = path.posix.join(uploadPath.replace(/\\/g, "/"), fileName);
-
       await sharp(file.buffer).jpeg({ quality: 40 }).toFile(savePath);
 
       /* -----------------------------------
@@ -591,9 +582,9 @@ export const addAttendence = async (req, res) => {
       mediaSrNo = mediaMaxResult[0].next_id;
 
       const mediaQuery = `
-        INSERT INTO event_media (sr_no,event_id,in_time,punch_date,event_date,media_path,address,lat,lng,media_desc,mem_id,step_id,task_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        INSERT INTO event_media (sr_no,event_id,in_time,punch_date,event_date,media_path,address,city,state,pin,lat,lng,media_desc,step_id,task_id,c_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-      await dbQuery(mediaQuery, [mediaSrNo, eventId, Time, punchDate, eventDate, savePath, locationObj?.address ?? null, locationObj?.latitude ?? null, locationObj?.longitude ?? null, attenddesc, memId, stepId, taskId]);
+      await dbQuery(mediaQuery, [mediaSrNo, eventId, Time, punchDate, eventDate, savePath, locationObj?.address ?? null, locationObj?.city ?? null, locationObj?.state ?? null, locationObj?.pin ?? null, locationObj?.latitude ?? null, locationObj?.longitude ?? null, attenddesc, stepId, taskId, c_by]);
     }
 
     return res.json({ success: true, message: "Attendance added successfully!" });
@@ -680,9 +671,8 @@ export const addAttendence_old041225 = async (req, res) => {
 };
 
 export const addSteps = (req, res) => {
-  const { eventId, eventDate, userId, description, taskId, stepId, status } = req.body;
+  const { eventId, eventDate, memId, userId, description, taskId, stepId, status } = req.body;
 
-  // STEP 1: Check if the step already exists
   const checkSql = `
                       SELECT * 
                       FROM event_dt 
@@ -717,7 +707,7 @@ export const addSteps = (req, res) => {
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)
                       `;
 
-      db.query(insertSql, [nextStepId, eventId, eventDate, userId, description, stepId, taskId, status, userId], (err, insertResult) => {
+      db.query(insertSql, [nextStepId, eventId, eventDate, memId, description, stepId, taskId, status, userId], (err, insertResult) => {
         if (err) {
           console.error("Error adding step:", err);
           return res.status(500).json({ message: "Internal server error" });

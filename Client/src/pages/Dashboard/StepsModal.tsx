@@ -22,7 +22,7 @@ export interface Inputs {
   status: string;
 }
 
-const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, fetchAllData }) => {
+const StepsModal: FC<Props> = ({ show, setShow, Data, User, setSelectedEvent, fetchAllData }) => {//Member
   const [steps, setSteps] = useState<Steps[]>([]);
   const [tasks, setTasks] = useState<Tasks[]>([]);
   const [selectedStep, setSelectedStep] = useState<number>(0);
@@ -56,22 +56,6 @@ const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, 
     fetchTasks();
     fetchSteps();
   }, []);
-
-  // useEffect(() => {
-  //   const fetchTasks = async () => {
-  //     setTaskLoading(true)
-  //     if (selectedStep && selectedStep !== 0) {
-  //       const response = await getActiveTasks({ Id: selectedStep });
-  //       if (response) {
-  //         setTasks(response.tasks || []);
-  //         setTaskLoading(false)
-  //       }
-  //     } else {
-  //       setTasks([]);
-  //     }
-  //   };
-  //   fetchTasks();
-  // }, [selectedStep]);
 
   const handleStepChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const stepValue = parseInt(event.target.value);
@@ -116,7 +100,8 @@ const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, 
     const body = {
       eventId: Data.event_id || 0,
       eventDate: Data.event_date || '',
-      userId: Member.mem_id || 0,
+      // memId: Member.mem_id || 0,
+      userId: User?.id || 0,
       description: inputs?.taskdesc || "",
       stepId: selectedStep || 0,
       taskId: selectedTask || 0,
@@ -160,7 +145,7 @@ const StepsModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, 
         </div>
         <div className="flex-1 overflow-auto">
           <form className="p-6 space-y-3" onSubmit={handleSubmit}>
-            {Member?.isorganizer === 'Y' &&
+            {User?.isorganizer === 'Y' &&
               (<>
                 {/* Steps */}
                 <div>

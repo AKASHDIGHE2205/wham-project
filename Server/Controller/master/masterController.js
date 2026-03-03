@@ -1030,8 +1030,7 @@ export const addUniversity = async (req, res) => {
     // ✅ Parse locations array
     const locationArr = typeof locations === "string" ? JSON.parse(locations) : locations;
 
-    const { address, lat, lng } = locationArr[0];
-    const city = address?.split(",").pop()?.trim() || "";
+    const { address, lat, lng, city = "", state = "", pin = null } = locationArr[0];
 
     // ✅ File save
     let savedFilePath = null;
@@ -1053,12 +1052,12 @@ export const addUniversity = async (req, res) => {
     }
 
     const sql = `
-      INSERT INTO universities(id, name, address, city, lat, lng, photo, status, c_by, c_at)
-      SELECT IFNULL(MAX(id), 0) + 1,?, ?, ?, ?, ?, ?, ?, ?, NOW()
+      INSERT INTO universities(id, name, address, city, state, pin, lat, lng, photo, status, c_by, c_at)
+      SELECT IFNULL(MAX(id), 0) + 1,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW()
       FROM universities
     `;
 
-    const values = [name, address, city, lat, lng, savedFilePath, status, c_by];
+    const values = [name, address, city, state, pin, lat, lng, savedFilePath, status, c_by];
 
     await db.query(sql, values);
 
@@ -1221,19 +1220,16 @@ export const addCollege = async (req, res) => {
   try {
     const { name, status, uniId, totalStudents = 0, c_by, locations } = req.body;
     const file = req.file;
-
+    const totalStudentsNum = Number(totalStudents) || 0;
+    console.log("Received college data:", { name, status, uniId, totalStudents, locations });
     if (!name || !status || !uniId || !locations) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    const locationArr =
-      typeof locations === "string" ? JSON.parse(locations) : locations;
+    const locationArr = typeof locations === "string" ? JSON.parse(locations) : locations;
 
-    if (!Array.isArray(locationArr) || locationArr.length === 0) {
-      return res.status(400).json({ message: "Invalid locations data" });
-    }
-
-    const { address = "", lat = null, lng = null } = locationArr[0];
+    const { address = "", lat = null, lng = null, city = "", state = "", pin = null } = locationArr[0];
+    const pinNum = Number(pin) || null;
 
     // ✅ File save
     let savedFilePath = null;
@@ -1256,37 +1252,13 @@ export const addCollege = async (req, res) => {
 
     // ✅ IMPORTANT PART (manual clg_id)
     const sql = `
-      INSERT INTO colleges
-      (
-        clg_id,
-        university_id,
-        clg_name,
-        clg_address,
-        total_students,
-        clg_photo,
-        lat,
-        lng,
-        status,
-        c_at,
-        c_by
-      )
-      SELECT
-        IFNULL(MAX(clg_id), 0) + 1,
-        ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?
-      FROM colleges
-    `;
+INSERT INTO colleges
+  (clg_id, university_id, clg_name, clg_address, state, city, pin, total_students, clg_photo, lat, lng, status, c_at, c_by)
+SELECT IFNULL(MAX(clg_id), 0) + 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?
+FROM colleges
+`;
 
-    const values = [
-      uniId,
-      name,
-      address,
-      totalStudents,
-      savedFilePath,
-      lat,
-      lng,
-      status,
-      c_by
-    ];
+    const values = [uniId, name, address, state, city, pinNum, totalStudentsNum, savedFilePath, lat, lng, status, c_by];
 
     await db.query(sql, values);
 
@@ -1443,7 +1415,7 @@ export const updateCollege = (req, res) => {
     return res.status(400).json({ message: "Location data is missing" });
   }
 
-  const { address = "", lat = null, lng = null } = locationArr[0];
+  const { address = "", lat = null, lng = null, city = "", state = "", pin = null } = locationArr[0];
 
   const sql = `
     UPDATE colleges
@@ -1451,6 +1423,9 @@ export const updateCollege = (req, res) => {
       university_id = ?,
       clg_name = ?,
       clg_address = ?,
+      city = ?,
+      state = ?,
+      pin = ?,
       total_students = ?,
       lat = ?,
       lng = ?,
@@ -1458,7 +1433,7 @@ export const updateCollege = (req, res) => {
     WHERE clg_id = ?
   `;
 
-  db.query(sql, [uniId, name, address, totalStudents, lat, lng, status, id], (err, results) => {
+  db.query(sql, [uniId, name, address, city, state, pin, totalStudents, lat, lng, status, id], (err, results) => {
     if (err) {
       console.error("College Update Error:", err);
       return res.status(500).json({ message: "Internal server error" });

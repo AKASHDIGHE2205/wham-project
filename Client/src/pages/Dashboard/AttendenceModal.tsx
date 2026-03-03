@@ -9,15 +9,19 @@ export interface Props {
   show: boolean;
   setShow: (show: boolean) => void;
   Data: any;
-  Member: any;
+  // Member: any;
   setSelectedEvent: (event: any) => void;
   fetchAllData: () => void;
+  User?: any;
 }
 
 interface Location {
   lat: number;
   lng: number;
   address: string;
+  city?: string;
+  state?: string;
+  pin?: string;
 }
 
 interface Inputs {
@@ -26,7 +30,7 @@ interface Inputs {
   attenddesc: string;
 }
 
-const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEvent, fetchAllData }) => {
+const AttendenceModal: FC<Props> = ({ show, setShow, Data, User, setSelectedEvent, fetchAllData }) => {//Member
   const [location, setLocation] = useState<Location | null>(null);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [inputs, setInputs] = useState<Inputs>({
@@ -36,22 +40,44 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
   });
   const [loading, setLoading] = useState(false);
 
-  const getAddressFromCoordinates = async (lat: number, lng: number): Promise<string> => {
+  const getAddressFromCoordinates = async (lat: number, lng: number): Promise<Location> => {
     try {
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_MAPS_API_KEY}`
       );
+
       const data = await response.json();
-      if (data?.status === "OK" && data?.results?.length > 0) {
-        return data.results[0].formatted_address;
+
+      if (data.status !== "OK" || !data.results.length) {
+        throw new Error("No address found");
       }
-      return "Address not found";
+
+      const result = data.results[0];
+      const components = result.address_components;
+
+      const getComponent = (type: string) =>
+        components.find((c: any) => c.types.includes(type))?.long_name || "";
+
+      return {
+        lat,
+        lng,
+        address: result.formatted_address,
+        city: getComponent("locality") || getComponent("administrative_area_level_2"),
+        state: getComponent("administrative_area_level_1"),
+        pin: getComponent("postal_code"),
+      };
     } catch (error) {
-      console.error("Error getting address:", error);
-      return "Error fetching address";
+      console.error("Geocode error:", error);
+      return {
+        lat,
+        lng,
+        address: "Address not found",
+        city: "",
+        state: "",
+        pin: "",
+      };
     }
   };
-
 
   const handlePunchIn = async () => {
     if (!navigator.geolocation) {
@@ -66,14 +92,7 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
         try {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          const address = await getAddressFromCoordinates(lat, lng);
-
-          const locationData: Location = {
-            lat,
-            lng,
-            address
-          };
-
+          const locationData = await getAddressFromCoordinates(lat, lng);
           setLocation(locationData);
           setIsGettingLocation(false);
         } catch (error) {
@@ -140,13 +159,17 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
         eventDate: Data?.event_Date ?? '',
         stepId: Data?.step_no ?? 0,
         taskId: Data?.task_id ?? 0,
-        memId: Member?.mem_id ?? 0,
+        // memId: Member?.mem_id ?? 0,
+        c_by: User?.id ?? 0,
         media: inputs.media,
         attenddesc: inputs.attenddesc,
         location: {
           latitude: location.lat ?? 0,
           longitude: location.lng ?? 0,
-          address: location.address ?? ""
+          address: location.address ?? "",
+          city: location.city ?? "",
+          state: location.state ?? "",
+          pin: location.pin ?? ""
         }
       };
 
@@ -155,17 +178,17 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
       formData.append("eventDate", body.eventDate);
       formData.append("Time", currentDate.toLocaleTimeString());
       formData.append("punchDate", currentDate.toISOString().split('T')[0]);
-      formData.append("memId", body.memId.toString());
+      // formData.append("memId", body.memId.toString());
       formData.append("stepId", body.stepId.toString());
       formData.append("taskId", body.taskId.toString());
       formData.append("attenddesc", body.attenddesc);
       formData.append("location", JSON.stringify(body.location));
+      formData.append("c_by", body.c_by.toString());
 
       // Append media if it's a File object
       if (body.media instanceof File) {
         formData.append("media", body.media);
       }
-
       const response = await addAttendence(formData);
       if (response) handleClose();
     } catch (error) {
@@ -174,7 +197,6 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
       setLoading(false);
     }
   };
-
 
   if (!show) return null;
 
@@ -241,6 +263,7 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, Member, setSelectedEv
                     />
                     {location && (
                       <p className="text-xs text-gray-500 mt-1 hidden">
+                        {location.city}, {location.state} - {location.pin}
                         Coordinates: Lat: {location.lat.toFixed(6)}, Lng: {location.lng.toFixed(6)}
                       </p>
                     )}

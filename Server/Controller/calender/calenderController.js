@@ -133,7 +133,6 @@ export const addEvent = (req, res) => {
               });
             });
           };
-
           const insertLocations = (callback) => {
             if (locations.length === 0) {
               return callback();
@@ -147,44 +146,25 @@ export const addEvent = (req, res) => {
                 return res.status(500).json({ message: "Internal Server Error" });
               }
 
-              // Helper to extract city + postal code
-              const parseAddress = (fullAddress) => {
-                let parts = fullAddress.split(",");
-                let postal = null;
-                let city = null;
-
-                // Try to extract pin code (Indian-style)
-                const pinMatch = fullAddress.match(/\b\d{6}\b/);
-                if (pinMatch) postal = pinMatch[0];
-
-                // City is usually the item before "India"
-                if (parts.length >= 3) {
-                  city = parts[parts.length - 2]?.trim();
-                }
-
-                return { city, postal };
-              };
-
               let locNextId = locResult[0].next_id;
-              const locationValues = locations.map((loc, index) => {
-                const { city, postal } = parseAddress(loc.address);
-                return [
-                  locNextId + index,
-                  eventId,
-                  loc.address,
-                  loc.lng,
-                  loc.lat,
-                  city,
-                  postal,
-                  eventDate
-                ];
-              });
+
+              const locationValues = locations.map((loc, index) => [
+                locNextId + index,
+                eventId,
+                loc.address,
+                loc.lng,
+                loc.lat,
+                loc.city,
+                loc.state,
+                loc.pin,
+                eventDate
+              ]);
 
               const locSQL = `
-                INSERT INTO event_loc
-                (id, event_id, address, lng, lat, city, postal_code, event_date)
-                VALUES ?
-              `;
+                                INSERT INTO event_loc
+                                (id, event_id, address, lng, lat, city, state, postal_code, event_date)
+                                VALUES ?
+                              `;
 
               db.query(locSQL, [locationValues], err => {
                 if (err) {

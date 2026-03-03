@@ -6,9 +6,9 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import AttendenceModal from './AttendenceModal';
 import { getTeamMembers } from '../../services/auth/authApi';
-import type { Member } from '../Master/member-master/EditMember';
+// import type { Member } from '../Master/member-master/EditMember';
 import { Calendar, BarChart3, Users, Rocket, ChevronRight, Clock, MapPin, Calendar1 } from 'lucide-react';
-import { getActiveEvents, getEventForAttend, getMemberDetailsForDashboard, getUpcomingEvents } from '../../services/dashboard/DashboardApi';
+import { getActiveEvents, getEventForAttend, getUpcomingEvents } from '../../services/dashboard/DashboardApi';//getMemberDetailsForDashboard
 import { getUserFromStorage } from '../../helper/cryptoUser';
 import Loadings from '../../components/Loadings';
 import WeeklyViewUI from './WeeklyViewUI';
@@ -96,7 +96,7 @@ const Dashboard = () => {
   const [showAttend, setShowAttend] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState({})
   const [showAddSteps, setShowAddSteps] = useState(false);
-  const [data, setData] = useState<Member | null>(null);
+  // const [data, setData] = useState<Member | null>(null);
   const [attendEvents, setAttendEvents] = useState<EventForAttend[]>([]);
   const [loading, setLoading] = useState(true);
   const [showUpdate, setShowUpdate] = useState(false);
@@ -144,13 +144,13 @@ const Dashboard = () => {
       const body = {
         userId: id || 0,
         role: user?.role || 'User',
-        isOrganizer: data?.isorganizer || 'N'
+        isOrganizer: user?.isorganizer || 'N'
       };
 
       if (!id) return;
 
-      const memberResponse = await getMemberDetailsForDashboard(id);
-      setData(memberResponse?.member || []);
+      // const memberResponse = await getMemberDetailsForDashboard(id);
+      // setData(memberResponse?.member || []);
 
       const teamsResponse = await getTeamMembers({ userId: id || 0 });
       setTeams(teamsResponse.teams || []);
@@ -273,13 +273,13 @@ const Dashboard = () => {
                 currentWeekStart={currentWeekStart}
                 fetchAllData={fetchAllData}
                 Role={user?.role || 'User'}
-                isOrganizer={data?.isorganizer || 'N'}
+                isOrganizer={user?.isorganizer || 'N'}
               />
             </div>
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 hid">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 " hidden>
             {stats?.map((stat, index) => (
               <div
                 key={index}
@@ -618,9 +618,7 @@ const Dashboard = () => {
                 ))}
               </div>
             </div>
-
           </div>
-
         </div>
       </div >
       {showAttend && (
@@ -628,7 +626,8 @@ const Dashboard = () => {
           show={showAttend}
           setShow={setShowAttend}
           Data={selectedEvent}
-          Member={data}
+          // Member={data}
+          User={user}
           setSelectedEvent={setSelectedEvent}
           fetchAllData={fetchAllData}
         />
@@ -638,7 +637,8 @@ const Dashboard = () => {
           show={showAddSteps}
           setShow={setShowAddSteps}
           Data={selectedEvent}
-          Member={data}
+          // Member={data}
+          User={user}
           setSelectedEvent={setSelectedEvent}
           fetchAllData={fetchAllData}
         />

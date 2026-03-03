@@ -55,7 +55,7 @@ const CollgeAdd = () => {
     navigate("/master/view-colleges")
   };
 
-  const handleAddLocation = (location: { lat: number; lng: number; address: string }) => {
+  const handleAddLocation = (location: { lat: number; lng: number; address: string, city: string, state: string, pin: string }) => {
     const newLocation: SelectedLocation = {
       id: Date.now(),
       ...location

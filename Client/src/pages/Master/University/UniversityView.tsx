@@ -180,8 +180,8 @@ const UniversityView = () => {
                           className="w-20 h-20 object-cover mx-auto rounded"
                         />
                       </td>
-                      <td className="px-4 py-2 text-left">
-                        <div className="max-w-[300px] wrap-break-words whitespace-normal text-sm text-gray-900">
+                      <td className="px-2 py-2 text-left text-sm text-black min-w-[220px] sm:min-w-0">
+                        <div className="text-sm leading-snug wrap-break-words">
                           {item?.name}
                         </div>
                       </td>

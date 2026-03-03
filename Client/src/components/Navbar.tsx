@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import {
-  BarChart3, Bell, BookOpen, CalendarDays, Contact, FileBarChart2, FileText, GraduationCap, HelpCircle, Home, Layers3, LayoutDashboard, LifeBuoy, ListChecks, LogOutIcon, Presentation, School, Settings, University, User, UserCheck, Users, UsersRound, Workflow
-} from "lucide-react";
+  BarChart3, Bell, CalendarDays, FileBarChart2, FileText, GraduationCap, Home, Layers3, LayoutDashboard, ListChecks, LogOutIcon, School, Settings, University, User, UserCheck, Users, UsersRound, Workflow
+} from "lucide-react";//BookOpen, Contact, HelpCircle, LifeBuoy, Presentation
 import { getUserFromStorage } from '../helper/cryptoUser';
 
 interface NavLinkItem {

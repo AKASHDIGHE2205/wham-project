@@ -216,7 +216,7 @@ import { GOOGLE_MAPS_API_KEY } from "../../constant/Baseurl";
 interface Props {
   isShow: boolean;
   setIsShow: (show: boolean) => void;
-  onLocationSelect: (location: { lat: number; lng: number; address: string }) => void;
+  onLocationSelect: (location: { lat: number; lng: number; address: string, city: string, state: string, pin: string }) => void;
 }
 
 const containerStyle = {
@@ -249,11 +249,42 @@ const GoogleLocation: FC<Props> = ({ isShow, setIsShow, onLocationSelect }) => {
     }
   }, []);
 
-  const getAddress = (lat: number, lng: number) => {
+  const getAddress_old = (lat: number, lng: number) => {
     const geocoder = new google.maps.Geocoder();
     geocoder.geocode({ location: { lat, lng } }, (results, status) => {
       if (status === "OK" && results?.[0]) {
         setSelectedAddress(results[0].formatted_address);
+      }
+    });
+  };
+
+  const getAddressDetails = (results: google.maps.GeocoderResult[]) => {
+    const componentForm: Record<string, string> = {};
+
+    if (results?.[0]) {
+      results[0].address_components.forEach(comp => {
+        const type = comp.types[0];
+        componentForm[type] = comp.long_name;
+      });
+    }
+
+    const address = results[0]?.formatted_address || "";
+    const city = componentForm["locality"] || componentForm["administrative_area_level_2"] || "";
+    const state = componentForm["administrative_area_level_1"] || "";
+    const pin = componentForm["postal_code"] || "";
+
+    return { address, city, state, pin };
+  };
+
+  const getAddress = (lat: number, lng: number) => {
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+      if (status === "OK" && results?.[0]) {
+        const { address, city, state, pin } = getAddressDetails(results);
+        setSelectedAddress(address);
+
+        // Optional: you can also save city/pin separately
+        console.log("City:", city, "Pin:", pin, "State:", state);
       }
     });
   };
@@ -266,15 +297,40 @@ const GoogleLocation: FC<Props> = ({ isShow, setIsShow, onLocationSelect }) => {
     setMarker({ lat, lng });
     getAddress(lat, lng);
   };
-  const handleAddLocation = () => {
+
+  const handleAddLocation_old = () => {
     if (marker && selectedAddress) {
       onLocationSelect({
         lat: marker.lat,
         lng: marker.lng,
         address: selectedAddress,
+        city: "",
+        state: "",
+        pin: ""
       });
       setMarker(null);
       setSelectedAddress("");
+    }
+  };
+
+  const handleAddLocation = () => {
+    if (marker && selectedAddress) {
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ location: { lat: marker.lat, lng: marker.lng } }, (results, status) => {
+        if (status === "OK" && results?.[0]) {
+          const { address, city, state, pin } = getAddressDetails(results);
+          onLocationSelect({
+            lat: marker.lat,
+            lng: marker.lng,
+            address,
+            city,
+            state,
+            pin,
+          });
+          setMarker(null);
+          setSelectedAddress("");
+        }
+      });
     }
   };
 
