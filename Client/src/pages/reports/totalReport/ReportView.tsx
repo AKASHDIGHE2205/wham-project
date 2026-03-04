@@ -349,9 +349,9 @@ const ReportView = () => {
                                         </div>
                                         <div className="flex-1 ">
                                           <p className="text-sm text-gray-900">{location?.address}</p>
-                                          <div className="flex items-center gap-2 mt-1 text-xs text-gray-500 " hidden>
-                                            <span>Lat: {location?.lat.toFixed(4)}</span>
-                                            <span>Lng: {location?.lng.toFixed(4)}</span>
+                                          <div className="flex items-center gap-2 mt-1 text-xs text-gray-500 ">
+                                            <span>Lat: {location?.lat}</span>
+                                            <span>Lng: {location?.lng}</span>
                                           </div>
                                         </div>
                                       </div>

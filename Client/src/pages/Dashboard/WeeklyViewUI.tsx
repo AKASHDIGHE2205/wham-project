@@ -42,9 +42,6 @@ const WeeklyViewUI: React.FC<WeeklyViewUIProps> = ({ events, currentWeekStart = 
     setShowAdd(true);
   }
 
-  // Shared grid for header + body
-  const gridCols = "grid grid-cols-7 min-w-[700px] sm:min-w-full";
-
   return (
     <div className="bg-linear-to-b from-white to-blue-50/30 rounded-lg">
 
@@ -52,7 +49,7 @@ const WeeklyViewUI: React.FC<WeeklyViewUIProps> = ({ events, currentWeekStart = 
       <div className="overflow-x-auto scroll-smooth">
 
         {/* ================= HEADER ================= */}
-        <div className={`${gridCols} border-b border-gray-200 bg-white`}>
+        <div className={`grid grid-cols-7 min-w-[700px] sm:min-w-full border-b border-gray-200 bg-white`}>
           {weekDates?.map((date, index) => {
             const isToday = date.isSame(moment(), "day");
             const isPast = date.isBefore(moment(), "day");
@@ -64,9 +61,9 @@ const WeeklyViewUI: React.FC<WeeklyViewUIProps> = ({ events, currentWeekStart = 
                 </div>
 
                 <div
-                  className={`mx-auto mt-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold cursor-pointer
-                  ${isToday ? "bg-orange-500 text-white"
-                      : isPast ? "text-gray-400 cursor-not-allowed" : "text-gray-700 hover:bg-blue-100 cursor-pointer"
+                  className={`mx-auto mt-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold
+                  ${isToday ? "bg-orange-500 text-white cursor-pointer"
+                      : isPast ? "text-gray-400 cursor-not-allowed " : "text-gray-700 hover:bg-blue-100 cursor-pointer"
                     }`}
                   onClick={() => { if (!isPast) handleClickDate(date) }}
                 >
@@ -82,7 +79,7 @@ const WeeklyViewUI: React.FC<WeeklyViewUIProps> = ({ events, currentWeekStart = 
         </div>
 
         {/* ================= EVENTS ================= */}
-        <div className={`${gridCols} gap-2 p-2`}>
+        <div className={`grid grid-cols-7 min-w-[700px] sm:min-w-full gap-2 p-2`}>
           {weekDates?.map((date, index) => {
             const dayEvents = getEventsForDay(date);
 
@@ -135,6 +132,7 @@ const WeeklyViewUI: React.FC<WeeklyViewUIProps> = ({ events, currentWeekStart = 
             );
           })}
         </div>
+
       </div>
       {viewEvent && selectedEvent && (
         <UpdateEvent

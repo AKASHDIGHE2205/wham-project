@@ -280,11 +280,9 @@ const GoogleLocation: FC<Props> = ({ isShow, setIsShow, onLocationSelect }) => {
     const geocoder = new google.maps.Geocoder();
     geocoder.geocode({ location: { lat, lng } }, (results, status) => {
       if (status === "OK" && results?.[0]) {
-        const { address, city, state, pin } = getAddressDetails(results);
+        const { address } = getAddressDetails(results);//, city, state, pin 
         setSelectedAddress(address);
 
-        // Optional: you can also save city/pin separately
-        console.log("City:", city, "Pin:", pin, "State:", state);
       }
     });
   };

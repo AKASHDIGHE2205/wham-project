@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react"
 import GoogleLocation from "../../Calender-new/GoogleLocation";
 import toast from "react-hot-toast";
 import { addUniversity } from "../../../services/master/masterApi";
 import { getUserFromStorage } from "../../../helper/cryptoUser";
 import { useNavigate } from "react-router-dom";
+
 export interface SelectedLocation {
   id: number;
   lat: number;

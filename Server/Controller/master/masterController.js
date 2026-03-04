@@ -1221,7 +1221,6 @@ export const addCollege = async (req, res) => {
     const { name, status, uniId, totalStudents = 0, c_by, locations } = req.body;
     const file = req.file;
     const totalStudentsNum = Number(totalStudents) || 0;
-    console.log("Received college data:", { name, status, uniId, totalStudents, locations });
     if (!name || !status || !uniId || !locations) {
       return res.status(400).json({ message: "Missing required fields" });
     }
