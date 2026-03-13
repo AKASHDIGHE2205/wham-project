@@ -1,9 +1,9 @@
-import React, { useState } from "react"
-import GoogleLocation from "../../Calender-new/GoogleLocation";
+import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { addUniversity } from "../../../services/master/masterApi";
-import { getUserFromStorage } from "../../../helper/cryptoUser";
 import { useNavigate } from "react-router-dom";
+import GoogleLocation from "../../../components/GoogleLocation";
+import { getUserFromStorage } from "../../../helper/cryptoUser";
+import { addUniversity } from "../../../services/master/masterApi";
 
 export interface SelectedLocation {
   id: number;
@@ -104,9 +104,9 @@ const UniversityAdd = () => {
   return (
     <>
       <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 border border-orange-300 m-1 rounded-md p-2 sm:p-6">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-2xl mx-auto">
           {/* Header */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 transform hover:shadow-md transition-all duration-300">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 mb-6 transform hover:shadow-md transition-all duration-300">
             <div className="flex items-center space-x-4">
               <div className="bg-linear-to-r from-orange-500 to-purple-600 p-3 rounded-xl">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

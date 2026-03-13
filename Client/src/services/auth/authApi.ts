@@ -3,20 +3,12 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { BASE_URL } from "../../constant/Baseurl";
 
-interface registerData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  phone: string;
-}
-
 interface loginData {
   email: string;
   password: string;
 }
 
-export const registerApi = async (data: registerData) => {
+export const registerApi = async (data: any) => {
   try {
     const response = await axios.post(`${BASE_URL}/auth/register`, data);
     if (response.status === 201) {

@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, type FC } from "react";
-import { addAttendence } from "../../services/dashboard/DashboardApi";
-import { GOOGLE_MAPS_API_KEY } from "../../constant/Baseurl";
-import toast from "react-hot-toast";
 import type React from "react";
+import { useState, type FC } from "react";
+import toast from "react-hot-toast";
+import { GOOGLE_MAPS_API_KEY } from "../../constant/Baseurl";
+import { addAttendence } from "../../services/dashboard/DashboardApi";
 
 export interface Props {
   show: boolean;
   setShow: (show: boolean) => void;
   Data: any;
-  // Member: any;
+  Member?: any;
   setSelectedEvent: (event: any) => void;
   fetchAllData: () => void;
   User?: any;
@@ -329,7 +329,7 @@ const AttendenceModal: FC<Props> = ({ show, setShow, Data, User, setSelectedEven
                   type="file"
                   name="media"
                   accept="image/*"
-                  capture="environment"
+                  // capture="environment"
                   onChange={handleFileChange}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   required

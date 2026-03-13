@@ -1,7 +1,8 @@
-import { Link } from "react-router-dom";
 import { ShieldX } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const AccessDenied = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
@@ -23,9 +24,12 @@ const AccessDenied = () => {
         </p>
 
         <div className="flex gap-3 justify-center">
-          <Link to="/" className="inline-block px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
-            Return to Home
-          </Link>
+          <button
+            onClick={() => navigate(-1)}
+            className="inline-block px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors cursor-pointer"
+          >
+            Go Back
+          </button>
         </div>
 
       </div>

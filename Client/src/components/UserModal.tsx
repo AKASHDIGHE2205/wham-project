@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Search } from "lucide-react";
 import { useEffect, useState, type FC } from "react";
-import { getUsers } from "../../../services/master/masterApi";
 import { useDispatch } from "react-redux";
-import { handleSelectUser } from "../../../feature/masterSlice";
+import { handleSelectUser } from "../feature/masterSlice";
+import { getUsers } from "../services/master/masterApi";
 
 interface Props {
   show: boolean;

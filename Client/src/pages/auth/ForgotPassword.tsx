@@ -190,11 +190,11 @@ const ForgotPassword: React.FC = () => {
               </div>
             </div>
 
-            <h1 className="text-4xl font-bold mb-6 text-white">
+            <h1 className="text-3xl font-bold mb-6 text-white">
               Reset Your <span className="text-orange-400">Password</span>
             </h1>
 
-            <p className="text-lg text-gray-300 mb-8 leading-relaxed">
+            <p className="text-md text-gray-300 mb-8 leading-relaxed">
               Secure password reset process with OTP verification to protect your account.
             </p>
 
@@ -220,12 +220,12 @@ const ForgotPassword: React.FC = () => {
         <div className="w-full max-w-md">
           <div className="bg-white rounded-2xl shadow-xl p-6 lg:p-8 border border-gray-100">
 
-            <div className="mb-6">
+            <div className="mb-6 hidden">
               <Link
                 to="/auth/login"
-                className="inline-flex items-center text-sm text-black hover:text-orange-600 hover:underline transition-colors duration-200"
+                className="flex items-center text-sm text-black hover:text-orange-600 hover:underline transition-colors duration-200"
               >
-                <ArrowLeft className="w-4 h-4 mr-2 " />
+                <ArrowLeft className="w-4 h-4" />
                 Back to Sign In
               </Link>
             </div>
@@ -234,7 +234,7 @@ const ForgotPassword: React.FC = () => {
               <div className="w-16 h-16 bg-linear-to-br from-orange-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <Key className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-orange-600 mb-2">
+              <h2 className="text-xl font-bold text-orange-600 mb-2">
                 Reset Your Password
               </h2>
               <p className="text-gray-600">
@@ -269,7 +269,7 @@ const ForgotPassword: React.FC = () => {
               {step === 1 && (
                 <div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Mobile Number</label>
+                    <label className="text-xs font-medium text-gray-700">Mobile Number</label>
 
                     <div className="flex space-x-2">
                       <div className="relative group flex-1">
@@ -282,7 +282,7 @@ const ForgotPassword: React.FC = () => {
                           maxLength={10}
                           minLength={10}
                           required
-                          className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
+                          className="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
                           placeholder="Enter your mobile number"
                         />
                       </div>
@@ -290,7 +290,7 @@ const ForgotPassword: React.FC = () => {
                         type="button"
                         onClick={handleSendOtp}
                         disabled={loading.sendOtp}
-                        className="px-4 py-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors duration-200 whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-w-[90px]"
+                        className="px-4 py-2 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors duration-200 whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-w-[90px]"
                       >
                         {loading.sendOtp ? (
                           'Sending OTP'
@@ -308,13 +308,13 @@ const ForgotPassword: React.FC = () => {
               {step === 2 && (
                 <div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">OTP Verification</label>
+                    <label className="text-xs font-medium text-gray-700">OTP Verification</label>
                     <div className="flex space-x-2">
                       <div className="relative group flex-1">
                         <input
                           type="number"
                           onChange={(e: any) => setOtp(e.target.value)}
-                          className="block w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
+                          className="block w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
                           placeholder="Enter OTP"
                         />
                       </div>
@@ -322,7 +322,7 @@ const ForgotPassword: React.FC = () => {
                         type="button"
                         onClick={handleVerifyOtp}
                         disabled={loading.verifyOtp}
-                        className="px-4 py-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors duration-200 whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-w-[100px]"
+                        className="px-4 py-2 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors duration-200 whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-w-[100px]"
                       >
                         {loading.verifyOtp ? (
                           <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -334,12 +334,12 @@ const ForgotPassword: React.FC = () => {
 
                     {/* Timer and Resend OTP */}
                     <div className="flex justify-between items-center mt-2">
-                      <span className="text-sm text-gray-500">
+                      <span className="text-xs text-gray-500">
                         OTP sent to your mobile number {maskedMobile}
                       </span>
                       <div className="flex items-center space-x-2">
                         {isTimerRunning ? (
-                          <span className={`text-sm font-medium ${timeLeft < 60 ? 'text-red-600' : 'text-orange-600'}`}>
+                          <span className={`text-xs font-medium ${timeLeft < 60 ? 'text-red-600' : 'text-orange-600'}`}>
                             {formatTime(timeLeft)}
                           </span>
                         ) : (
@@ -347,7 +347,7 @@ const ForgotPassword: React.FC = () => {
                             type="button"
                             onClick={handleResendOtp}
                             disabled={loading.resendOtp || (isTimerRunning && timeLeft > 0)}
-                            className="text-sm text-orange-600 hover:text-orange-700 font-medium underline disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                            className="text-xs text-orange-600 hover:text-orange-700 font-medium underline disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                           >
                             {loading.resendOtp ? (
                               <>
@@ -370,7 +370,7 @@ const ForgotPassword: React.FC = () => {
                 <>
                   <div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Password <span className='text-red-600'>*</span></label>
+                      <label className="text-xs font-medium text-gray-700">Password <span className='text-red-600'>*</span></label>
                       <div className="relative group">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                           <Lock className="h-5 w-5 text-gray-400" />
@@ -380,7 +380,7 @@ const ForgotPassword: React.FC = () => {
                           name='password'
                           onChange={(e: any) => setPassword(e.target.value)}
                           required
-                          className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
+                          className="block w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
                           placeholder="Enter your password"
                         />
                         <button
@@ -396,7 +396,7 @@ const ForgotPassword: React.FC = () => {
 
                   <div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Confirm New Password</label>
+                      <label className="text-xs font-medium text-gray-700">Confirm New Password</label>
                       <div className="relative group">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                           <Lock className="h-5 w-5 text-gray-400" />
@@ -404,7 +404,7 @@ const ForgotPassword: React.FC = () => {
                         <input
                           type="password"
                           onChange={(e: any) => setCPassword(e.target.value)}
-                          className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
+                          className="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
                           placeholder="Confirm new password"
                         />
                       </div>
@@ -417,7 +417,7 @@ const ForgotPassword: React.FC = () => {
                       type="button"
                       onClick={handleResetPassword}
                       disabled={loading.resetPassword}
-                      className="w-full bg-linear-to-r from-orange-500 to-purple-600 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center hover:shadow-lg transition-shadow duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
+                      className="w-full bg-linear-to-r from-orange-500 to-purple-600 text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center hover:shadow-lg transition-shadow duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                       {loading.resetPassword ? (
                         <>

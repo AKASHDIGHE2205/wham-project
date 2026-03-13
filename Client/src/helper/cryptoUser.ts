@@ -40,7 +40,6 @@ export const getUserFromStorage = (): User | null | any => {
   return null;
 };
 export const getTokenFromStorage = (): string | null => {
-  const encryptedData = Cookies.get("user");
-  const decryptedData = decryptUser<any>(encryptedData);
-  return decryptedData?.token || null;
+  const token = Cookies.get("token");
+  return token || null;
 };

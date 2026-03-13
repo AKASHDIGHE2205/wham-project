@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, type FC } from "react";
-import { getActiveSteps } from "../../../services/dashboard/DashboardApi";
 import { useDispatch } from "react-redux";
-import { handleSelectStep } from "../../../feature/masterSlice";
+import { handleSelectStep } from "../feature/masterSlice";
+import { getActiveSteps } from "../services/dashboard/DashboardApi";
 
 interface Props {
   show: boolean;
@@ -86,13 +86,13 @@ const StepModal: FC<Props> = ({ show, setShow }) => {
           <table className="w-full divide-y divide-gray-200">
             <thead className="bg-linear-to-r from-purple-50 to-orange-50">
               <tr>
-                <th className="px-3 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                <th className="px-3 py-2 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   ID
                 </th>
-                <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Name
                 </th>
-                <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Action
                 </th>
               </tr>
@@ -110,9 +110,9 @@ const StepModal: FC<Props> = ({ show, setShow }) => {
               ) : filteredData.length > 0 ? (
                 filteredData.map((step: Steps) => (
                   <tr key={step.id} className="hover:bg-gray-50 transition-colors duration-150">
-                    <td className="px-3 py-3 text-center text-sm text-gray-900">{step.id}</td>
-                    <td className="px-3 py-3 text-left text-sm text-gray-900">{step.step_name}</td>
-                    <td className="px-3 py-3 text-left">
+                    <td className="px-3 py-1 text-center text-sm text-gray-900">{step.id}</td>
+                    <td className="px-3 py-1 text-left text-sm text-gray-900">{step.step_name}</td>
+                    <td className="px-3 py-1 text-left">
                       <button
                         type="button"
                         className="inline-flex items-center px-3 py-1.5 text-xs sm:text-sm font-medium text-orange-600 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-all duration-200 cursor-pointer"
@@ -126,7 +126,7 @@ const StepModal: FC<Props> = ({ show, setShow }) => {
               ) : (
                 <tr>
                   <td colSpan={3} className="text-center py-6 text-orange-600 text-sm sm:text-base">
-                    No Records Found
+                    No active stpe Found.
                   </td>
                 </tr>
               )}

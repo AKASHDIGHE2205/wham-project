@@ -1,46 +1,72 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import { Calendar, Clock } from "lucide-react";
 import moment from "moment";
-import type { UpcomingEvent } from "./Dashboard";
-import UpdateEvent from "../Calender-new/UpdateEvent";
-import NewEventModal from "../Calender-new/NewEventModal";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import type { Activities } from "../Calender-new/Calender";
 
 interface WeeklyViewUIProps {
-  events?: UpcomingEvent[];
+  events?: Activities[];
   currentWeekStart: moment.Moment;
-  fetchAllData: () => void;
-  Role?: any;
-  isOrganizer: "Y" | "N";
 }
-
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-const WeeklyViewUI: React.FC<WeeklyViewUIProps> = ({ events, currentWeekStart = moment().startOf("week"), fetchAllData, Role, isOrganizer
-}) => {
-  const [viewEvent, showViewEvent] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<UpcomingEvent | null>(null);
-  const [showAdd, setShowAdd] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-
+const WeeklyViewUI: React.FC<WeeklyViewUIProps> = ({ events, currentWeekStart = moment().startOf("week") }) => {
+  const navigate = useNavigate();
   // Generate week dates
   const weekDates = Array.from({ length: 7 }, (_, i) =>
     moment(currentWeekStart).add(i, "days")
   );
-
   // Get events for a day
   const getEventsForDay = (date: moment.Moment) =>
-    events?.filter((event) => date.isSame(moment(event?.from_date), "day")
+    events?.filter((event) => date.isSame(moment(event?.start_date), "day")
     );
 
-  const handleEventClick = (event: UpcomingEvent) => {
-    setSelectedEvent(event);
-    showViewEvent(true);
-  };
-
-  const handleClickDate = (date: moment.Moment) => {
-    setSelectedDate(date.toDate());
-    setShowAdd(true);
+  const handleDateClick = (date: moment.Moment) => {
+    // Format date as DD-MM-YYYY
+    const formattedDate = date.format('DD-MM-YYYY');
+    navigate(`/add-activity?date=${formattedDate}`);
   }
+
+  const getActivityStyles = (status: string) => {
+    switch (status) {
+      case 'A':
+        return {
+          bg: 'bg-green-100',
+          border: 'border-green-500',
+          hover: 'hover:bg-green-200',
+          text: 'text-green-800'
+        };
+      case 'P':
+        return {
+          bg: 'bg-yellow-100',
+          border: 'border-yellow-500',
+          hover: 'hover:bg-yellow-200',
+          text: 'text-yellow-800'
+        };
+      case 'R':
+        return {
+          bg: 'bg-red-100',
+          border: 'border-red-500',
+          hover: 'hover:bg-red-200',
+          text: 'text-red-800'
+        };
+      case 'C':
+        return {
+          bg: 'bg-blue-100',
+          border: 'border-blue-500',
+          hover: 'hover:bg-blue-200',
+          text: 'text-blue-800'
+        };
+      default:
+        return {
+          bg: 'bg-gray-100',
+          border: 'border-gray-500',
+          hover: 'hover:bg-gray-200',
+          text: 'text-gray-800'
+        };
+    }
+  };
 
   return (
     <div className="bg-linear-to-b from-white to-blue-50/30 rounded-lg">
@@ -62,10 +88,14 @@ const WeeklyViewUI: React.FC<WeeklyViewUIProps> = ({ events, currentWeekStart = 
 
                 <div
                   className={`mx-auto mt-1 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold
-                  ${isToday ? "bg-orange-500 text-white cursor-pointer"
-                      : isPast ? "text-gray-400 cursor-not-allowed " : "text-gray-700 hover:bg-blue-100 cursor-pointer"
+                            ${isToday ? "bg-orange-500 text-white cursor-pointer"
+                      : isPast ? "text-gray-400 cursor-not-allowed" : "text-gray-700 hover:bg-blue-100 cursor-pointer"
                     }`}
-                  onClick={() => { if (!isPast) handleClickDate(date) }}
+                  onClick={() => {
+                    if (!isPast) {
+                      handleDateClick(date);
+                    }
+                  }}
                 >
                   {date.date()}
                 </div>
@@ -86,7 +116,12 @@ const WeeklyViewUI: React.FC<WeeklyViewUIProps> = ({ events, currentWeekStart = 
             return (
               <div
                 key={index}
-                className="bg-white border border-gray-200 rounded p-2 min-h-[90px]"
+                className="bg-white border border-gray-200 rounded p-2 min-h-[90px] cursor-pointer hover:bg-blue-50/50 transition-colors"
+                onClick={() => {
+                  if (!date.isBefore(moment(), "day")) {
+                    handleDateClick(date);
+                  }
+                }}
               >
                 {dayEvents?.length ? (
                   <>
@@ -96,25 +131,37 @@ const WeeklyViewUI: React.FC<WeeklyViewUIProps> = ({ events, currentWeekStart = 
                     </div>
 
                     <div className="space-y-1">
-                      {dayEvents?.slice(0, 3).map((event, i) => (
-                        <div
-                          key={i}
-                          className="text-xs p-1 rounded bg-green-100 border border-green-300 truncate cursor-pointer hover:bg-green-200"
-                          onClick={() => handleEventClick(event)}
-                          title={event?.title}
-                        >
-                          <div className="truncate">{event?.title}</div>
-                          <div className="text-[10px] flex flex-col justify-between">
-                            <div>
-                              {moment(event?.from_date).format('DD/MMM')}
-                              {event?.from_date !== event?.to_date && `- ${moment(event?.to_date).format('DD/MMM')}`}
-                            </div>
-                            <div>
-                              {moment(event?.from_date).format("HH:mm")} - {moment(event?.to_date).format("HH:mm")}
+                      {dayEvents?.slice(0, 3).map((event, i) => {
+                        const styles = getActivityStyles(event?.status);
+
+                        return (
+                          <div
+                            key={i}
+                            className={`text-xs p-1 rounded border truncate ${styles.bg} ${styles.border} ${styles.hover} ${styles.text}`}
+                            title={event?.title}
+                            onClick={(e) => e.stopPropagation()} // Prevent event bubbling when clicking on an event
+                          >
+                            <div className="truncate">#{event?.title}</div>
+                            <div className="text-[10px] flex flex-col justify-between">
+                              <div className="flex justify-start items-center">
+                                <Calendar size={10} />
+                                <span>
+                                  {moment(event?.start_date).format("DD/MMM")}
+                                  {event?.start_date !== event?.end_date && ` - ${moment(event?.end_date).format("DD/MMM")}`}
+                                </span>
+                              </div>
+
+                              <div className="flex justify-start items-center">
+                                <Clock size={10}/>
+                                <span>
+                                  {moment(event?.start_date).format("HH:mm")} -{" "}
+                                  {moment(event?.end_date).format("HH:mm")}
+                                </span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
 
                     {dayEvents?.length > 3 && (
@@ -134,23 +181,6 @@ const WeeklyViewUI: React.FC<WeeklyViewUIProps> = ({ events, currentWeekStart = 
         </div>
 
       </div>
-      {viewEvent && selectedEvent && (
-        <UpdateEvent
-          isShow={viewEvent}
-          setIsShow={showViewEvent}
-          fetchData={fetchAllData}
-          Event={selectedEvent}
-          Role={Role}
-          isorganizer={isOrganizer}
-        />)}
-      {showAdd && (
-        <NewEventModal
-          isShow={showAdd}
-          setIsShow={setShowAdd}
-          selectedDate={selectedDate}
-          fetchData={fetchAllData}
-          isorganizer={isOrganizer}
-        />)}
     </div>
   );
 };

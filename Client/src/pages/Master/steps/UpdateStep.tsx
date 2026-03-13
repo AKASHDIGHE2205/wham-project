@@ -1,16 +1,17 @@
 import { useState, type FC } from "react";
-import type { Steps } from "./StepView";
 import toast from "react-hot-toast";
 import { updateStep } from "../../../services/master/masterApi";
+import type { Steps } from "./StepView";
 
 interface UpdateStepProps {
   show: boolean;
   setShow: (show: boolean) => void;
   stepData: Steps | null;
   fetchData: () => void;
+  isEdit : boolean;
 }
 
-const UpdateStep: FC<UpdateStepProps> = ({ show, setShow, stepData, fetchData }) => {
+const UpdateStep: FC<UpdateStepProps> = ({ show, setShow, stepData, fetchData, isEdit }) => {
   const [inputs, setInputs] = useState({
     id: stepData?.id || 0,
     stepName: stepData?.step_name || '',
@@ -36,6 +37,7 @@ const UpdateStep: FC<UpdateStepProps> = ({ show, setShow, stepData, fetchData })
     // Handle form submission logic here
     if (!inputs.stepName || !inputs.status) {
       toast.error("Please fill in all required fields");
+      setLoading(false);
       return;
     }
     const body = {
@@ -54,7 +56,7 @@ const UpdateStep: FC<UpdateStepProps> = ({ show, setShow, stepData, fetchData })
   return (
     <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
       <div
-        className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
+        className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
@@ -66,7 +68,7 @@ const UpdateStep: FC<UpdateStepProps> = ({ show, setShow, stepData, fetchData })
               </svg>
             </div>
             <h3 className="text-xl font-bold text-gray-900">
-              Update Step
+              {isEdit ? 'Update Step':'View Step'}
             </h3>
           </div>
           <button
@@ -97,10 +99,11 @@ const UpdateStep: FC<UpdateStepProps> = ({ show, setShow, stepData, fetchData })
                 type="text"
                 name="stepName"
                 placeholder="Enter step name"
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
                 required
                 value={inputs.stepName}
                 onChange={handleInputChange}
+                disabled={!isEdit}
               />
             </div>
           </div>
@@ -118,10 +121,11 @@ const UpdateStep: FC<UpdateStepProps> = ({ show, setShow, stepData, fetchData })
               </div>
               <select
                 name="status"
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer disabled:cursor-not-allowed"
                 required
                 value={inputs.status}
                 onChange={handleInputChange}
+                disabled={!isEdit}
               >
                 <option value="">Select status</option>
                 <option value="A">Active</option>
@@ -150,9 +154,10 @@ const UpdateStep: FC<UpdateStepProps> = ({ show, setShow, stepData, fetchData })
                 rows={3}
                 name="description"
                 placeholder="Enter step description, goals, or notes..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none resize-none transition-all duration-200"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none resize-none transition-all duration-200 disabled:cursor-not-allowed"
                 value={inputs.description}
                 onChange={handleInputChange}
+                disabled={!isEdit}
               />
             </div>
           </div>
@@ -166,6 +171,7 @@ const UpdateStep: FC<UpdateStepProps> = ({ show, setShow, stepData, fetchData })
             >
               Cancel
             </button>
+            {isEdit &&(
             <button
               type="submit"
               disabled={loading}
@@ -173,6 +179,7 @@ const UpdateStep: FC<UpdateStepProps> = ({ show, setShow, stepData, fetchData })
             >
               {loading ? 'Updatting' : 'Update'}
             </button>
+            )}
           </div>
         </form>
       </div >

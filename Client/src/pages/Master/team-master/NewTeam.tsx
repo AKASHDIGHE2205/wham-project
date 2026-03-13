@@ -1,10 +1,10 @@
 import { useState, type FC } from "react";
-import MembersModal from "./MembersModal";
-import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../../store/store";
 import toast from "react-hot-toast";
-import { newTeam } from "../../../services/master/masterApi";
+import { useDispatch, useSelector } from "react-redux";
+import MembersModal from "../../../components/MembersModal";
 import { handleSelectMember } from "../../../feature/masterSlice";
+import { newTeam } from "../../../services/master/masterApi";
+import type { RootState } from "../../../store/store";
 
 interface Props {
   show: boolean;
@@ -45,6 +45,7 @@ const NewTeam: FC<Props> = ({ show, setShow, fetchData }) => {
     setLoading(true)
     if (!inputs.name || !inputs.description || !inputs.status || !mem_id) {
       toast.error('Please fill all required fields.!')
+      setLoading(false);
       return;
     }
 
@@ -67,7 +68,7 @@ const NewTeam: FC<Props> = ({ show, setShow, fetchData }) => {
     <>
       <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
         <div
-          className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
+          className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Modal Header */}

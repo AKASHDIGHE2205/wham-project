@@ -1,16 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Plus, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import NewTeam from './NewTeam';
-import { getAllTeams } from '../../../services/master/masterApi';
-import CustomPagination from '../../../helper/CustomPagination';
-import EditTeam from './EditTeam';
 import DataLoading from '../../../components/DataLoading';
+import CustomPagination from '../../../helper/CustomPagination';
+import { getAllTeams, updateTeam } from '../../../services/master/masterApi';
+import EditTeam from './EditTeam';
+import NewTeam from './NewTeam';
 
 interface Teams {
   id: number;
   name: string;
   manager_name: string;
+  manager_id: number;
   description: string;
   status: string;
 }
@@ -18,6 +19,7 @@ interface Teams {
 const TeamView = () => {
   const [showCreate, setShowCreat] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const [showView, setShowView] = useState(false);
   const [data, setData] = useState<Teams[]>([]);
   const [totalItems, setTotalItems] = useState(0);
   const [search, setSearch] = useState("");
@@ -64,11 +66,29 @@ const TeamView = () => {
     setSelectedTeam(data);
     setShowEdit(true);
   }
+  const handleView = (data : Teams)=> {
+    setSelectedTeam(data);
+    setShowView(true);
+  }
+
+  const handleDeactivate = async (data: Teams) => {
+    const body = {
+      id: data?.id,
+      name: data?.name,
+      managerId: data?.manager_id,
+      description: data?.description,
+      status: data?.status === "A" ? "I" : "A"
+    }
+    const response = await updateTeam(body);
+    if (response) {
+      fetchData();
+    }
+  }
 
   return (
     <>
-      <div className="min-h-screen bg-white p-2 sm:p-6 border border-orange-300 m-1 rounded-md">
-        <div className="max-w-7xl mx-auto">
+      <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 p-2 sm:p-6 border border-orange-300 m-1 rounded-md">
+        <div className="max-w-5xl mx-auto">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
             <div>
@@ -157,7 +177,7 @@ const TeamView = () => {
                     <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-2 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Action
                     </th>
                   </tr>
@@ -186,13 +206,29 @@ const TeamView = () => {
                             {item?.status === "A" ? "Active" : "In-active"}
                           </span>
                         </td>
-                        <td className=" text-left px-3 py-2 whitespace-nowrap">
-                          <button
-                            className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-orange-600 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-all duration-200 cursor-pointer"
-                            onClick={() => handleEdit(item)}
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-square-pen-icon lucide-square-pen"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" /></svg>
-                          </button>
+                        <td className="px-3 py-2 text-left whitespace-nowrap">
+                          <div className="flex justify-center items-center gap-1">
+                            <button
+                              type="button"
+                              className="inline-flex items-center p-1.5 text-sm font-medium text-gray-900 bg-green-50 rounded-lg hover:bg-green-200 transition-all duration-200 cursor-pointer"
+                              onClick={() => handleView(item)}
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" color="green" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye-icon lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" /><circle cx="12" cy="12" r="3" /></svg>
+                            </button>
+                            <button
+                              onClick={() => handleEdit(item)}
+                              className="inline-flex items-center p-1.5 text-sm font-medium text-gray-900 bg-blue-50 rounded-lg hover:bg-blue-200 transition-all duration-200 cursor-pointer"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" color="#0047B3" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-pencil-line-icon lucide-pencil-line"><path d="M13 21h8" /><path d="m15 5 4 4" /><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /></svg>
+                            </button>
+                            <button
+                              type="button"
+                              className="inline-flex items-center p-1.5 text-sm font-medium text-gray-900 bg-red-50 rounded-lg hover:bg-red-200 transition-all duration-200 cursor-pointer"
+                              onClick={() => handleDeactivate(item)}
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" color="red" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-ban-icon lucide-ban"><circle cx="12" cy="12" r="10" /><path d="M4.929 4.929 19.07 19.071" /></svg>
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -233,6 +269,16 @@ const TeamView = () => {
           setShow={setShowEdit}
           data={selectedTeam}
           fetchData={fetchData}
+          isEdit={true}
+        />
+      )}
+      {showView && (
+        <EditTeam
+          show={showView}
+          setShow={setShowView}
+          data={selectedTeam}
+          fetchData={fetchData}
+          isEdit={false}
         />
       )}
     </>

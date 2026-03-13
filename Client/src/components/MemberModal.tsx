@@ -1,17 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, type FC } from "react";
-import { getAllMembers, getActiveTeams } from "../../services/calender/calenderApi";
 import toast from "react-hot-toast";
-import type { Team } from "./NewEventModal";
-
-interface Props {
-  show: boolean;
-  setShow: (show: boolean) => void;
-  setSelectedMembers: any;
-  setSelectedTeams: any;
-  selectedMembers: any[];
-  selectedTeams: any[];
-}
+import { getActiveTeams, getAllMembers } from "../services/calender/calenderApi";
 
 interface Member {
   mem_id: number;
@@ -31,34 +21,46 @@ interface SelectedItem {
   last_name?: string;
 }
 
-const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelectedTeams, selectedMembers, selectedTeams }) => {
+interface Props {
+  show: boolean;
+  setShow: (show: boolean) => void;
+  selectedMembers: any[];
+  selectedTeams: any[];
+  onConfirm: (members: any[], teams: any[]) => void;
+}
+
+const MemberModal: FC<Props> = ({ 
+  show, 
+  setShow, 
+  selectedMembers = [], 
+  selectedTeams = [], 
+  onConfirm 
+}) => {
   const [members, setMembers] = useState<Member[]>([]);
   const [search, setSearch] = useState("");
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
-  const [teams, setTeams] = useState<Team[]>([]);
+  const [teams, setTeams] = useState([]);
   const [loadingMembers, setLoadingMembers] = useState(true);
   const [loadingTeams, setLoadingTeams] = useState(true);
-
   const [activeTab, setActiveTab] = useState<'teams' | 'members'>('teams');
 
   useEffect(() => {
     if (!show) return;
 
     const fetchMembers = async () => {
-      setLoadingMembers(true)
+      setLoadingMembers(true);
       try {
         const response = await getAllMembers();
         setMembers(response.Members || []);
       } catch {
         toast.error("Failed to load members");
-      }
-      finally {
-        setLoadingMembers(false)
+      } finally {
+        setLoadingMembers(false);
       }
     };
 
     const fetchTeams = async () => {
-      setLoadingTeams(true)
+      setLoadingTeams(true);
       try {
         const response = await getActiveTeams();
         setTeams(response.Teams || []);
@@ -66,7 +68,7 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
         console.error('Error fetching teams:', error);
         toast.error('Failed to load teams');
       } finally {
-        setLoadingTeams(false)
+        setLoadingTeams(false);
       }
     };
 
@@ -80,7 +82,7 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
       const memberItems: SelectedItem[] = selectedMembers?.map(member => ({
         id: member.id,
         type: 'member',
-        name: `${member.first_name} ${member.middle_name ? member.middle_name + ' ' : ''}${member.last_name}`.trim(),
+        name: `${member.first_name} ${member.middle_name ? member.middle_name + ' ' : ''}${member.last_name || ''}`.trim(),
         first_name: member.first_name,
         middle_name: member.middle_name,
         last_name: member.last_name
@@ -120,20 +122,24 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
 
   const handleConfirm = () => {
     // Separate members and teams from selected items
-    const selectedMembersData = selectedItems?.filter(item => item?.type === 'member')?.map(item => ({
-      id: item?.id,
-      first_name: item?.first_name || '',
-      middle_name: item?.middle_name || '',
-      last_name: item?.last_name || ''
-    }));
+    const selectedMembersData = selectedItems
+      ?.filter(item => item?.type === 'member')
+      ?.map(item => ({
+        id: item?.id,
+        first_name: item?.first_name || '',
+        middle_name: item?.middle_name || '',
+        last_name: item?.last_name || ''
+      }));
 
-    const selectedTeamsData = selectedItems?.filter(item => item?.type === 'team')?.map(item => ({
-      id: item?.id,
-      name: item?.name
-    }));
+    const selectedTeamsData = selectedItems
+      ?.filter(item => item?.type === 'team')
+      ?.map(item => ({
+        id: item?.id,
+        name: item?.name
+      }));
 
-    setSelectedMembers(selectedMembersData);
-    setSelectedTeams(selectedTeamsData);
+    // Call the onConfirm callback with the selected data
+    onConfirm(selectedMembersData, selectedTeamsData);
 
     const membersCount = selectedMembersData.length;
     const teamsCount = selectedTeamsData.length;
@@ -142,20 +148,24 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
     handleClose();
   };
 
-  const filteredMembers =
-    members.filter((m) => `${m.mem_id} ${m.first_name} ${m.middle_name} ${m.last_name}`.toLowerCase().includes(search.toLowerCase()));
+  const filteredMembers = members.filter((m) => 
+    `${m.mem_id} ${m.first_name} ${m.middle_name} ${m.last_name}`
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
 
-  const filteredTeams =
-    teams.filter((team) => `${team.id} ${team.name}`.toLowerCase().includes(search.toLowerCase()));
+  const filteredTeams = teams.filter((team:any) => 
+    `${team.id} ${team.name}`.toLowerCase().includes(search.toLowerCase())
+  );
 
   const getFullName = (member: Member) => {
-    return `${member.first_name} ${member.middle_name ? member.middle_name + ' ' : ''}${member.last_name}`.trim();
+    return `${member.first_name} ${member.middle_name ? member.middle_name + ' ' : ''}${member.last_name || ''}`.trim();
   };
 
   return (
     <div className="fixed inset-0 bg-orange-100/10 backdrop-blur-xs flex items-center justify-center p-4 z-50">
       <div
-        className="bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col border border-gray-100"
+        className="bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col border border-gray-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -207,10 +217,11 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
               {selectedItems?.map((item, index: number) => (
                 <div
                   key={index}
-                  className={`border rounded-full px-3 py-2 shadow-sm flex items-center gap-2 group hover:shadow-md transition-all duration-200 ${item?.type === 'team'
-                    ? 'bg-blue-100 border-blue-200 text-blue-800'
-                    : 'bg-orange-100 border-orange-200 text-orange-800'
-                    }`}
+                  className={`border rounded-full px-3 py-2 shadow-sm flex items-center gap-2 group hover:shadow-md transition-all duration-200 ${
+                    item?.type === 'team'
+                      ? 'bg-blue-100 border-blue-200 text-blue-800'
+                      : 'bg-orange-100 border-orange-200 text-orange-800'
+                  }`}
                 >
                   <span className="text-sm font-medium">
                     {item?.type === 'team' ? '👥' : '👤'} {item?.name}
@@ -220,21 +231,16 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
                       e.stopPropagation();
                       toggleSelection(item);
                     }}
-                    className={`p-0.5 rounded-full transition-colors ${item?.type === 'team'
-                      ? 'text-blue-600 hover:text-blue-800 hover:bg-blue-200'
-                      : 'text-orange-600 hover:text-orange-800 hover:bg-orange-200'
-                      }`}
+                    className={`p-0.5 rounded-full transition-colors ${
+                      item?.type === 'team'
+                        ? 'text-blue-600 hover:text-blue-800 hover:bg-blue-200'
+                        : 'text-orange-600 hover:text-orange-800 hover:bg-orange-200'
+                    }`}
                   >
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
-
                 </div>
               ))}
             </div>
@@ -248,19 +254,21 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
             <div className="flex space-x-1">
               <button
                 onClick={() => setActiveTab('teams')}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer ${activeTab === 'teams'
-                  ? 'bg-blue-500 text-white shadow-sm'
-                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-                  }`}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer ${
+                  activeTab === 'teams'
+                    ? 'bg-blue-500 text-white shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                }`}
               >
                 Teams ({filteredTeams?.length})
               </button>
               <button
                 onClick={() => setActiveTab('members')}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer ${activeTab === 'members'
-                  ? 'bg-orange-500 text-white shadow-sm'
-                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-                  }`}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer ${
+                  activeTab === 'members'
+                    ? 'bg-orange-500 text-white shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                }`}
               >
                 Members ({filteredMembers?.length})
               </button>
@@ -322,13 +330,14 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
                         </tr>
                       ) : (
                         <>
-                          {filteredTeams?.map((item) => (
+                          {filteredTeams?.map((item:any) => (
                             <tr
                               key={`team-${item?.id}`}
-                              className={`hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${isSelected(item?.id, 'team')
-                                ? "bg-blue-50 border-l-4 border-l-blue-500"
-                                : ""
-                                }`}
+                              className={`hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${
+                                isSelected(item?.id, 'team')
+                                  ? "bg-blue-50 border-l-4 border-l-blue-500" 
+                                  : ""
+                              }`}
                               onClick={() =>
                                 toggleSelection({
                                   id: item?.id,
@@ -352,24 +361,17 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
                                   className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 transition-colors duration-200"
                                 />
                               </td>
-
                               <td className="px-4 py-2 text-sm text-gray-900">
                                 {item?.id}
                               </td>
-
                               <td className="px-4 py-2">
-                                <div className="flex items-center space-x-3">
-                                  <span className="text-sm font-medium text-gray-900">
-                                    {item?.name}
-                                  </span>
-                                </div>
+                                {item?.name}
                               </td>
                             </tr>
                           ))}
                         </>
                       )}
                     </tbody>
-
                   </table>
                 </div>
               ) : (
@@ -424,10 +426,11 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
                           {filteredMembers?.map((item) => (
                             <tr
                               key={`member-${item?.mem_id}`}
-                              className={`hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${isSelected(item?.mem_id, 'member')
-                                ? "bg-orange-50 border-l-4 border-l-orange-500"
-                                : ""
-                                }`}
+                              className={`hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${
+                                isSelected(item?.mem_id, 'member')
+                                  ? "bg-orange-50 border-l-4 border-l-orange-500" 
+                                  : ""
+                              }`}
                               onClick={() =>
                                 toggleSelection({
                                   id: item?.mem_id,
@@ -457,24 +460,17 @@ const MemberModal: FC<Props> = ({ show, setShow, setSelectedMembers, setSelected
                                   className="h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500 transition-colors duration-200"
                                 />
                               </td>
-
                               <td className="px-4 py-2 text-sm text-gray-900">
                                 {item?.mem_id}
                               </td>
-
                               <td className="px-4 py-2">
-                                <div className="flex items-center space-x-3">
-                                  <span className="text-sm font-medium text-gray-900">
-                                    {getFullName(item)}
-                                  </span>
-                                </div>
+                                {getFullName(item)}
                               </td>
                             </tr>
                           ))}
                         </>
                       )}
                     </tbody>
-
                   </table>
                 </div>
               ) : (

@@ -1,6 +1,6 @@
 import { useState, type FC } from "react";
-import { addStep } from "../../../services/master/masterApi";
 import toast from "react-hot-toast";
+import { addStep } from "../../../services/master/masterApi";
 
 interface AddStepProps {
   show: boolean;
@@ -27,6 +27,7 @@ const AddStep: FC<AddStepProps> = ({ show, setShow, fetchData }) => {
     // Handle form submission logic here
     if (!inputs.stepName || !inputs.status) {
       toast.error("Please fill in all required fields");
+      setLoading(false);
       return;
     }
     const body = {
@@ -56,7 +57,7 @@ const AddStep: FC<AddStepProps> = ({ show, setShow, fetchData }) => {
   return (
     <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
       <div
-        className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
+        className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}

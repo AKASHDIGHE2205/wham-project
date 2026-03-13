@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { getCollegeDetails, updateCollege } from "../../../services/master/masterApi";
-import type { SelectedLocation } from "../University/UniversityAdd";
-import GoogleLocation from "../../Calender-new/GoogleLocation";
-import UniversityModal from "./UniversityModal";
-import { MEDIA_URL } from "../../../constant/Baseurl";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import GoogleLocation from "../../../components/GoogleLocation";
+import UniversityModal from "../../../components/UniversityModal";
+import { MEDIA_URL } from "../../../constant/Baseurl";
 import { handleSelectUniversity } from "../../../feature/masterSlice";
+import { getCollegeDetails, updateCollege } from "../../../services/master/masterApi";
 import type { RootState } from "../../../store/store";
+import type { SelectedLocation } from "../University/UniversityAdd";
 
 const CollegeEdit = () => {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const isEdit = searchParams.get('isEdit');
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [selectedLocations, setSelectedLocations] = useState<SelectedLocation[]>([]);
@@ -23,6 +25,7 @@ const CollegeEdit = () => {
   });
   const [photo, setPhoto] = useState<string>("");
   const dispatch = useDispatch();
+
 
   const { university_id, university_name } = useSelector((state: RootState) => state.master);
 
@@ -122,9 +125,9 @@ const CollegeEdit = () => {
   return (
     <>
       <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 border border-orange-300 m-1 rounded-md p-2 sm:p-6">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-2xl mx-auto">
           {/* Header */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 transform hover:shadow-md transition-all duration-300">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 mb-6 transform hover:shadow-md transition-all duration-300">
             <div className="flex items-center space-x-4">
               <div className="bg-linear-to-r from-orange-500 to-purple-600 p-3 rounded-xl">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -132,8 +135,8 @@ const CollegeEdit = () => {
                 </svg>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-orange-600">Add New College</h1>
-                <p className="text-orange-500">Create a new College profile</p>
+                <h1 className="text-2xl font-bold text-orange-600">Update College</h1>
+                <p className="text-orange-500">edit a College profile</p>
               </div>
             </div>
           </div>
@@ -185,8 +188,9 @@ const CollegeEdit = () => {
                         name="name"
                         value={inputs.name}
                         onChange={handleInputChange}
+                        disabled={isEdit === 'false'}
                         placeholder="Enter College name"
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
                         required
                       />
                     </div>
@@ -208,9 +212,10 @@ const CollegeEdit = () => {
                         name="count"
                         value={inputs.count === 0 ? "" : inputs.count}
                         onChange={handleInputChange}
+                        disabled={isEdit === 'false'}
                         placeholder="Enter Student count"
                         min="0"
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
                         required
                       />
                     </div>
@@ -234,7 +239,8 @@ const CollegeEdit = () => {
                         name="status"
                         value={inputs.status}
                         onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer"
+                        disabled={isEdit === 'false'}
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer disabled:cursor-not-allowed"
                         required
                       >
                         <option value="" disabled>Select status</option>
@@ -267,8 +273,9 @@ const CollegeEdit = () => {
                         </div>
                         <button
                           type="button"
-                          className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 rounded-lg hover:shadow-lg transition duration-300 flex items-center gap-2 cursor-pointer"
+                          className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 rounded-lg hover:shadow-lg transition duration-300 flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed"
                           onClick={() => setShowUniversity(true)}
+                          disabled={isEdit === 'false'}
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M3 5h.01" /><path d="M3 12h.01" /><path d="M3 19h.01" /><path d="M8 5h13" /><path d="M8 12h13" /><path d="M8 19h13" />
@@ -302,10 +309,11 @@ const CollegeEdit = () => {
                       </div>
                       <button
                         type="button"
-                        className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 rounded-lg hover:shadow-lg transition duration-300 flex items-center gap-2 cursor-pointer"
+                        className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 rounded-lg hover:shadow-lg transition duration-300 flex items-center gap-2 cursor-pointer  disabled:cursor-not-allowed"
                         onClick={handleLocation}
+                        disabled={isEdit === 'false'}
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-map-pin-plus-icon lucide-map-pin-plus"><path d="M19.914 11.105A7.298 7.298 0 0 0 20 10a8 8 0 0 0-16 0c0 4.993 5.539 10.193 7.399 11.799a1 1 0 0 0 1.202 0 32 32 0 0 0 .824-.738" /><circle cx="12" cy="10" r="3" /><path d="M16 18h6" /><path d="M19 15v6" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-map-pin-plus-icon lucide-map-pin-plus"><path d="M19.914 11.105A7.298 7.298 0 0 0 20 10a8 8 0 0 0-16 0c0 4.993 5.539 10.193 7.399 11.799a1 1 0 0 0 1.202 0 32 32 0 0 0 .824-.738" /><circle cx="12" cy="10" r="3" /><path d="M16 18h6" /><path d="M19 15v6" /></svg>
                       </button>
                     </div>
                   </div>
@@ -339,7 +347,8 @@ const CollegeEdit = () => {
                           <button
                             type="button"
                             onClick={() => removeSelectedLocation(location.id)}
-                            className="text-green-600 hover:text-green-800 transition-colors cursor-pointer p-1 rounded-full hover:bg-green-200 ml-2"
+                            disabled={isEdit === 'false'}
+                            className="text-green-600 hover:text-green-800 transition-colors cursor-pointer p-1 rounded-full hover:bg-green-200 ml-2 disabled:cursor-not-allowed"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -361,12 +370,14 @@ const CollegeEdit = () => {
                 >
                   Cancel
                 </button>
+                {isEdit === 'true' &&(
                 <button
                   type="submit"
                   className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Submit
                 </button>
+                )}
               </div>
             </form>
           </div>

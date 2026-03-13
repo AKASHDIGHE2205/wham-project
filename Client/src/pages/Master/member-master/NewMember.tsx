@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react"
+import { useState } from "react";
 import toast from "react-hot-toast";
-import TeamModal from "./TeamModal";
-import { addMember } from "../../../services/master/masterApi";
 import { useNavigate } from "react-router-dom";
+import TeamModal from "../../../components/TeamModal";
+import { addMember } from "../../../services/master/masterApi";
 
 const NewMember = () => {
   const [inputs, setInputs] = useState({
@@ -15,8 +15,10 @@ const NewMember = () => {
     address: "",
     designation: "",
     birth_date: "",
-    isOrganizer: "N", // Default to "No"
-    gender: "" // Added gender field
+    join_date: "",
+    education_year:"",
+    isOrganizer: "N",
+    gender: ""
   });
   const [showTeams, setShowTeams] = useState(false);
   const [selectedTeams, setSelectedTeams] = useState<any[]>([]);
@@ -36,8 +38,10 @@ const NewMember = () => {
       address: "",
       designation: "",
       birth_date: "",
+      join_date: "",
+      education_year:"",
       isOrganizer: "",
-      gender: "" // Reset gender field
+      gender: ""
     })
     setSelectedTeams([])
     navigate('/master/view-members')
@@ -60,15 +64,16 @@ const NewMember = () => {
       address: inputs.address || "",
       designation: inputs.designation || '',
       birth_date: inputs.birth_date || '',
+      join_date: inputs.join_date || '',
+      education_year : inputs.education_year ||'',
       isOrganizer: inputs.isOrganizer || "",
-      gender: inputs.gender || "", // Added gender to request body
+      gender: inputs.gender || "",
       teams: selectedTeams || []
     }
     const response = await addMember(body);
     if (response) {
       handleCancel();
     }
-
   }
 
   const removeTeam = (teamId: number) => {

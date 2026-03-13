@@ -1,40 +1,36 @@
-// components/YearlyView.tsx
+import { eachDayOfInterval, eachMonthOfInterval, endOfMonth, endOfWeek, endOfYear, format, isSameMonth, isToday, startOfMonth, startOfWeek, startOfYear } from 'date-fns';
 import React from 'react';
-import {
-  format,
-  eachMonthOfInterval,
-  startOfYear,
-  endOfYear,
-  startOfMonth,
-  endOfMonth,
-  eachDayOfInterval,
-  startOfWeek,
-  endOfWeek,
-  isSameMonth,
-  isToday
-} from 'date-fns';
 
 interface YearlyViewProps {
   currentDate: Date;
-  selectedDate: Date | null;
   onDateSelect: (date: Date) => void;
-  onShowModal: (show: boolean) => void;
+  onclickDate: (date: Date) => void;
 }
 
-const YearlyView: React.FC<YearlyViewProps> = ({ currentDate, onDateSelect, onShowModal }) => {
+const YearlyView: React.FC<YearlyViewProps> = ({ currentDate, onDateSelect, onclickDate }) => {
   const yearStart = startOfYear(currentDate);
   const yearEnd = endOfYear(currentDate);
   const months = eachMonthOfInterval({ start: yearStart, end: yearEnd });
 
   const handleMonthClick = (month: Date) => {
     onDateSelect(month);
-    onShowModal(true);
   };
 
   const handleDayClick = (day: Date) => {
     onDateSelect(day);
-    onShowModal(true);
+    onclickDate(day);
   };
+
+  // Weekday headers with unique keys
+  const weekDays = [
+    { key: 'sun', label: 'S' },
+    { key: 'mon', label: 'M' },
+    { key: 'tue', label: 'T' },
+    { key: 'wed', label: 'W' },
+    { key: 'thu', label: 'T' },
+    { key: 'fri', label: 'F' },
+    { key: 'sat', label: 'S' }
+  ];
 
   return (
     <div className="h-full overflow-auto bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 p-3 sm:p-6">
@@ -56,9 +52,12 @@ const YearlyView: React.FC<YearlyViewProps> = ({ currentDate, onDateSelect, onSh
               </h3>
 
               <div className="grid grid-cols-7 gap-0.5 sm:gap-1 text-xs mb-3 sm:mb-4">
-                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
-                  <div key={day} className="text-center font-semibold text-gray-500 text-[8px] sm:text-[10px] py-0.5 sm:py-1">
-                    {day}
+                {weekDays.map(day => (
+                  <div
+                    key={day.key}
+                    className="text-center font-semibold text-gray-500 text-[8px] sm:text-[10px] py-0.5 sm:py-1"
+                  >
+                    {day.label}
                   </div>
                 ))}
 

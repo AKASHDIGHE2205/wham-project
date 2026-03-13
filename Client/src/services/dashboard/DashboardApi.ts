@@ -2,12 +2,22 @@
 import axios from "axios";
 import { BASE_URL } from "../../constant/Baseurl";
 import toast from "react-hot-toast";
+import { getTokenFromStorage } from "../../helper/cryptoUser";
+
+const getHeaders = () => {
+  const token = getTokenFromStorage();
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+};
 
 export const getUpcomingEvents = async (data: any) => {
   try {
     const response = await axios.post(
       `${BASE_URL}/dashboard/getUpcomingEvents`,
-      data
+      data,{...getHeaders()}
     );
     return response.data;
   } catch (error: any) {
@@ -22,7 +32,7 @@ export const getActiveEvents = async (data: any) => {
   try {
     const response = await axios.post(
       `${BASE_URL}/dashboard/getActiveEvents`,
-      data
+      data,{...getHeaders()}
     );
     return response.data;
   } catch (error: any) {
@@ -35,7 +45,7 @@ export const getActiveEvents = async (data: any) => {
 
 export const getActiveSteps = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/dashboard/getActiveSteps`);
+    const response = await axios.get(`${BASE_URL}/dashboard/getActiveSteps`,{...getHeaders()});
     return response.data;
   } catch (error: any) {
     toast.error(
@@ -47,7 +57,7 @@ export const getActiveSteps = async () => {
 
 export const getActiveTasks = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/dashboard/getActiveTasks`);
+    const response = await axios.get(`${BASE_URL}/dashboard/getActiveTasks`,{...getHeaders()});
     return response.data;
   } catch (error: any) {
     toast.error(
@@ -75,7 +85,7 @@ export const addAttendence = async (data: any) => {
   try {
     const response: any = await axios.post(
       `${BASE_URL}/dashboard/addAttendence`,
-      data
+      data,{...getHeaders(),}
     );
     if (response.status === 200) {
       toast.success(response?.message || "Attendance added successfully!");
@@ -91,7 +101,7 @@ export const addSteps = async (data: any) => {
   try {
     const response: any = await axios.post(
       `${BASE_URL}/dashboard/addSteps`,
-      data
+      data,{...getHeaders()}
     );
     if (response.status === 200) {
       toast.success(response?.message || "Steps added successfully!");
@@ -107,7 +117,7 @@ export const getEventForAttend = async (data: any) => {
   try {
     const response = await axios.post(
       `${BASE_URL}/dashboard/getEventForAttend`,
-      data
+      data,{...getHeaders(),}
     );
     return response.data;
   } catch (error: unknown) {
@@ -128,7 +138,7 @@ export const updateSteps = async (data: any) => {
   try {
     const response: any = await axios.put(
       `${BASE_URL}/dashboard/updateSteps`,
-      data
+      data,{...getHeaders(),}
     );
     if (response.status === 200) {
       toast.success(response?.message || "Steps updated successfully!");
@@ -143,7 +153,7 @@ export const updateSteps = async (data: any) => {
 export const getMemberDetailsForDashboard = async (id: number | string) => {
   try {
     const response = await axios.get(
-      `${BASE_URL}/dashboard/getMemberDetailsForDashboard/${id}`
+      `${BASE_URL}/dashboard/getMemberDetailsForDashboard/${id}`,{...getHeaders(),}
     );
     if (response.status === 200) {
       return response.data;

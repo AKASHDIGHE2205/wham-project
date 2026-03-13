@@ -1,659 +1,239 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import moment from 'moment';
-import StepsModal from './StepsModal';
-import UpdateStep from './UpdateStep';
-import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import AttendenceModal from './AttendenceModal';
-import { getTeamMembers } from '../../services/auth/authApi';
-// import type { Member } from '../Master/member-master/EditMember';
-import { Calendar, BarChart3, Users, Rocket, ChevronRight, Clock, MapPin, Calendar1 } from 'lucide-react';
-import { getActiveEvents, getEventForAttend, getUpcomingEvents } from '../../services/dashboard/DashboardApi';//getMemberDetailsForDashboard
-import { getUserFromStorage } from '../../helper/cryptoUser';
-import Loadings from '../../components/Loadings';
-import WeeklyViewUI from './WeeklyViewUI';
-
-export interface EventMember {
-  event_id: number;
-  id: number;
-  first_name: string;
-  middle_name: string | null;
-  last_name: string;
-  designation: string | null;
-  full_name: string;
-}
-
-export interface EventTeam {
-  event_id: number;
-  id: number;
-  name: string;
-}
-
-export interface EventLocation {
-  event_id: number;
-  id: number;
-  address: string;
-  lng: string;
-  lat: string;
-  city: string;
-  postal_code: number;
-}
-
-export interface UpcomingEvent {
-  event_id: number;
-  title: string;
-  description: string;
-  from_date: string;
-  to_date: string;
-  isapproved: string;
-  type: string;
-  isdeleted: string;
-  approved_by: number | null;
-  created_by: number;
-  created_at: string;
-  updated_by: number;
-  updated_at: string;
-  organizer_name: string;
-
-  members: EventMember[];
-  teams: EventTeam[];
-  locations: EventLocation[];
-}
-
-export interface EventForAttend {
-  event_id: number;
-  event_Date: string;
-  title: string;
-  description: string | null;
-  from_date: string;
-  to_date: string;
-  isapproved: string | null;
-  type: string;
-  isdeleted: string;
-  approved_by: number | null;
-  created_by: number;
-  created_at: string;
-  updated_by: number | null;
-  updated_at: string;
-
-
-  // Task fields
-  sr_no: number | null;
-  dt_event_id: number | null;
-  event_date: string | null;
-  step_no: number | null;
-  task_id: number | null;
-  task_desc: string | null;
-  dt_status: string | null;
-  step_name: string | null;
-  task_name: string | null;
-}
+import { Calendar, Calendar1, ChevronRight, Clock, MapPin, Users } from "lucide-react";
+import moment from "moment";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import DataLoading from "../../components/DataLoading";
+import { getUserFromStorage } from "../../helper/cryptoUser";
+import { getActivities } from "../../services/calender/calenderApi";
+import type { Activities } from "../Calender-new/Calender";
+import WeeklyViewUI from "./WeeklyViewUI";
 
 const Dashboard = () => {
-  const [teams, setTeams] = useState([]);
-  const [upcomingEvent, setUpcomingEvent] = useState<UpcomingEvent[]>([]);
-  const [ActiveEvent, setActiveEvent] = useState<UpcomingEvent[]>([]);
-  const [showAttend, setShowAttend] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState({})
-  const [showAddSteps, setShowAddSteps] = useState(false);
-  // const [data, setData] = useState<Member | null>(null);
-  const [attendEvents, setAttendEvents] = useState<EventForAttend[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showUpdate, setShowUpdate] = useState(false);
-  const [currentWeekStart, setCurrentWeekStart] = useState(moment().startOf('week'));
-
-  const stats = [
-    {
-      label: 'Active Events',
-      value: ActiveEvent?.length || 0,
-      icon: Rocket,
-      color: 'bg-orange-500',
-      bgcolor: 'bg-linear-to-r from-orange-100 to-orange-50'
-    },
-    {
-      label: 'Upcoming Events',
-      value: upcomingEvent?.length || 0,
-      icon: BarChart3,
-      color: 'bg-yellow-500',
-      bgcolor: 'bg-linear-to-r from-yellow-100 to-yellow-50'
-    },
-    {
-      label: 'Tasks To Attend',
-      value: attendEvents.length || 0,
-      icon: Users,
-      color: 'bg-green-500',
-      bgcolor: 'bg-linear-to-r from-green-100 to-green-50'
-    },
-    {
-      label: 'Team Members',
-      value: teams?.length || 0,
-      icon: Users,
-      color: 'bg-purple-500',
-      bgcolor: 'bg-linear-to-r from-purple-100 to-purple-50'
-    },
-  ];
-
   const user = getUserFromStorage();
+  const [currentWeekStart, setCurrentWeekStart] = useState(moment().startOf("week"));
+  const [activities, setActivities] = useState<Activities[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const fetchAllData = async () => {
-    setLoading(true);
-
-    try {
-      const id = user?.id || 0;
-
-      const body = {
-        userId: id || 0,
-        role: user?.role || 'User',
-        isOrganizer: user?.isorganizer || 'N'
-      };
-
-      if (!id) return;
-
-      // const memberResponse = await getMemberDetailsForDashboard(id);
-      // setData(memberResponse?.member || []);
-
-      const teamsResponse = await getTeamMembers({ userId: id || 0 });
-      setTeams(teamsResponse.teams || []);
-
-      const upcomingEventsResponse = await getUpcomingEvents(body);
-      setUpcomingEvent(upcomingEventsResponse.events || []);
-
-      const activeEventsResponse = await getActiveEvents(body);
-      setActiveEvent(activeEventsResponse.events || []);
-
-      const attendEventsResponse = await getEventForAttend(body);
-      setAttendEvents(attendEventsResponse.events || []);
-
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-    } finally {
-      setLoading(false);
-      handleSetCurrentWeek();
+  const fetchData = async () => {
+    setLoading(true)
+    const body = {
+      userId: user?.id || 0,
+      role: user?.role || ''
     }
-  };
-
+    const response = await getActivities(body);
+    setLoading(false);
+    if (response) {
+      setActivities(response?.activities || [])
+    }
+  }
   useEffect(() => {
-    fetchAllData();
-  }, []);
+    fetchData();
+  }, [])
 
-  const handleAddAttend = (data: any) => {
-    setShowAttend(true);
-    setSelectedEvent(data);
-  }
-
-  const handleAddSteps = (data: any) => {
-    setShowAddSteps(true);
-    setSelectedEvent(data);
-  }
-
-  const handleUpdate = (data: any) => {
-    setSelectedEvent(data);
-    setShowUpdate(true);
-  }
-
-  const handleWeekChange = (direction: 'prev' | 'next') => {
-    setCurrentWeekStart(prev =>
-      direction === 'prev'
-        ? moment(prev).subtract(1, 'week')
-        : moment(prev).add(1, 'week')
+  const handleWeekChange = (direction: "prev" | "next") => {
+    setCurrentWeekStart((prev) =>
+      direction === "prev"
+        ? moment(prev).subtract(1, "week")
+        : moment(prev).add(1, "week")
     );
   };
 
   const handleSetCurrentWeek = () => {
-    setCurrentWeekStart(moment().startOf('week'));
-  }
+    setCurrentWeekStart(moment().startOf("week"));
+  };
 
-  // Show loading state
+  const ActiveEvent = [
+    {
+      event_id: 1,
+      title: "Marketing Meeting",
+      from_date: "2026-03-12T10:00:00",
+      to_date: "2026-03-12T12:00:00",
+      isapproved: "A",
+      teams: [{ name: "Marketing" }],
+      members: [{ full_name: "John Doe" }],
+      locations: [{ address: "Conference Hall A" }]
+    }
+  ];
+
+  const upcomingEvent = [
+    {
+      event_id: 2,
+      title: "Product Launch",
+      from_date: "2026-03-18T11:00:00",
+      to_date: "2026-03-18T14:00:00",
+      isapproved: "P",
+      teams: [{ name: "Product Team" }],
+      members: [{ full_name: "Jane Smith" }],
+      locations: [{ address: "Main Auditorium" }]
+    }
+  ];
+  const currentTime = moment().format("HH:mm:ss");
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-white to-orange-50/30 flex items-center justify-center">
-        <div className="text-center">
-          <Loadings />
-        </div>
+      <div className="flex justify-center items-center h-screen w-full">
+        <DataLoading />
       </div>
-    );
+    )
   }
 
-  // Combine all events for calendar view
-  const allEvents = [...ActiveEvent, ...upcomingEvent];
-
   return (
-    <>
-      <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 border border-orange-300 m-1 rounded-md">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 border border-orange-300 m-1 rounded-md">
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-          {/* Welcome Section */}
-          <div className="mb-8">
-            <h1 className="text-md font-bold text-gray-900 mb-2">
-              Welcome back, <span className=" text-orange-600">{user?.firstName}</span>
-            </h1>
-            <p className="text-gray-600">Ready to plan your next mission? 🚀</p>
-          </div>
+        {/* Welcome */}
+        <div className="mb-8">
+          <h1 className="text-md font-bold mb-2">
+            {(() => {
+              const hour = parseInt(currentTime.split(":")[0]);
+              if (hour >= 5 && hour < 12) return "Good Morning";
+              if (hour >= 12 && hour < 17) return "Good Afternoon";
+              if (hour >= 17 && hour < 21) return "Good Evening";
+              return "Good Night";
+            })()}
+            , <span className="text-orange-600">{user.firstName}!</span>
+          </h1>
+          <p className="text-gray-600">Ready to plan your next mission? 🚀</p>
+        </div>
 
-          {/* Weekly Calendar Section */}
-          <div className="mb-8 bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
-
-            {/* Header */}
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-linear-to-r">
-              <div>
-                <h2 className="text-sm font-semibold">
-                  Weekly Calendar
-                </h2>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleWeekChange('prev')}
-                  className="p-2 rounded-md bg-white/20 hover:bg-white/30 text-black cursor-pointer"
-                >
-                  <ChevronRight className="w-4 h-4 rotate-180" />
-                </button>
-
-                <button
-                  onClick={() => handleSetCurrentWeek()}
-                  className="px-3 py-1.5 text-xs font-medium bg-linear-to-r from-orange-500 to-orange-500 text-white rounded-md hover:from-orange-600 hover:to-orange-600 transition cursor-pointer"
-                >
-                  Current Week
-                </button>
-
-                <button
-                  onClick={() => handleWeekChange('next')}
-                  className="p-2 rounded-md bg-white/20 hover:bg-white/30 text-black cursor-pointer"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Weekly Calendar */}
-            <div className="p-4 bg-gray-50">
-              <WeeklyViewUI
-                events={allEvents}
-                currentWeekStart={currentWeekStart}
-                fetchAllData={fetchAllData}
-                Role={user?.role || 'User'}
-                isOrganizer={user?.isorganizer || 'N'}
-              />
-            </div>
-          </div>
-
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 " hidden>
-            {stats?.map((stat, index) => (
-              <div
-                key={index}
-                className={`${stat?.bgcolor} rounded-2xl p-6 shadow-3xl border border-orange-200 transition-all duration-300 hover:shadow-[0_0_40px_rgba(249,115,22,0.4)] hover:border-orange-300 relative`}
+        {/* Weekly Calendar */}
+        <div className="mb-8 bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 className="text-sm font-semibold">
+              Weekly Calendar
+            </h2>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleWeekChange("prev")}
+                className="p-2 rounded-md bg-white/20 hover:bg-white/30 text-black cursor-pointer"
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 text-sm font-medium">{stat?.label}</p>
-                    <p className="text-2xl font-bold text-gray-900 mt-1">#{stat?.value}</p>
-                  </div>
-                  <div className={`${stat?.color} p-3 rounded-xl text-white`}>
-                    <stat.icon className="w-6 h-6" />
-                  </div>
-                </div>
-              </div>
-            ))}
+                <ChevronRight className="w-4 h-4 rotate-180" />
+              </button>
+
+              <button
+                onClick={handleSetCurrentWeek}
+                className="px-3 py-1.5 text-xs font-medium bg-linear-to-r from-indigo-600 to-purple-600 text-white rounded-md cursor-pointer"
+              >
+                Current Week
+              </button>
+              <button
+                onClick={() => handleWeekChange("next")}
+                className="p-2 rounded-md bg-white/20 hover:bg-white/30 text-black cursor-pointer"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
-          {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="bg-white rounded-2xl shadow-sm border border-orange-200 overflow-hidden">
-              {/* Active Events */}
-              <div>
-                <div className="px-6 py-4 border-b border-orange-100 flex items-center justify-between">
-                  <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-orange-500" />
-                    Active Events
-                  </h2>
-                  <Link
-                    to="/calender"
-                    className="text-orange-600 hover:text-orange-700 text-sm font-medium flex items-center"
-                  >
-                    View Calendar <ChevronRight className="w-4 h-4 ml-1" />
-                  </Link>
-                </div>
+          <div className="p-4 bg-gray-50">
+            <WeeklyViewUI
+              events={activities}
+              currentWeekStart={currentWeekStart}
+            />
+          </div>
 
-                <div className="p-6 space-y-4">
-                  {ActiveEvent.length === 0 && (
-                    <p className="text-orange-600">No active events available</p>
-                  )
-                  }
-                  {ActiveEvent?.map((event) => (
-                    <div
-                      key={event?.event_id}
-                      className="bg-orange-50 border border-orange-100 rounded-xl p-4 hover:shadow-md transition"
-                    >
-                      <div className="flex gap-4">
-                        {/* Date Badge */}
-                        <div className="flex flex-col justify-center items-center w-12 h-12 bg-linear-to-br from-orange-500 to-yellow-500 rounded-xl text-white">
-                          <span className="text-md font-bold">{new Date(event?.from_date).getDate()}</span>
-                          <span className="text-xs uppercase">
-                            {new Date(event?.from_date).toLocaleDateString('en', { month: 'short' })}
-                          </span>
-                        </div>
-
-                        {/* Details */}
-                        <div className="flex-1 space-y-1">
-                          <div className="flex justify-between items-start">
-                            <h3 className="font-semibold text-gray-900">
-                              Title : {event?.title}
-                            </h3>
-
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs border font-semibold ${event?.isapproved === "A"
-                                ? "bg-green-100 text-green-700 border-green-200"
-                                : event?.isapproved === "P"
-                                  ? "bg-yellow-100 text-yellow-700 border-yellow-200"
-                                  : event?.isapproved === "C"
-                                    ? "bg-blue-100 text-blue-700 border-blue-200"
-                                    : "bg-red-100 text-red-700 border-red-200"
-                                }`}
-                            >
-                              {event?.isapproved === "A"
-                                ? "Approved"
-                                : event?.isapproved === "P"
-                                  ? "Pending"
-                                  : event?.isapproved === "C"
-                                    ? "Completed"
-                                    : "Rejected"}
-                            </span>
-                          </div>
-
-                          <div className="flex items-center text-xs text-gray-600">
-                            <Clock className="w-4 h-4 mr-2 text-orange-500" />
-                            {moment(event?.from_date).format("hh:mm A")} -{" "}
-                            {moment(event?.to_date).format("hh:mm A")}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            <Calendar1 className="w-4 h-4 mr-2 text-orange-500 inline" />
-                            {moment(event?.from_date).format("DD/MMM/YYYY")} - {" "}
-                            {moment(event?.to_date).format("DD/MMM/YYYY")}
-                          </div>
-                          {(event.teams).length > 0 && (
-                            <div className="flex items-center text-sm text-gray-600">
-                              <Users className="w-4 h-4 mr-2 text-orange-500" />
-                              <span className="font-medium mr-1">Teams:</span>
-                              {event?.teams.map((t) => t.name).join(", ")}
-                            </div>
-                          )}
-                          {(event.members).length > 0 && (
-                            <div className="flex items-center text-sm text-gray-600">
-                              <Users className="w-4 h-4 mr-2 text-orange-500" />
-                              <span className="font-medium mr-1">Members:</span>
-                              {event?.members.map((m) => m.full_name).join(", ")}
-                            </div>
-                          )}
-
-                          {/* FIXED Venue icon layout */}
-                          <div className="flex text-sm text-gray-600 gap-2">
-                            <MapPin className="w-5 h-5 text-orange-500 mt-0.5" />
-                            <span className="font-medium mr-1">Venue:</span>
-                            <div className="flex flex-col">
-                              {event?.locations.map((loc, index) => (
-                                <span
-                                  key={index}
-                                  className="line-clamp-2"
-                                >
-                                  • {loc.address}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-
-                          <div className="flex justify-end items-center gap-4 space-y-2 ">
-                            {user && (["Admin", "Manager", "Master"].includes(user?.role) || user?.isorganizer === "Y") && (
-                              <button
-                                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow hover:shadow-lg text-sm cursor-pointer"
-                                onClick={() => handleAddSteps(event)}
-                              >
-                                Add Task
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Attend Events */}
-              <div>
-                <div className="px-6 py-4 border-b border-orange-100 flex items-center justify-between">
-                  <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-orange-500" />
-                    Attend Events
-                  </h2>
-                </div>
-
-                <div className="p-4 space-y-2">
-                  {attendEvents.length === 0 && (
-                    <p className="text-orange-600">No events available</p>
-                  )
-                  }
-                  {attendEvents?.map((event, index) => (
-                    <div
-                      key={index}
-                      className="bg-orange-50 hover:bg-orange-100 border border-orange-100 rounded-xl p-2 hover:shadow-md transition"
-                    >
-                      <div className="flex gap-2">
-                        {/* Date Badge */}
-                        <div className="flex flex-col justify-center items-center w-12 h-12 bg-linear-to-br from-orange-500 to-yellow-500 rounded-xl text-white">
-                          <span className="text-md font-bold">{new Date(event?.from_date).getDate()}</span>
-                          <span className="text-xs uppercase">
-                            {new Date(event?.from_date).toLocaleDateString('en', { month: 'short' })}
-                          </span>
-                        </div>
-
-                        {/* Details */}
-                        <div className="flex-1 space-y-0">
-                          <div className="flex justify-between items-start">
-                            <h3 className="font-semibold text-gray-900">
-                              Title : {event?.title}
-                            </h3>
-                            <p className={`px-2 py-1 rounded-full text-xs border font-semibold 
-                            ${event?.dt_status === "S"
-                                ? "bg-green-100 text-green-700 border-green-200"
-                                : event?.dt_status === "P"
-                                  ? "bg-yellow-100 text-yellow-700 border-yellow-200"
-                                  : event?.dt_status === "C"
-                                    ? "bg-blue-100 text-blue-700 border-blue-200"
-                                    : "bg-red-100 text-red-700 border-red-200"
-                              }`}>
-                              {
-                                event?.dt_status === "P" ? "In Progress" :
-                                  event?.dt_status === "S" ? "Started" :
-                                    event?.dt_status === "C" ? "Completed" : ""
-                              }
-                            </p>
-                          </div>
-
-                          <div>
-                            <p className="text-sm text-gray-800 truncate  max-w-[200px] sm:max-w-[400px] "><span className='font-medium'>Step : </span>{event?.step_name}</p>
-                            <p className="text-xs text-gray-800 truncate max-w-[200px] sm:max-w-[400px]"><span className='font-medium '>Task : </span>{event?.task_name}</p>
-                          </div>
-
-                          <div className="flex justify-end items-center gap-4">
-                            {event?.isapproved === "A" && (
-                              <button
-                                onClick={() => handleAddAttend(event)}
-                                className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg shadow hover:shadow-lg text-sm cursor-pointer"
-                              >
-                                Attend
-                              </button>
-                            )}
-                            {((user?.role === 'Manager' || user?.role === 'Admin' || user?.role === 'Master') && (event?.isapproved === "A")) && (
-                              <button
-                                onClick={() => handleUpdate(event)}
-                                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow hover:shadow-lg text-sm cursor-pointer"
-                              >
-                                Update
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
+        </div>
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 " hidden>
+          {/* Active Events */}
+          <div className="bg-white rounded-2xl shadow-sm border border-orange-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-orange-100 flex items-center justify-between">
+              <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-orange-500" />
+                Active Events
+              </h2>
+              <Link
+                to="/calender"
+                className="text-orange-600 text-sm font-medium flex items-center"
+              >
+                View Calendar <ChevronRight className="w-4 h-4 ml-1" />
+              </Link>
             </div>
 
-            {/* Upcoming Events */}
-            <div className="bg-white rounded-2xl shadow-sm border border-orange-200 overflow-hidden">
-              <div className="px-6 py-4 border-b border-orange-100 flex items-center justify-between">
-                <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-orange-500" />
-                  Upcoming Events
-                </h2>
-                <Link
-                  to="/calender"
-                  className="text-orange-600 hover:text-orange-700 text-sm font-medium flex items-center"
+            <div className="p-6 space-y-4">
+              {ActiveEvent.map((event) => (
+                <div
+                  key={event.event_id}
+                  className="bg-orange-50 border border-orange-100 rounded-xl p-4"
                 >
-                  View Calendar <ChevronRight className="w-4 h-4 ml-1" />
-                </Link>
-              </div>
-
-              <div className="p-6 space-y-2">
-                {upcomingEvent?.length === 0 && (
-                  <p className="text-orange-600">No upcoming events available</p>
-                )
-                }
-                {upcomingEvent?.map((event) => (
-                  <div
-                    key={event?.event_id}
-                    className="bg-orange-50 border border-orange-100 rounded-xl p-4 hover:shadow-md transition"
-                  >
-                    <div className="flex gap-4">
-                      <div className="flex flex-col justify-center items-center w-12 h-12 bg-linear-to-br from-orange-500 to-yellow-500 rounded-xl text-white">
-                        <span className="text-md font-bold">{new Date(event?.from_date).getDate()}</span>
-                        <span className="text-xs uppercase">
-                          {new Date(event?.from_date).toLocaleDateString("en", { month: "short" })}
-                        </span>
+                  <div className="flex gap-4">
+                    <div className="flex flex-col justify-center items-center w-12 h-12 bg-orange-500 rounded-xl text-white">
+                      <span className="text-md font-bold">
+                        {new Date(event.from_date).getDate()}
+                      </span>
+                      <span className="text-xs uppercase">
+                        {new Date(event.from_date).toLocaleDateString("en", { month: "short" })}
+                      </span>
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <h3 className="font-semibold text-gray-900">
+                        Title : {event.title}
+                      </h3>
+                      <div className="flex items-center text-xs text-gray-600">
+                        <Clock className="w-4 h-4 mr-2 text-orange-500" />
+                        {moment(event.from_date).format("hh:mm A")} -
+                        {moment(event.to_date).format("hh:mm A")}
                       </div>
-
-                      <div className="flex-1 space-y-1">
-                        <div className="flex justify-between items-start">
-                          <h3 className="font-semibold text-gray-900">Title : {event?.title}</h3>
-
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs border font-semibold ${event?.isapproved === "A"
-                              ? "bg-green-100 text-green-700 border-green-200"
-                              : event?.isapproved === "P"
-                                ? "bg-yellow-100 text-yellow-700 border-yellow-200"
-                                : event?.isapproved === "C"
-                                  ? "bg-blue-100 text-blue-700 border-blue-200"
-                                  : "bg-red-100 text-red-700 border-red-200"
-                              }`}
-                          >
-                            {event?.isapproved === "A"
-                              ? "Approved"
-                              : event?.isapproved === "P"
-                                ? "Pending"
-                                : event?.isapproved === "C"
-                                  ? "Completed"
-                                  : "Rejected"}
-                          </span>
+                      <div className="text-xs text-gray-500">
+                        <Calendar1 className="w-4 h-4 mr-2 text-orange-500 inline" />
+                        {moment(event.from_date).format("DD/MMM/YYYY")}
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Users className="w-4 h-4 mr-2 text-orange-500" />
+                        {event.teams.map((t) => t.name).join(", ")}
+                      </div>
+                      <div className="flex text-sm text-gray-600 gap-2">
+                        <MapPin className="w-5 h-5 text-orange-500 mt-0.5" />
+                        <div className="flex flex-col">
+                          {event.locations.map((loc, index) => (
+                            <span key={index}>• {loc.address}</span>
+                          ))}
                         </div>
-
-                        <div className="text-sm text-gray-600 flex items-center">
-                          <Clock className="w-4 h-4 mr-2 text-orange-500" />
-                          {moment(event?.from_date).format("hh:mm A")} —{" "}
-                          {moment(event?.to_date).format("hh:mm A")}
-                        </div>
-                        <div className="text-sm text-gray-600 flex items-center">
-                          <Calendar className="w-4 h-4 mr-2 text-orange-500" />
-                          {moment(event?.from_date).format("DD/MMM/YYYY")} —{" "}
-                          {moment(event?.to_date).format("DD/MMM/YYYY ")}
-                        </div>
-
-                        {(event.teams).length > 0 && (
-                          <div className="flex items-center text-sm text-gray-600">
-                            <Users className="w-4 h-4 mr-2 text-orange-500" />
-                            <span className="font-medium mr-1">Teams:</span>
-                            {event?.teams.map((t) => t.name).join(", ")}
-                          </div>
-                        )}
-                        {(event.members).length > 0 && (
-                          <div className="flex items-center text-sm text-gray-600">
-                            <Users className="w-4 h-4 mr-2 text-orange-500" />
-                            <span className="font-medium mr-1">Members:</span>
-                            {event?.members.map((m) => m.full_name).join(", ")}
-                          </div>
-                        )}
-
-                        {/* FIXED Venue Layout */}
-                        <div className="flex text-sm text-gray-600 gap-2">
-                          <MapPin className="w-5 h-5 text-orange-500 mt-0.5" />
-                          <span className="font-medium mr-1">Venue:</span>
-
-                          <div className="flex flex-col">
-                            {event?.locations.map((loc, index) => (
-                              <p
-                                key={index}
-                                className="line-clamp-2"
-                              >
-                                • {loc.address}
-                              </p>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="flex justify-end items-center gap-4 space-y-2 ">
-                          {user && (["Admin", "Manager", "Master"].includes(user?.role) || user?.isorganizer === "Y") && (
-                            <button
-                              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow hover:shadow-lg text-sm cursor-pointer"
-                              onClick={() => handleAddSteps(event)}
-                            >
-                              Add Task
-                            </button>
-                          )}
-                        </div>
+                      </div>
+                      <div className="flex justify-end">
+                        <button className="px-4 py-2 bg-green-600 text-white rounded-lg">
+                          Add Task
+                        </button>
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Upcoming Events */}
+          <div className="bg-white rounded-2xl shadow-sm border border-orange-200 overflow-hidden">
+
+            <div className="px-6 py-4 border-b border-orange-100">
+              <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-orange-500" />
+                Upcoming Events
+              </h2>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {upcomingEvent.map((event) => (
+                <div
+                  key={event.event_id}
+                  className="bg-orange-50 border border-orange-100 rounded-xl p-4"
+                >
+                  <h3 className="font-semibold text-gray-900">
+                    Title : {event.title}
+                  </h3>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Clock className="w-4 h-4 mr-2 text-orange-500" />
+                    {moment(event.from_date).format("hh:mm A")}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
-      </div >
-      {showAttend && (
-        <AttendenceModal
-          show={showAttend}
-          setShow={setShowAttend}
-          Data={selectedEvent}
-          // Member={data}
-          User={user}
-          setSelectedEvent={setSelectedEvent}
-          fetchAllData={fetchAllData}
-        />
-      )}
-      {showAddSteps && (
-        <StepsModal
-          show={showAddSteps}
-          setShow={setShowAddSteps}
-          Data={selectedEvent}
-          // Member={data}
-          User={user}
-          setSelectedEvent={setSelectedEvent}
-          fetchAllData={fetchAllData}
-        />
-      )}
-      {showUpdate && (
-        <UpdateStep
-          show={showUpdate}
-          setShow={setShowUpdate}
-          Data={selectedEvent}
-          User={user}
-          fetchAllData={fetchAllData}
-        />
-      )}
-    </>
-  )
-}
+      </div>
+    </div>
+  );
+};
 
-export default Dashboard
+export default Dashboard;

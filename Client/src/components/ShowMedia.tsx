@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { useState } from "react";
-import { MEDIA_URL } from "../../../constant/Baseurl";
+import { MEDIA_URL } from "../constant/Baseurl";
 
 interface Props {
   show: boolean;

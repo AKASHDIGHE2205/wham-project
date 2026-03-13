@@ -1,9 +1,11 @@
 import { Search } from "lucide-react"
 import DataLoading from "../../../components/DataLoading"
 import { useEffect, useState } from "react";
-import { getAllUsers } from "../../../services/master/masterApi";
+import { activeUser, getAllUsers } from "../../../services/master/masterApi";
 import CustomPagination from "../../../helper/CustomPagination";
 import UserEdit from "./UserEdit";
+import { toast } from "react-hot-toast/headless";
+import { getUserFromStorage } from "../../../helper/cryptoUser";
 
 export interface Users {
   user_id: number;
@@ -34,6 +36,7 @@ const UsersView = () => {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [loading, setLoading] = useState(true);
   const [showEdit, setShowEdit] = useState(false);
+  const [showView, setShowView] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
 
   const fetchData = async () => {
@@ -70,9 +73,33 @@ const UsersView = () => {
     setShowEdit(true);
     setSelectedUser(item);
   }
+  const user = getUserFromStorage();
+
+  const handleDeactivateUser = async (Data: Users) => {
+    const body = {
+      user_id: Data?.user_id || "",
+      full_name: Data?.full_name || "",
+      phone: Data?.phone || "",
+      email: Data?.email || "",
+      role: Data?.role || "",
+      is_verified: Data?.is_verified === "A" ? "I" : "A",
+      isorganizer: Data?.isorganizer || "",
+      u_by: user?.id || 0
+    }
+    const response = await activeUser(body);
+    if (response) {
+      toast.success(response?.message || "User has been successfully updated!");
+      fetchData();
+    }
+  }
+
+  const handleView = (item: Users) => {
+    setShowView(true);
+    setSelectedUser(item);
+  }
 
   return (
-    <div className="min-h-screen bg-white border border-orange-300 m-1 rounded-md p-2 sm:p-6">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 border border-orange-300 m-1 rounded-md p-2 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
@@ -267,11 +294,15 @@ const UsersView = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="px-2 py-0.5 text-left whitespace-nowrap text-sm text-black">
-                        {item?.email}
+                      <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-black">
+                        <a href={`tel:${item?.phone}`} className="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer">
+                          {item?.phone}
+                        </a>
                       </td>
-                      <td className="px-2 py-0.5 text-left whitespace-nowrap text-sm text-black">
-                        {item?.phone}
+                      <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-black">
+                        <a href={`mailto:${item?.email}`} className="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer">
+                          {item?.email}
+                        </a>
                       </td>
                       <td className="px-2 py-0.5">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item?.is_verified === 'A' ? 'bg-green-100 text-green-800' : item?.is_verified === 'I' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'
@@ -287,16 +318,30 @@ const UsersView = () => {
                         </span>
                       </td>
 
-                      <td className="px-3 py-2 text-center whitespace-nowrap">
-                        <button
-                          onClick={() => handleEdit(item)}
-                          className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-orange-600 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-all duration-200 cursor-pointer"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-square-pen">
-                            <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                            <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" />
-                          </svg>
-                        </button>
+                      <td className="px-3 py-2 text-left whitespace-nowrap">
+                        <div className="flex justify-center items-center gap-1">
+                          <button
+                            type="button"
+                            className="inline-flex items-center p-1.5 text-sm font-medium text-gray-900 bg-green-50 rounded-lg hover:bg-green-200 transition-all duration-200 cursor-pointer"
+                            onClick={() => handleView(item)}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" color="green" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye-icon lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" /><circle cx="12" cy="12" r="3" /></svg>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleEdit(item)}
+                            className="inline-flex items-center p-1.5 text-sm font-medium text-gray-900 bg-blue-50 rounded-lg hover:bg-blue-200 transition-all duration-200 cursor-pointer"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" color="#0047B3" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-pencil-line-icon lucide-pencil-line"><path d="M13 21h8" /><path d="m15 5 4 4" /><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /></svg>
+                          </button>
+                          <button
+                            type="button"
+                            className="inline-flex items-center p-1.5 text-sm font-medium text-gray-900 bg-red-50 rounded-lg hover:bg-red-200 transition-all duration-200 cursor-pointer"
+                            onClick={() => handleDeactivateUser(item)}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" color="red" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-ban-icon lucide-ban"><circle cx="12" cy="12" r="10" /><path d="M4.929 4.929 19.07 19.071" /></svg>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -322,7 +367,8 @@ const UsersView = () => {
         </div>
 
       </div>
-      {showEdit && (<UserEdit Data={selectedUser} show={showEdit} setShow={setShowEdit} fetchData={fetchData} />)}
+      {showEdit && (<UserEdit Data={selectedUser} show={showEdit} setShow={setShowEdit} fetchData={fetchData} isEdit={true} />)}
+      {showView && (<UserEdit Data={selectedUser} show={showView} setShow={setShowView} fetchData={fetchData} isEdit={false} />)}
     </div>
   )
 }

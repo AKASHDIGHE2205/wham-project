@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { CheckCircle, ChevronDown, ChevronUp, Mail, Phone, Shield, Sparkles, User, Users, Zap } from 'lucide-react'; //IdCard
 import React, { useEffect, useState } from 'react';
-import { User, Mail, CheckCircle, Phone, Shield, Zap, Sparkles, ChevronDown, ChevronUp, Users } from 'lucide-react';//IdCard
 import { Link } from 'react-router-dom';
-import { getTeamMembers } from '../../services/auth/authApi';
+import { MEDIA_URL } from '../../constant/Baseurl';
 import { getUserFromStorage } from '../../helper/cryptoUser';
+import { getTeamMembers } from '../../services/auth/authApi';
 
 export interface TeamInfo {
   team_id: number;
@@ -26,6 +27,7 @@ const Profile: React.FC = () => {
   const [data, setData] = useState<TeamMembersResponse[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showTeams, setShowTeams] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const userData = getUserFromStorage();
 
   useEffect(() => {
@@ -115,10 +117,21 @@ const Profile: React.FC = () => {
             <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-indigo-600 to-purple-600"></div>
 
             <div className="relative z-10">
-              <div className="w-22 h-22 bg-linear-to-br from-indigo-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl border-4 border-white">
-                <span className="text-2xl font-bold text-white">
-                  {userData?.firstName?.[0]}{userData?.lastName?.[0]}
-                </span>
+              <div className="w-22 h-22 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl border-4 border-white">
+                {userData?.photo && !imgError ? (
+                  <div className="w-22 h-22 rounded-full flex items-center justify-center shadow-md">
+                    <img
+                      src={`${MEDIA_URL}${userData?.photo}`}
+                      alt={userData?.photo || "user"}
+                      className=" rounded-full"
+                      onError={() => setImgError(true)}
+                    />
+                  </div>
+                ) : (
+                  <div className="bg-linear-to-r from-indigo-600 to-purple-600 w-22 h-22 rounded-full flex items-center justify-center shadow-md">
+                    <User className="text-white" />
+                  </div>
+                )}
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 {userData?.firstName} {userData?.lastName}

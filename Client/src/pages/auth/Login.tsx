@@ -1,10 +1,10 @@
+import { ArrowRight, BarChart3, Calendar, Eye, EyeOff, Image, LayoutDashboard, Lock, Mail, MessageSquare } from 'lucide-react';
 import React, { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight, LayoutDashboard, Calendar, MessageSquare, BarChart3, Image } from 'lucide-react';
-import { Link } from 'react-router-dom';//useNavigate
 import toast from 'react-hot-toast';
-import { loginApi } from '../../services/auth/authApi';
 import { useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom'; //useNavigate
 import { login } from '../../feature/authSlice';
+import { loginApi } from '../../services/auth/authApi';
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = React.useState(false);
@@ -78,7 +78,7 @@ const Login: React.FC = () => {
                         <IconComponent className="w-6 h-6 text-orange-400" />
                       </div>
                       <div className="text-center">
-                        <h3 className="font-semibold text-white text-sm mb-1">{feature.name}</h3>
+                        <h3 className="font-semibold text-white text-xs mb-1">{feature.name}</h3>
                         <p className="text-xs text-gray-300 leading-tight">{feature.description}</p>
                       </div>
                     </div>
@@ -87,11 +87,11 @@ const Login: React.FC = () => {
               })}
             </div>
 
-            <h1 className="text-5xl font-bold mb-6 text-white" data-aos="fade-up" data-aos-delay="200">
+            <h1 className="text-2xl font-bold mb-6 text-white" data-aos="fade-up" data-aos-delay="200">
               Welcome <span className="text-orange-400">Back</span>
             </h1>
 
-            <p className="text-xl text-gray-300 mb-8 leading-relaxed" data-aos="fade-up" data-aos-delay="400">
+            <p className="text-lg text-gray-300 mb-8 leading-relaxed" data-aos="fade-up" data-aos-delay="400">
               Sign in to access your personalized dashboard and continue your journey with our comprehensive platform.
             </p>
 
@@ -106,7 +106,7 @@ const Login: React.FC = () => {
               ].map((feature) => (
                 <div key={feature.text} className="flex items-center space-x-3">
                   <div className={`w-2 h-2 rounded-full ${feature.color.replace("text", "bg")}`} />
-                  <span className="text-gray-300 text-lg">{feature.text}</span>
+                  <span className="text-gray-300 text-md">{feature.text}</span>
                 </div>
               ))}
             </div>
@@ -124,9 +124,9 @@ const Login: React.FC = () => {
                 className="w-16 h-16 bg-linear-to-br from-orange-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg"
                 data-aos="zoom-in"
               >
-                <User className="w-8 h-8 text-white" />
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className=" text-white lucide lucide-user-key-icon lucide-user-key"><path d="M20 11v6" /><path d="M20 13h2" /><path d="M3 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 2.072.578" /><circle cx="10" cy="7" r="4" /><circle cx="20" cy="19" r="2" /></svg>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              <h2 className="text-xl font-bold text-gray-900 mb-2">
                 Sign In to <span className="text-orange-600">Your Account</span>
               </h2>
             </div>
@@ -136,7 +136,7 @@ const Login: React.FC = () => {
               <div className="space-y-6">
                 {/* Email Field */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Email/Mobile <span className='text-red-600'>*</span> </label>
+                  <label className="text-xs font-medium text-gray-700">Email/Mobile <span className='text-red-600'>*</span> </label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Mail className="h-5 w-5 text-gray-400" />
@@ -147,7 +147,7 @@ const Login: React.FC = () => {
                       onChange={handleChange}
                       value={inputs.email}
                       required
-                      className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
+                      className="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
                       placeholder="Enter your email/mobile"
                     />
                   </div>
@@ -155,7 +155,7 @@ const Login: React.FC = () => {
 
                 {/* Password Field */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Password <span className='text-red-600'>*</span></label>
+                  <label className="text-xs font-medium text-gray-700">Password <span className='text-red-600'>*</span></label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Lock className="h-5 w-5 text-gray-400" />
@@ -166,7 +166,7 @@ const Login: React.FC = () => {
                       onChange={handleChange}
                       value={inputs.password}
                       required
-                      className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
+                      className="block w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
                       placeholder="Enter your password"
                     />
                     <button
@@ -194,7 +194,7 @@ const Login: React.FC = () => {
               <div className="space-y-4" >
                 <button
                   type="submit"
-                  className="w-full bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+                  className="w-full bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center hover:shadow-lg transition-shadow duration-300 cursor-pointer"
                 >
                   {loading ? 'Signing In' : "Sign In"}
 

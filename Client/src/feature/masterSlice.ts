@@ -13,6 +13,8 @@ interface Master {
   university_name: string;
   clg_id: number;
   clg_name: string;
+  dept_id: number;
+  dept_name: string;
 }
 
 const initialState: Master = {
@@ -28,6 +30,8 @@ const initialState: Master = {
   university_name: "",
   clg_id: 0,
   clg_name: "",
+  dept_id: 0,
+  dept_name: "",
 };
 
 export const masterSlice = createSlice({
@@ -81,6 +85,14 @@ export const masterSlice = createSlice({
       state.clg_id = id;
       state.clg_name = name;
     },
+    handleSelectDepartment: (
+      state,
+      action: PayloadAction<{ id: number; name: string }>,
+    ) => {
+      const { id, name } = action.payload;
+      state.dept_id = id;
+      state.dept_name = name;
+    },
   },
 });
 export const {
@@ -89,5 +101,6 @@ export const {
   handleSelectStep,
   handleSelectUniversity,
   handleSelectCollege,
+  handleSelectDepartment,
 } = masterSlice.actions;
 export default masterSlice.reducer;

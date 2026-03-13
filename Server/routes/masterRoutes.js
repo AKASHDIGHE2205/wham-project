@@ -1,50 +1,99 @@
-import express from 'express';
-import { getAllMembers, getAllTeams, newTeam, updateTeam, addMember, getMemberDetails, getUsers, updateMember, getAllSidebarMembers, getAllTasks, getAllSteps, addStep, updateStep, addTask, updateTask, getAllUsers, activateUser, addUniversity, getAllUniversities, getUniversityDetails, updateUniversity, addCollege, getAllColleges, getCollegeDetails, updateCollege, getActiveUniversities, getAllDepartments, addDepartment, updateDepartment, getActiveColleges } from '../Controller/master/masterController.js';
+import express from "express";
 import multer from "multer";
+import {
+  activateUser,
+  addCollege,
+  addDepartment,
+  addFaq,
+  addMember,
+  addStep,
+  addTask,
+  addUniversity,
+  deactivateCollege,
+  deactivateDepartment,
+  deactivateMember,
+  deactivateUniversity,
+  getActiveColleges,
+  getActiveDepartments,
+  getActiveFaqs,
+  getActiveUniversities,
+  getAllColleges,
+  getAllDepartments,
+  getAllFaqs,
+  getAllMembers,
+  getAllSidebarMembers,
+  getAllSteps,
+  getAllTasks,
+  getAllTeams,
+  getAllUniversities,
+  getAllUsers,
+  getCollegeDetails,
+  getMemberDetails,
+  getUniversityDetails,
+  getUsers,
+  newTeam,
+  updateCollege,
+  updateDepartment,
+  updateFaq,
+  updateMember,
+  updateStep,
+  updateTask,
+  updateTeam,
+  updateUniversity
+} from "../Controller/master/masterController.js";
+import { verifyToken } from "../middleware/verifyToken.js";
 
 const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-router.get('/getAllUsers', getAllUsers);
-router.post('/activeUser', activateUser);
+router.get("/getAllUsers", verifyToken, getAllUsers);
+router.post("/activeUser", verifyToken, activateUser);
 
-router.get('/getAllteams', getAllTeams);
-router.post('/add-team', newTeam);
-router.put('/edit-team', updateTeam);
+router.get("/getAllteams", verifyToken, getAllTeams);
+router.post("/add-team", verifyToken, newTeam);
+router.put("/edit-team", verifyToken, updateTeam);
 
-router.get('/getAllmembers', getAllMembers);
-router.get('/getUsers', getUsers);
-router.post('/addMember', addMember);
-router.get('/getmemberDetails/:id', getMemberDetails);
-router.put('/update-member', updateMember)
+router.get("/getAllmembers", verifyToken, getAllMembers);
+router.get("/getUsers", verifyToken, getUsers);
+router.post("/addMember", verifyToken, addMember);
+router.get("/getmemberDetails/:id", verifyToken, getMemberDetails);
+router.put("/update-member", verifyToken, updateMember);
+router.put("/deactivateMember", verifyToken, deactivateMember);
 
-router.get('/getAllTasks', getAllTasks);
-router.post('/add-task', addTask);
-router.put('/update-task', updateTask);
+router.get("/getAllTasks", verifyToken, getAllTasks);
+router.post("/add-task", verifyToken, addTask);
+router.put("/update-task", verifyToken, updateTask);
 
+router.get("/getAllSteps", verifyToken, getAllSteps);
+router.post("/add-step", verifyToken, addStep);
+router.put("/update-step", verifyToken, updateStep);
 
-router.get('/getAllSteps', getAllSteps);
-router.post('/add-step', addStep);
-router.put('/update-step', updateStep);
+router.post("/getAllSidebarMembers", verifyToken, getAllSidebarMembers);
 
-router.post('/getAllSidebarMembers', getAllSidebarMembers);
+router.post("/addUniversity", verifyToken, upload.single("photo"), addUniversity,);
+router.get("/getAllUniversities", verifyToken, getAllUniversities);
+router.get("/getUniversityDetails/:id", verifyToken, getUniversityDetails);
+router.put("/update-university", verifyToken, updateUniversity);
+router.get("/getActiveUniversities", verifyToken, getActiveUniversities);
+router.put("/deactivateUniversity", verifyToken, deactivateUniversity);
 
-router.post('/addUniversity', upload.single("photo"), addUniversity);
-router.get('/getAllUniversities', getAllUniversities);
-router.get('/getUniversityDetails/:id', getUniversityDetails);
-router.put('/update-university', updateUniversity);
-router.get('/getActiveUniversities', getActiveUniversities);
+router.post("/addCollege", verifyToken, upload.single("photo"), addCollege);
+router.get("/getAllColleges", verifyToken, getAllColleges);
+router.get("/getCollegeDetails/:id", verifyToken, getCollegeDetails);
+router.put("/update-College", verifyToken, updateCollege);
+router.get("/getActiveColleges", verifyToken, getActiveColleges);
+router.put("/deactivateCollege", verifyToken, deactivateCollege);
 
-router.post('/addCollege', upload.single("photo"), addCollege);
-router.get('/getAllColleges', getAllColleges);
-router.get('/getCollegeDetails/:id', getCollegeDetails);
-router.put('/update-College', updateCollege);
-router.get('/getActiveColleges', getActiveColleges);
+router.get("/getAlldepartments", verifyToken, getAllDepartments);
+router.post("/add-department", verifyToken, addDepartment);
+router.put("/update-department", verifyToken, updateDepartment);
+router.put("/deactivateDepartment", verifyToken, deactivateDepartment);
+router.get("/getActiveDepartments", verifyToken, getActiveDepartments);
 
-router.get('/getAlldepartments', getAllDepartments);
-router.post('/add-department', addDepartment);
-router.put('/update-department', updateDepartment);
-
+router.get("/getAllFaqs", verifyToken, getAllFaqs);
+router.post("/add-faq", verifyToken, addFaq);
+router.put("/update-faq", verifyToken, updateFaq);
+router.get("/getActiveFaqs", verifyToken, getActiveFaqs);
 
 export default router;

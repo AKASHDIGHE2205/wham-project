@@ -1,323 +1,212 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { eachDayOfInterval, endOfWeek, format, isToday, startOfWeek } from 'date-fns';
+import { CalendarHeart, Clock } from 'lucide-react';
 import React from 'react';
-import {
-  format,
-  isSameDay,
-  isToday,
-  startOfWeek,
-  endOfWeek,
-  eachDayOfInterval,
-} from 'date-fns';
-import moment from 'moment';
-import type { CalendarEvent } from './MonthlyView';
+import type { Activities } from './Calender';
 
 interface WeeklyViewProps {
-  setSelectedDate: (date: Date | null) => void;
   currentDate: Date;
-  selectedDate: Date | null;
-  onDateSelect: (date: Date) => void;
-  onShowModal: (show: boolean) => void;
-  Data: any;
-  setIsEditShowModal: (show: boolean) => void;
-  setEditData: (data: any) => void;
-  Loading: boolean;
+  Data: Activities[]
+  Loading: boolean
+  onclickDate: (date: Date) => void
 }
 
-const WeeklyView: React.FC<WeeklyViewProps> = ({
-  setSelectedDate,
-  currentDate,
-  selectedDate,
-  onDateSelect,
-  onShowModal,
-  Data,
-  setIsEditShowModal,
-  setEditData,
-  Loading
-}) => {
-  const weekStart = startOfWeek(currentDate);
+// Reuse the same activity styles from MonthlyView
+const getActivityStyles = (status: string) => {
+  switch (status) {
+    case 'A':
+      return {
+        bg: 'bg-green-100',
+        border: 'border-green-500',
+        hover: 'hover:bg-green-200',
+        text: 'text-green-800'
+      };
+    case 'P':
+      return {
+        bg: 'bg-yellow-100',
+        border: 'border-yellow-500',
+        hover: 'hover:bg-yellow-200',
+        text: 'text-yellow-800'
+      };
+    case 'R':
+      return {
+        bg: 'bg-red-100',
+        border: 'border-red-500',
+        hover: 'hover:bg-red-200',
+        text: 'text-red-800'
+      };
+    case 'C':
+      return {
+        bg: 'bg-red-100',
+        border: 'border-red-500',
+        hover: 'hover:bg-red-200',
+        text: 'text-red-800'
+      };
+    default:
+      return {
+        bg: 'bg-blue-100',
+        border: 'border-blue-500',
+        hover: 'hover:bg-blue-200',
+        text: 'text-blue-800'
+      };
+  }
+};
+
+// Reuse the same date/time parsing functions
+const parseDateTime = (dateTimeStr: string): Date => {
+  const isoString = dateTimeStr.replace(' ', 'T');
+  return new Date(isoString);
+};
+
+const formatDate = (date: Date): string => {
+  return format(date, 'dd/MMM');
+};
+
+const formatTime = (date: Date): string => {
+  return format(date, 'HH:mm');
+};
+
+const WeeklyView: React.FC<WeeklyViewProps> = ({ currentDate, Data, Loading, onclickDate }) => {
   const weekEnd = endOfWeek(currentDate);
+  const weekStart = startOfWeek(currentDate);
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
-  const hours = Array.from({ length: 14 }, (_, i) => i + 7); // 7 AM to 8 PM
-
-  // Same safeParseDate function as MonthlyView
-  const safeParseDate = (dateString: string): Date | null => {
-    if (!dateString || dateString.includes("0000-00-00")) return null;
-    const d = new Date(dateString);
-    return isNaN(d.getTime()) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  };
-
-  // Same getEventsForDate function as MonthlyView
-  const getEventsForDate = (date: Date): CalendarEvent[] => {
-    if (!Array.isArray(Data)) return [];
-
-    const targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-
-    return Data.filter((event: CalendarEvent) => {
-      const start = safeParseDate(event.from_date);
-      const end = safeParseDate(event.to_date);
-      if (!start || !end) return false;
-
-      return targetDate >= start && targetDate <= end;
-    });
-  };
-
-  // Get events for specific hour (similar to DailyView)
-  const getEventsForDateAndHour = (date: Date, hour: number): CalendarEvent[] => {
-    const dayEvents = getEventsForDate(date);
-
-    return dayEvents.filter((event: CalendarEvent) => {
-      try {
-        const eventStartHour = event.from_time ? parseInt(event.from_time.split(':')[0]) : 0;
-        return eventStartHour === hour;
-      } catch (error) {
-        console.error('Error processing event:', error);
-        return false;
-      }
-    });
-  };
-
-  // Handle day click (for all-day events or date selection)
-  const handleDayClick = (day: Date) => {
-    if (isPastDate(day)) return;
-
-    setSelectedDate(day);
-    onDateSelect(day);
-    onShowModal(true);
-  };
-
-  // Handle time slot click (for specific hour)
-  const handleTimeSlotClick = (day: Date, hour: number) => {
-    const selectedDateTime = new Date(day);
-    selectedDateTime.setHours(hour, 0, 0, 0);
-
-    if (isPastDate(selectedDateTime)) return;
-
-    setSelectedDate(selectedDateTime);
-    onDateSelect(selectedDateTime);
-    onShowModal(true);
-  };
-
-  // Handle event edit (same as MonthlyView)
-  const handleEditEvent = (event: CalendarEvent, e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    if (isEventInPast(event)) return;
-
-    setEditData(event);
-    setIsEditShowModal(true);
-  };
-
-  const isEventInPast = (event: CalendarEvent): boolean => {
-    const eventEnd = safeParseDate(event.to_date);
-    if (!eventEnd) return false;
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    return eventEnd < today;
-  };
 
   const isPastDate = (date: Date): boolean => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
     const target = new Date(date);
     target.setHours(0, 0, 0, 0);
-
     return target < today;
   };
 
-  // Format time from date strings (same as DailyView)
-  const formatTimeFromDate = (dateString: string): string => {
-    if (!dateString || dateString.includes("0000-00-00")) return "All day";
-    try {
-      return moment(dateString).format("HH:mm");
-    } catch {
-      return "All day";
-    }
+  // Function to get activities for a specific day
+  const getActivitiesForDay = (day: Date): Activities[] => {
+    return Data.filter(activity => {
+      const startDate = parseDateTime(activity.start_date);
+      const endDate = parseDateTime(activity.end_date);
+
+      const dayStart = new Date(day);
+      dayStart.setHours(0, 0, 0, 0);
+
+      const dayEnd = new Date(day);
+      dayEnd.setHours(23, 59, 59, 999);
+
+      return (
+        (startDate <= dayEnd && endDate >= dayStart) ||
+        (format(startDate, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd')) ||
+        (format(endDate, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd'))
+      );
+    });
   };
 
-  // Get all-day events (events that span the entire day)
-  const getAllDayEvents = (date: Date): CalendarEvent[] => {
-    const dayEvents = getEventsForDate(date);
-    return dayEvents.filter(event =>
-      !event.from_time || event.from_time === "00:00:00" || event.from_time === "00:00"
-    );
+  const handleDayClick = (day: Date) => {
+    if (isPastDate(day)) return;
+    onclickDate(day);
   };
 
-  // Loading state
+  const handleActivityClick = (activity: Activities, e: React.MouseEvent) => {
+    e.stopPropagation();
+    console.log('Activity clicked:', activity);
+  };
+
   if (Loading) {
     return (
-      <div className="h-full bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 sm:mx-4 my-2 rounded-xl shadow-md overflow-hidden flex items-center justify-center min-h-[500px]">
-        <div className="flex flex-col items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-          <p className="text-gray-600 text-lg">Loading calendar...</p>
-        </div>
+      <div className="h-full flex items-center justify-center">
+        <div className="text-sm text-gray-500">Loading activities...</div>
       </div>
     );
   }
+
   return (
-    <div className="h-full overflow-auto bg-linear-to-b from-white to-blue-50/30">
-      {/* Header with days */}
-      <div className="flex border-b bg-white/80 backdrop-blur-md shadow-sm">
-        <div className="w-16 sm:w-20 p-2 text-xs sm:text-sm text-gray-600 border-r border-gray-200 sticky left-0 bg-white/70 backdrop-blur-md z-20">
-          All Day
-        </div>
-        {days.map((day) => {
-          const isSelected = selectedDate && isSameDay(day, selectedDate);
-          const allDayEvents = getAllDayEvents(day);
-
-          return (
-            <div
-              key={day.toString()}
-              className={`flex-1 text-center border-l border-gray-200 p-2 sm:p-4 min-h-16
-                transition-all duration-300 hover:bg-blue-50 relative
-                ${isSelected ? "bg-blue-100/60 border-blue-300 shadow-inner" : ""}
-                
-              `}
-            >
-              <div className="text-xs text-gray-500">{format(day, "EEE")}</div>
-
-              {/* Date Badge - Clickable for adding events */}
+    <div className="h-full bg-white sm:mx-4 my-2 rounded-lg border border-gray-200 overflow-hidden">
+      <div className="overflow-x-auto">
+        {/* Header with days */}
+        <div className="grid grid-cols-7 min-w-[750px] bg-gray-50 border-b border-gray-200">
+          {days.map((day) => {
+            const isPastDay = isPastDate(day);
+            return (
               <div
-                className={`mx-auto mt-1 rounded-full w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center font-semibold
-                  transition-all duration-300 cursor-pointer
-                  ${isToday(day) ? "bg-blue-600 text-white shadow-md"
-                    : isSelected ? "bg-blue-200 text-blue-800"
-                      : "text-gray-800 hover:bg-blue-100"
-                  }
-                `}
-                onClick={() => handleDayClick(day)}
-                title="Click to add event"
+                key={day.toISOString()}
+                className={`text-center py-3 border-l border-gray-200 first:border-l-0
+                ${isPastDay ? 'opacity-60' : ''}`}
               >
-                {format(day, "d")}
-              </div>
-
-              {/* All Day Events */}
-              <div className="mt-2 space-y-1">
-                {allDayEvents.map((event, index) => (
-                  <div
-                    key={index}
-                    className={`text-xs px-1 py-0.5 rounded border truncate
-                        ${isEventInPast(event) ? 'opacity-85 cursor-not-allowed' : 'cursor-pointer'}
-                        ${event?.isapproved === "P" ? "bg-yellow-100 border-yellow-300 text-yellow-800"
-                        : event?.isapproved === "R" ? "bg-red-100 border-red-300 text-red-800"
-                          : event?.isapproved === "A" ? "bg-green-100 border-green-300 text-green-800"
-                            : event?.isapproved === "C" ? "bg-blue-100 border-blue-300 text-blue-800"
-                              : "bg-gray-100 border-gray-300 text-gray-800"
-                      }`}
-                    onClick={(e) => handleEditEvent(event, e)}
-                    title={isEventInPast(event) ? 'Past events cannot be edited' : `Click to edit`}
-                  >
-                    <div className='flex justify-between mb-1'>
-                      <span className="truncate flex-1 font-semibold flex items-center gap-1">
-                        {event.type === 'task' ? (
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-circle-check-big-icon lucide-circle-check-big"><path d="M21.801 10A10 10 0 1 1 17 3.335" /><path d="m9 11 3 3L22 4" /></svg>
-                        ) : (
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" /><path d="M8 14h.01" /><path d="M12 14h.01" /><path d="M16 14h.01" /><path d="M8 18h.01" /><path d="M12 18h.01" /><path d="M16 18h.01" /></svg>
-                        )}
-                        {event.title}
-                      </span>
-                    </div>
-
-                    <div className="text-[10px] flex justify-between">
-                      <div>
-                        {moment(event.from_date).format('DD/MMM')}
-                        {event.from_date !== event.to_date &&
-                          ` to ${moment(event.to_date).format('DD/MMM')}`}
-                      </div>
-                      <div>
-                        All day
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Time Grid */}
-      <div className="relative max-w-7xl mx-auto">
-        {hours.map((hour) => (
-          <div
-            key={hour}
-            className="flex border-b border-gray-200 min-h-[70px] sm:min-h-20 group hover:bg-blue-50/20 transition-all duration-300"
-          >
-            {/* Time Label */}
-            <div className="w-16 sm:w-20 p-2 text-xs sm:text-sm text-gray-600 
-              border-r border-gray-200 sticky left-0 bg-white/70 backdrop-blur-md z-10">
-              {hour < 12 ? `${hour} AM` : hour === 12 ? "12 PM" : `${hour - 12} PM`}
-            </div>
-
-            {/* Grid Cells per Day */}
-            {days.map((day) => {
-              const hourEvents = getEventsForDateAndHour(day, hour);
-
-              return (
+                <div className="text-xs sm:text-sm font-medium text-gray-600">
+                  {format(day, "EEE")}
+                </div>
                 <div
-                  className={`flex-1 border-l p-1 sm:p-2 relative
-                  ${isPastDate(day) ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:bg-blue-100/30'}`}
-                  onClick={() => {
-                    if (!isPastDate(day)) handleTimeSlotClick(day, hour);
-                  }}
+                  className={`inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full mt-1 font-semibold text-sm sm:text-base
+                  transition-colors duration-200
+                  ${isPastDay ? 'cursor-not-allowed text-gray-400' : 'cursor-pointer hover:bg-purple-50'}
+                  ${isToday(day) ? "bg-purple-600 text-white hover:bg-purple-700" : ""}`}
+                  onClick={() => handleDayClick(day)}
+                  title={isPastDay ? "Unable to select past date" : "Click to add event"}
                 >
-                  {/* Today Glow */}
-                  {isToday(day) && (
-                    <div className="absolute inset-0 border-2 border-blue-400/40 rounded-lg pointer-events-none animate-pulse"></div>
-                  )}
+                  {format(day, "d")}
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
-                  {/* Events for this time slot */}
-                  <div className="space-y-1">
-                    {hourEvents.map((event, index) => (
-                      <div
-                        key={index}
-                        className={`text-xs px-1 py-0.5 rounded border cursor-pointer hover:shadow-md transition-all duration-200
-                          ${event.isapproved === "P"
-                            ? "bg-yellow-100 border-yellow-300 text-yellow-800"
-                            : event.isapproved === "R"
-                              ? "bg-red-100 border-red-300 text-red-800"
-                              : event.isapproved === "A"
-                                ? "bg-green-100 border-green-300 text-green-800"
-                                : event.isapproved === "C"
-                                  ? "bg-blue-100 border-blue-300 text-blue-800"
-                                  : "bg-gray-100 border-gray-300 text-gray-800"
-                          }`}
-                        onClick={(e) => handleEditEvent(event, e)}
-                        title={`Click to edit: ${event.title}`}
-                      >
-                        <span className="truncate flex-1 font-semibold flex items-center gap-1">
-                          {event.type === 'task' ? (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-circle-check-big-icon lucide-circle-check-big"><path d="M21.801 10A10 10 0 1 1 17 3.335" /><path d="m9 11 3 3L22 4" /></svg>
-                          ) : (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" /><path d="M8 14h.01" /><path d="M12 14h.01" /><path d="M16 14h.01" /><path d="M8 18h.01" /><path d="M12 18h.01" /><path d="M16 18h.01" /></svg>
-                          )}
-                          {event.title}
+        {/* Days Grid with Activities */}
+        <div className="grid grid-cols-7 min-w-[750px] bg-white">
+          {days.map((day, idx) => {
+            const isPastDay = isPastDate(day);
+            const dayActivities = getActivitiesForDay(day);
+
+            return (
+              <div
+                key={idx}
+                className={`min-h-[200px] sm:min-h-[300px] p-2 border-l border-b border-gray-200 first:border-l-0
+                ${isPastDay ? 'bg-gray-50 opacity-60' : 'bg-white'}
+                transition-colors duration-200`}
+              >
+                {/* Activities Container */}
+                <div className="space-y-2">
+                  {dayActivities.length === 0 ? (
+                    <div className="text-xs text-gray-400 text-center mt-4">
+                      {!isPastDay && (
+                        <span className="cursor-pointer hover:text-white" onClick={() => handleDayClick(day)}>
+
                         </span>
-
-                        <div className="text-[10px] flex justify-between mt-1">
-                          <span className="text-gray-600">
-                            {formatTimeFromDate(event.from_time)} - {formatTimeFromDate(event.to_time)}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Empty state hint */}
-                  {hourEvents.length === 0 && (
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                      <span className="text-xs text-gray-400 bg-white/80 px-2 py-1 rounded border">
-                        Click to add event
-                      </span>
+                      )}
                     </div>
+                  ) : (
+                    dayActivities.map((activity, index) => {
+                      const styles = getActivityStyles(activity.status);
+                      const startDate = parseDateTime(activity.start_date);
+                      const endDate = parseDateTime(activity.end_date);
+
+                      return (
+                        <div
+                          key={index}
+                          className={`text-xs p-2 rounded border ${styles.bg} ${styles.border} cursor-pointer ${styles.hover} transition-colors`}
+                          title={`Click to Edit`}
+                          onClick={(e) => handleActivityClick(activity, e)}
+                        >
+                          <div className={`truncate font-medium ${styles.text} mb-1`}>#{activity.title}</div>
+                          <div className="text-[10px] flex flex-col gap-1 text-gray-600">
+                            <div className="flex justify-start items-center gap-1">
+                              <CalendarHeart size={10} />
+                              <span>{formatDate(startDate)}</span>
+                              {formatDate(startDate) !== formatDate(endDate) && (
+                                <span>- {formatDate(endDate)}</span>
+                              )}
+                            </div>
+                            <div className="flex justify-start items-center gap-1">
+                              <Clock size={10} />
+                              {formatTime(startDate)} - {formatTime(endDate)}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
                   )}
                 </div>
-              );
-            })}
-          </div>
-        ))}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

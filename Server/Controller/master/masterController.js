@@ -1,6 +1,6 @@
-import db from '../../db.js';
 import fs from "fs";
 import path from "path";
+import db from '../../db.js';
 
 //TEAM CONTROLLER
 export const getAllTeams = (req, res) => {
@@ -186,96 +186,104 @@ export const getAllMembers = (req, res) => {
       LIMIT ? OFFSET ?
     `;
 
-    db.query(
-      memberIdSql,
-      [...params, limitNum, offset],
-      (idErr, idResults) => {
-        if (idErr) {
-          console.error("ID fetch error:", idErr);
-          return res.status(500).json({ message: "Internal server error" });
-        }
+    db.query(memberIdSql, [...params, limitNum, offset], (idErr, idResults) => {
+      if (idErr) {
+        console.error("ID fetch error:", idErr);
+        return res.status(500).json({ message: "Internal server error" });
+      }
 
-        const memberIds = idResults.map(row => row.mem_id);
+      const memberIds = idResults.map(row => row.mem_id);
 
-        // No data
-        if (memberIds.length === 0) {
-          return res.status(200).json({
-            message: "Members fetched successfully",
-            members: [],
-            total
-          });
-        }
+      // No data
+      if (memberIds.length === 0) {
+        return res.status(200).json({
+          message: "Members fetched successfully",
+          members: [],
+          total
+        });
+      }
 
-        // 3️⃣ FETCH FULL MEMBER DATA
-        const dataSql = `
+      // 3️⃣ FETCH FULL MEMBER DATA
+      const dataSql = `
           SELECT 
             a.mem_id,
-            CONCAT(
-              a.first_name, ' ',
-              IFNULL(a.middle_name,''), ' ',
-              IFNULL(a.last_name,'')
-            ) AS mem_name,
+            CONCAT(a.first_name, ' ', IFNULL(a.middle_name,''), ' ', IFNULL(a.last_name,'')) AS mem_name,
             a.mobile,
             a.email,
             a.birth_date,
+            a.dept_id,
+            d.dept_name,
+            a.clg_id,
+            e.clg_name,
             a.address,
             a.designation,
             a.isorganizer,
             a.status,
             b.team_id,
-            c.name AS team_name
+            c.name AS team_name,
+            a.join_date,
+            a.education_year
           FROM mst_members AS a
           LEFT JOIN team_members AS b ON b.member_id = a.mem_id
           LEFT JOIN mst_team AS c ON b.team_id = c.id
+          LEFT JOIN departments AS d ON d.dept_id = a.dept_id
+          LEFT JOIN colleges AS e ON a.clg_id = e.clg_id
           WHERE a.mem_id IN (?)
           ORDER BY a.mem_id ASC
         `;
 
-        db.query(dataSql, [memberIds], (dataErr, rows) => {
-          if (dataErr) {
-            console.error("Data fetch error:", dataErr);
-            return res.status(500).json({ message: "Internal server error" });
+      db.query(dataSql, [memberIds], (dataErr, rows) => {
+        if (dataErr) {
+          console.error("Data fetch error:", dataErr);
+          return res.status(500).json({ message: "Internal server error" });
+        }
+
+        // 4️⃣ GROUP TEAMS PER MEMBER
+        const membersMap = {};
+
+        rows.forEach(row => {
+          if (!membersMap[row.mem_id]) {
+            membersMap[row.mem_id] = {
+              mem_id: row.mem_id,
+              mem_name: row.mem_name,
+              mobile: row.mobile,
+              email: row.email,
+              birth_date: row.birth_date,
+              join_date: row.join_date,
+              education_year: row.education_year,
+              clg_id: row.clg_id,
+              clg_name: row.clg_name,
+              dept_id: row.dept_id,
+              dept_name: row.dept_name,
+              address: row.address,
+              designation: row.designation,
+              isorganizer: row.isorganizer,
+              status: row.status,
+              teams: []
+            };
           }
 
-          // 4️⃣ GROUP TEAMS PER MEMBER
-          const membersMap = {};
-
-          rows.forEach(row => {
-            if (!membersMap[row.mem_id]) {
-              membersMap[row.mem_id] = {
-                mem_id: row.mem_id,
-                mem_name: row.mem_name,
-                mobile: row.mobile,
-                email: row.email,
-                birth_date: row.birth_date,
-                address: row.address,
-                designation: row.designation,
-                isorganizer: row.isorganizer,
-                status: row.status,
-                teams: []
-              };
-            }
-
-            if (row.team_id) {
-              membersMap[row.mem_id].teams.push({
-                id: row.team_id,
-                name: row.team_name
-              });
-            }
-          });
-
-          res.status(200).json({
-            message: "Members fetched successfully",
-            members: Object.values(membersMap),
-            total
-          });
+          if (row.team_id) {
+            membersMap[row.mem_id].teams.push({
+              id: row.team_id,
+              name: row.team_name
+            });
+          }
         });
-      }
+
+        res.status(200).json({
+          message: "Members fetched successfully",
+          members: Object.values(membersMap),
+          total
+        });
+      });
+    }
     );
   });
 };
+//for add api the doj & education year logic not implemented.
 export const addMember = (req, res) => {
-  const { first_name, middle_name, last_name, mobile, email, address, designation, birth_date, isOrganizer, teams, gender } = req.body;
+  const { first_name, middle_name, last_name, mobile, email, address, designation, birth_date, isOrganizer, teams, gender, deptId, clgId } = req.body;
 
   try {
     /** ------------------------------------------
@@ -295,11 +303,11 @@ export const addMember = (req, res) => {
        * ------------------------------------------ */
       const sqlInsertMember = `
         INSERT INTO mst_members
-          (mem_id, first_name, middle_name, last_name, gender, mobile, email, birth_date, address, designation, isorganizer, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          (mem_id, first_name, middle_name, last_name, gender, mobile, email, birth_date, dept_id, clg_id, address, designation, isorganizer, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
 
-      db.query(sqlInsertMember, [nextMemId, first_name, middle_name, last_name, gender, mobile, email, birth_date, address, designation, isOrganizer, "A",], (err, insertResult) => {
+      db.query(sqlInsertMember, [nextMemId, first_name, middle_name, last_name, gender, mobile, email, birth_date, deptId, clgId, address, designation, isOrganizer, "A",], (err, insertResult) => {
         if (err) {
           console.error("Error inserting member:", err);
           return res.status(500).json({ message: "Internal server error" });
@@ -357,11 +365,14 @@ export const getMemberDetails = (req, res) => {
     const sql = `
                   SELECT a.mem_id,a.first_name,a.middle_name,a.last_name,a.mobile,a.email,a.birth_date,a.address,
                          a.designation,a.isorganizer,a.status,a.user_id, b.role,c.team_id,d.name,a.gender,
-                         CONCAT(b.first_name,' ',b.middle_name,' ',b.last_name) as user_name
+                         CONCAT(b.first_name,' ',b.middle_name,' ',b.last_name) as user_name,
+                         a.dept_id,f.dept_name,a.clg_id,e.clg_name, a.join_date,a.education_year
                   FROM mst_members AS a
                   LEFT JOIN users AS b ON a.user_id = b.id
                   LEFT JOIN team_members AS c ON c.member_id = a.mem_id
                   LEFT JOIN mst_team AS d on c.team_id = d.id
+                  LEFT JOIN colleges AS e on e.clg_id = a.clg_id
+                  LEFT JOIN departments AS f ON f.dept_id = a.dept_id
                   WHERE a.mem_id = ?
                 `;
 
@@ -385,6 +396,12 @@ export const getMemberDetails = (req, res) => {
         mobile: base.mobile,
         email: base.email,
         birth_date: base.birth_date,
+        join_date: base.join_date,
+        education_year: base.education_year,
+        clg_id: base.clg_id,
+        clg_name: base.clg_name,
+        dept_id: base.dept_id,
+        dept_name: base.dept_name,
         address: base.address,
         designation: base.designation,
         isorganizer: base.isorganizer,
@@ -430,7 +447,7 @@ export const getUsers = (req, res) => {
 }
 export const updateMember = (req, res) => {
   try {
-    const { mem_id, first_name, middle_name, last_name, mobile, email, gender, address, designation, birth_date, isOrganizer, role, user_id, teams } = req.body;
+    const { mem_id, first_name, middle_name, last_name, mobile, email, gender, address, designation, birth_date, isOrganizer, role, user_id, teams, dept_id, clg_id, join_date, education_year } = req.body;
 
     /** ------------------------------------------
      * 1. Update mst_members table
@@ -438,11 +455,11 @@ export const updateMember = (req, res) => {
     const sql1 = `
       UPDATE mst_members 
       SET first_name=?, middle_name=?, last_name=?, gender = ?, mobile=?, email=?, address=?, 
-          designation=?, birth_date=?, isOrganizer=?, user_id=?
+          designation=?, birth_date=?, dept_id = ?, clg_id = ?, isOrganizer=?, user_id=?, join_date = ?, education_year = ?
       WHERE mem_id = ?
     `;
 
-    db.query(sql1, [first_name, middle_name, last_name, gender, mobile, email, address, designation, birth_date, isOrganizer, user_id, mem_id], (err) => {
+    db.query(sql1, [first_name, middle_name, last_name, gender, mobile, email, address, designation, birth_date, dept_id, clg_id, isOrganizer, user_id, join_date, education_year, mem_id], (err) => {
       if (err) {
         console.error("Error updating member:", err);
         return res.status(500).json({ message: "Internal server error" });
@@ -541,6 +558,20 @@ export const updateMember = (req, res) => {
     console.error(error);
     return res.status(500).json({ message: "Something went wrong" });
   }
+};
+export const deactivateMember = (req, res) => {
+  const { mem_id, status } = req.body;
+  const sql = `UPDATE mst_members SET status = ? WHERE mem_id = ?`;
+  db.query(sql, [status, mem_id], (err, results) => {
+    if (err) {
+      console.error("Error deactivating member:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: "Member not found" });
+    }
+    return res.status(200).json({ message: `Member ${status === 'A' ? 'activated' : 'deactivated'} successfully` });
+  });
 };
 
 //TASk CONTROLLER
@@ -1214,6 +1245,27 @@ export const getActiveUniversities = (req, res) => {
     return res.status(200).json({ Result })
   });
 };
+export const deactivateUniversity = (req, res) => {
+  const { id, status } = req.body;
+
+  const sql = `
+    UPDATE universities
+    SET status = ?
+    WHERE id = ?
+  `;
+  db.query(sql, [status, id], (err, results) => {
+    if (err) {
+      console.error("University Deactivate Error:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: "University not found" });
+    }
+
+    return res.status(200).json({ message: `University ${status === 'I' ? 'deactivated' : 'activated'} successfully` });
+  });
+};
 
 
 export const addCollege = async (req, res) => {
@@ -1472,6 +1524,25 @@ export const getActiveColleges = (req, res) => {
     return res.status(200).json({ success: true, data: result, });
   });
 };
+export const deactivateCollege = (req, res) => {
+  const { id, status } = req.body;
+  const sql = `
+    UPDATE colleges
+    SET status = ?
+    WHERE clg_id = ?
+  `;
+  db.query(sql, [status, id], (err, results) => {
+    if (err) {
+      console.error("College Deactivate Error:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: "College not found" });
+    }
+    return res.status(200).json({ message: `College ${status === 'I' ? 'deactivated' : 'activated'} successfully` });
+  }
+  );
+};
 
 export const addDepartment = (req, res) => {
   const { clg_id, dept_name, student_strength, status } = req.body;
@@ -1589,3 +1660,152 @@ export const updateDepartment = (req, res) => {
   }
   );
 };
+export const deactivateDepartment = (req, res) => {
+  const { dept_id, status } = req.body;
+
+  const sql = `
+    UPDATE departments
+    SET status = ?
+    WHERE dept_id = ?
+  `;
+  db.query(sql, [status, dept_id], (err, results) => {
+    if (err) {
+      console.error("Department Deactivate Error:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: "Department not found" });
+    }
+    return res.status(200).json({ message: `Department ${status === 'I' ? 'deactivated' : 'activated'} successfully` });
+  }
+  );
+};
+export const getActiveDepartments = (req, res) => {
+  const dataSql = `
+    SELECT dept_id, dept_name      
+    FROM departments
+    WHERE status = 'A'
+  `;
+  db.query(dataSql, (Err, Result) => {
+    if (Err) {
+      console.error("Department fetch Error:", Err);
+      return res.status(500).json({ message: "Count failed" });
+    }
+    return res.status(200).json({ Result })
+  });
+};
+
+// FAQ CONTROLLER
+export const addFaq = (req, res) => {
+  const { question, ans, displayOrder, status, userId } = req.body;
+
+  const sql = `
+    INSERT INTO mst_faq (faq_id, faq_question, ans, display_order, status, c_by)
+    SELECT IFNULL(MAX(faq_id), 0) + 1, ?, ?, ?, ?, ?
+    FROM mst_faq
+  `;
+
+  db.query(sql, [question, ans, displayOrder || 0, status, userId], (err, results) => {
+    if (err) {
+      console.error("Error adding FAQ:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+    return res.status(201).json({
+      message: "FAQ added successfully",
+      faqId: results.insertId || null
+    });
+  });
+};
+export const updateFaq = (req, res) => {
+  const { id, question, ans, displayOrder, status, userId } = req.body;
+
+  const sql = `
+    UPDATE mst_faq  
+    SET faq_question = ?, ans = ?, display_order = ?, status = ?, u_by = ?
+    WHERE faq_id = ?
+  `;
+
+  db.query(sql, [question, ans, displayOrder || 0, status, userId, id], (err, results) => {
+    if (err) {
+      console.error("Error updating FAQ:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: "FAQ not found" });
+    }
+    return res.status(200).json({
+      message: "FAQ updated successfully",
+      updatedFaqId: id
+    });
+  });
+};
+export const getAllFaqs = (req, res) => {
+  const { search = "", page = 1, limit = 5 } = req.query;
+
+  const pageNum = Number(page);
+  const limitNum = Number(limit);
+  const offset = (pageNum - 1) * limitNum;
+
+  let whereClause = "WHERE 1=1";
+  const params = [];
+
+  if (search) {
+    whereClause += `
+      AND (
+        faq_id LIKE ?
+        OR faq_question LIKE ?
+      )
+    `;
+    params.push(`%${search}%`, `%${search}%`);
+  }
+
+  // Data Query
+  const dataSql = `
+    SELECT faq_id, faq_question, ans, display_order, status, c_at, u_at
+    FROM mst_faq
+    ${whereClause}
+    LIMIT ? OFFSET ?
+  `;
+
+  // Count Query
+  const countSql = `
+    SELECT COUNT(*) AS total
+    FROM mst_faq
+    ${whereClause}
+  `;
+
+  // First get total count
+  db.query(countSql, params, (countErr, countResult) => {
+    if (countErr) {
+      return res.status(500).json({ message: "Count failed" });
+    }
+
+    const total = countResult[0].total;
+
+    // Then get paginated data
+    db.query(dataSql, [...params, limitNum, offset], (dataErr, results) => {
+      if (dataErr) {
+        return res.status(500).json({ message: "Data fetch failed" });
+      }
+
+      res.status(200).json({
+        message: "FAQs fetched successfully",
+        faqs: results,
+        total: total,
+      });
+    }
+    );
+  });
+};
+export const getActiveFaqs = (req, res) => {
+  const dataSql = `SELECT * FROM mst_faq WHERE status = 'A'; `;
+
+  db.query(dataSql, (err, result) => {
+    if (err) {
+      console.error("Get Active faqs Error:", err);
+      return res.status(500).json({ message: "Failed to fetch faqs" });
+    }
+
+    return res.status(200).json({ success: true, data: result, });
+  })
+}

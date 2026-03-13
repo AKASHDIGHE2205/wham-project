@@ -1,199 +1,207 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { eachDayOfInterval, endOfMonth, endOfWeek, format, isSameMonth, isToday, startOfMonth, startOfWeek } from 'date-fns';
+import { CalendarHeart, Clock } from 'lucide-react';
 import React from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, startOfWeek, endOfWeek, isSameDay } from 'date-fns';
-import moment from 'moment';
+import { useNavigate } from 'react-router-dom';
+import type { Activities } from './Calender';
 
 interface MonthlyViewProps {
-  setSelectedDate: (date: Date | null) => void;
   currentDate: Date;
-  selectedDate: Date | null;
-  onDateSelect: (date: Date) => void;
-  onShowModal: (show: boolean) => void;
-  Data: any;
-  setIsEditShowModal: (show: boolean) => void;
-  setEditData: (data: any) => void;
-  Loading: boolean;
+  Data: Activities[]
+  Loading: boolean
+  onclickDate: (date: Date) => void;
 }
 
-export interface CalendarEvent {
-  id: number;
-  title: string;
-  description: string;
-  from_date: string;
-  to_date: string;
-  from_time: string;
-  to_time: string;
-  team_id: number;
-  isapproved: string | null;
-  type: string;
-  created_by: number;
-  approval_by: number;
-  created_at: string;
-}
+const getActivityStyles = (status: string) => {
+  switch (status) {
+    case 'A':
+      return {
+        bg: 'bg-green-100',
+        border: 'border-green-500',
+        hover: 'hover:bg-green-200',
+        text: 'text-green-800'
+      };
+    case 'P':
+      return {
+        bg: 'bg-yellow-100',
+        border: 'border-yellow-500',
+        hover: 'hover:bg-yellow-200',
+        text: 'text-yellow-800'
+      };
+    case 'R':
+      return {
+        bg: 'bg-red-100',
+        border: 'border-red-500',
+        hover: 'hover:bg-red-200',
+        text: 'text-red-800'
+      };
+    case 'C':
+      return {
+        bg: 'bg-blue-100',
+        border: 'border-blue-500',
+        hover: 'hover:bg-blue-200',
+        text: 'text-blue-800'
+      };
+    default:
+      return {
+        bg: 'bg-gray-100',
+        border: 'border-gray-500',
+        hover: 'hover:bg-gray-200',
+        text: 'text-gray-800'
+      };
+  }
+};
 
-const MonthlyView: React.FC<MonthlyViewProps> = ({ setSelectedDate, currentDate, selectedDate,
-  onDateSelect, onShowModal, Data, setIsEditShowModal, setEditData, Loading }) => {
+// Function to parse date string with time
+const parseDateTime = (dateTimeStr: string): Date => {
+  const isoString = dateTimeStr.replace(' ', 'T');
+  return new Date(isoString);
+};
 
+// Format date to "DD/MMM"
+const formatDate = (date: Date): string => {
+  return format(date, 'dd/MM');
+};
+
+// Format time to "HH:mm"
+const formatTime = (date: Date): string => {
+  return format(date, 'HH:mm');
+};
+
+const MonthlyView: React.FC<MonthlyViewProps> = ({ currentDate, Data, Loading, onclickDate }) => {
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const calendarStart = startOfWeek(monthStart);
   const calendarEnd = endOfWeek(monthEnd);
+  const navigate = useNavigate();
   const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
-  const safeParseDate = (dateString: string): Date | null => {
-    if (!dateString || dateString.includes("0000-00-00")) return null;
-    const d = new Date(dateString);
-    return isNaN(d.getTime()) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  };
+  const getActivitiesForDay = (day: Date): Activities[] => {
+    return Data.filter(activity => {
+      const startDate = parseDateTime(activity.start_date);
+      const endDate = parseDateTime(activity.end_date);
 
-  const getEventsForDate = (date: Date): CalendarEvent[] => {
-    if (!Array.isArray(Data)) return [];
+      // Set the day to start and end of day for proper comparison
+      const dayStart = new Date(day);
+      dayStart.setHours(0, 0, 0, 0);
 
-    const targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      const dayEnd = new Date(day);
+      dayEnd.setHours(23, 59, 59, 999);
 
-    return Data.filter((event: CalendarEvent) => {
-      const start = safeParseDate(event?.from_date);
-      const end = safeParseDate(event?.to_date);
-      if (!start || !end) return false;
-
-      return targetDate >= start && targetDate <= end;
+      // Check if the activity range overlaps with the day
+      return (
+        (startDate <= dayEnd && endDate >= dayStart) ||
+        (format(startDate, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd')) ||
+        (format(endDate, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd'))
+      );
     });
   };
 
   const handleClickDate = (day: Date) => {
-    setSelectedDate(day);
-    onDateSelect(day);
-    onShowModal(true);
+    onclickDate(day);
   };
 
-  const handleEditEvent = (event: CalendarEvent, e: React.MouseEvent) => {
+  const handleActivityClick = (activity: Activities, e: React.MouseEvent) => {
     e.stopPropagation();
-
-    if (isEventInPast(event)) {
-      return;
-    }
-
-    setEditData(event);
-    setIsEditShowModal(true);
+    navigate(`/update-activity/${activity?.id}/${activity?.date}`);
   };
 
-  const isEventInPast = (event: CalendarEvent): boolean => {
-    const eventEnd = safeParseDate(event.to_date);
-    if (!eventEnd) return false;
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    return eventEnd < today;
-  };
-
-  // Loading state
   if (Loading) {
     return (
-      <div className="h-full bg-white sm:mx-4 my-2 rounded-xl shadow-md overflow-hidden flex items-center justify-center min-h-[500px]">
-        <div className="flex flex-col items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border border-blue-600 mb-4"></div>
-          <p className="text-gray-600 text-lg">Loading calendar...</p>
-        </div>
+      <div className="h-full flex items-center justify-center">
+        <div className="text-sm text-gray-500">Loading activities...</div>
       </div>
     );
   }
 
   return (
-    <div className="h-full bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 sm:mx-4 my-2 rounded-xl shadow-md overflow-hidden">
-      {/* Header */}
-      <div className="grid grid-cols-7 bg-linear-to-br from-gray-50 to-blue-50/30 border-b text-xs sm:text-sm font-semibold text-gray-600">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']?.map(day => (
-          <div key={day} className="text-center py-3">{day}</div>
-        ))}
-      </div>
+    <div className="h-full bg-white sm:mx-4 my-2 rounded-lg border border-gray-200 overflow-hidden flex flex-col">
+      {/* Single scrollable container for both header and grid */}
+      <div className="overflow-x-auto hide-scrollbar flex-1">
+        <div className="min-w-[700px] sm:min-w-full">
+          {/* Header - Days of week */}
+          <div className="grid grid-cols-7 bg-gray-50 border-b border-gray-200 text-xs sm:text-sm font-medium text-gray-600 sticky top-0 z-10">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+              <div key={day} className="text-center py-3 px-1">{day}</div>
+            ))}
+          </div>
 
-      {/* Days Grid */}
-      <div className="grid grid-cols-7 gap-1px bg-gray-200">
-        {days?.map((day, idx) => {
-          const isCurrentMonth = isSameMonth(day, currentDate);
-          const isSelected = selectedDate && isSameDay(day, selectedDate);
-          const dayEvents = getEventsForDate(day);
-          const isPast = day < new Date(new Date().setHours(0, 0, 0, 0));
-          return (
-            <div
-              key={idx}
-              className={`relative min-h-[85px] sm:min-h-[100px] p-1 sm:p-2 group border bg-white
-              ${isCurrentMonth ? 'text-black border-gray-200' : 'text-gray-300'}
-              ${isSelected ? 'shadow-lg' : ''}
-              ${isPast ? 'cursor-not-allowed opacity-65' : 'cursor-pointer hover:shadow-lg hover:scale-[1.03]'}
-              transition-all duration-300`}
-            >
+          {/* Days Grid */}
+          <div className="grid grid-cols-7 bg-white">
+            {days.map((day, idx) => {
+              const isCurrentMonth = isSameMonth(day, currentDate);
+              const isPast = day < new Date(new Date().setHours(0, 0, 0, 0));
+              const dayActivities = getActivitiesForDay(day);
 
-              {isToday(day) && (<div className="absolute inset-0 bg-blue-500/10 border border-blue-500"></div>)}
-
-              {/* Date Click */}
-              <div
-                className="relative z-10"
-                onClick={() => {
-                  if (!isPast) handleClickDate(day);
-                }}
-                title={isPast ? "Unable to select past date" : "Click to add event"}
-              >
-                <div className={`flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full mx-auto text-sm sm:text-base font-medium transition-all duration-300
-                  ${isToday(day) ? "bg-blue-600 text-white shadow-md" : isCurrentMonth ? "group-hover:bg-blue-100 group-hover:text-blue-600" : ""}`}
+              return (
+                <div
+                  key={idx}
+                  className={`relative min-h-[120px] sm:min-h-[140px] p-1 border border-gray-200
+                    ${isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400'}
+                    ${isPast && isCurrentMonth ? 'opacity-60' : ''}
+                    transition-colors duration-200 overflow-hidden`}
                 >
-                  {format(day, "d")}
-                </div>
-              </div>
+                  {isToday(day) && (
+                    <div className="absolute inset-0 border border-purple-500 pointer-events-none"></div>
+                  )}
 
-              {/* Events */}
-              <div className="relative z-10 mt-1 space-y-1">
-                {dayEvents?.slice(0, 3)?.map((event, index) => (
-                  <div
-                    key={index}
-                    className={`text-xs px-1 py-0.5 rounded border truncate
-                        ${isEventInPast(event) ? 'opacity-85 cursor-not-allowed' : 'cursor-pointer'}
-                        ${event?.isapproved === "P" ? "bg-yellow-100 border-yellow-300 text-yellow-800"
-                        : event?.isapproved === "R" ? "bg-red-100 border-red-300 text-red-800"
-                          : event?.isapproved === "A" ? "bg-green-100 border-green-300 text-green-800"
-                            : event?.isapproved === "C" ? "bg-blue-100 border-blue-300 text-blue-800"
-                              : "bg-gray-100 border-gray-300 text-gray-800"
-                      }`}
-                    onClick={(e) => {
-                      if (!isEventInPast(event)) handleEditEvent(event, e);
-                    }}
-                    title={isEventInPast(event) ? "Past events cannot be edited" : `Click to edit: ${event?.title}`}
-                  >
-                    <div className='flex justify-between mb-1'>
-                      <span className="truncate flex-1 font-semibold flex items-center gap-1">
-                        {event?.type === 'task' ? (
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-circle-check-big-icon lucide-circle-check-big"><path d="M21.801 10A10 10 0 1 1 17 3.335" /><path d="m9 11 3 3L22 4" /></svg>
-                        ) : (
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar-days-icon lucide-calendar-days"><path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" /><path d="M8 14h.01" /><path d="M12 14h.01" /><path d="M16 14h.01" /><path d="M8 18h.01" /><path d="M12 18h.01" /><path d="M16 18h.01" /></svg>
-                        )}
-                        {event?.title}
+                  {/* Date Number */}
+                  <div className="relative z-10 flex justify-between items-start">
+                    <div
+                      className={`flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full text-sm sm:text-base 
+                        ${isToday(day) ? "bg-indigo-600 text-white" :
+                          isCurrentMonth ? "text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 cursor-pointer" :
+                            "text-gray-400"} transition-colors duration-200`}
+                      onClick={() => { if (!isPast && isCurrentMonth) handleClickDate(day) }}
+                      title={isPast ? "Unable to select past date" : "Click to add event"}
+                    >
+                      {format(day, "d")}
+                    </div>
+
+                    {/* More indicator if many activities */}
+                    {dayActivities.length > 3 && (
+                      <span className="text-xs bg-gray-100 text-gray-600 px-1.5 rounded">
+                        +{dayActivities.length - 3}
                       </span>
-                    </div>
-
-                    <div className="text-[10px] flex justify-between">
-                      <div>
-                        {moment(event?.from_date).format('DD/MMM')}
-                        {event?.from_date !== event?.to_date && ` to ${moment(event?.to_date).format('DD/MMM')}`}
-                      </div>
-                      <div>
-                        {moment(event?.from_date).format("HH:mm")} - {moment(event?.to_date).format("HH:mm")}
-                      </div>
-                    </div>
-
+                    )}
                   </div>
-                ))}
-                {dayEvents?.length > 3 && (
-                  <div className="text-xs text-gray-500 text-center">
-                    +{dayEvents?.length - 3} more
-                  </div>
-                )}
-              </div>
 
-              <div className="absolute inset-0 rounded-md transition-all duration-300 group-hover:bg-blue-500/5" />
-            </div>
-          );
-        })}
+                  {/* Activities Container */}
+                  <div className="mt-1 space-y-1 max-h-20 sm:max-h-[100px] overflow-y-auto">
+                    {dayActivities.slice(0, 3).map((activity, index) => {
+                      const styles = getActivityStyles(activity.status);
+                      const startDate = parseDateTime(activity.start_date);
+                      const endDate = parseDateTime(activity.end_date);
+
+                      return (
+                        <div
+                          key={index}
+                          className={`text-xs p-1 rounded border ${styles.bg} ${styles.border} cursor-pointer ${styles.hover} transition-colors`}
+                          title={`Click to Edit`}
+                          onClick={(e) => handleActivityClick(activity, e)}
+                        >
+                          <div className={`truncate font-medium ${styles.text}`}>#{activity.title}</div>
+                          <div className="sm:text-[10px] text-[8px] flex flex-col justify-between text-gray-600">
+                            <div className="flex justify-start items-center gap-0.5">
+                              <CalendarHeart size={10} />
+                              <span>{formatDate(startDate)}</span>
+                              {formatDate(startDate) !== formatDate(endDate) && (
+                                <span>- {formatDate(endDate)}</span>
+                              )}
+                            </div>
+                            <div className='flex justify-start items-center gap-0.5'>
+                              <Clock size={10} /> {formatTime(startDate)} - {formatTime(endDate)}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );

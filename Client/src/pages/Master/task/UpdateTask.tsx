@@ -1,19 +1,20 @@
 import React, { useEffect, useState, type FC } from "react";
-import type { Task } from "./TaskView";
-import type { RootState } from "../../../store/store";
 import { useDispatch, useSelector } from "react-redux";
+import StepModal from "../../../components/StepModal";
 import { handleSelectStep } from "../../../feature/masterSlice";
-import StepModal from "./StepModal";
 import { updateTask } from "../../../services/master/masterApi";
+import type { RootState } from "../../../store/store";
+import type { Task } from "./TaskView";
 
 interface Props {
   show: boolean;
   setShow: (show: boolean) => void;
-  Data: Task | null
-  fetchData: () => void
+  Data: Task | null;
+  fetchData: () => void;
+  isEdit: boolean;
 }
 
-const UpdateTask: FC<Props> = ({ show, setShow, Data, fetchData }) => {
+const UpdateTask: FC<Props> = ({ show, setShow, Data, fetchData, isEdit }) => {
   const [inputs, setInputs] = useState({
     id: Data?.id || 0,
     name: Data?.task_name || "",
@@ -65,19 +66,15 @@ const UpdateTask: FC<Props> = ({ show, setShow, Data, fetchData }) => {
   }
   return (
     <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-      <div
-        className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
-      >
+      <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100">
         {/* Modal Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-linear-to-br from-orange-500 to-purple-600 rounded-xl flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar-check-icon lucide-calendar-check text-white"><path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" /><path d="m9 16 2 2 4-4" /></svg>
             </div>
             <h3 className="text-xl font-bold text-gray-900">
-              Update Task
+              {isEdit ? "Update Task" : "View Task"}
             </h3>
           </div>
           <button
@@ -104,8 +101,9 @@ const UpdateTask: FC<Props> = ({ show, setShow, Data, fetchData }) => {
               name="name"
               value={inputs?.name}
               onChange={handleChange}
+              disabled={!isEdit}
               placeholder="Enter task name"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
               required
             />
           </div>
@@ -119,16 +117,17 @@ const UpdateTask: FC<Props> = ({ show, setShow, Data, fetchData }) => {
               <div className="flex-1">
                 <input
                   type="text"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
                   placeholder="Select Master Step..."
-                  readOnly
+                  disabled={!isEdit}
                   value={step_name}
                 />
               </div>
               <button
                 type="button"
-                className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 rounded-lg hover:shadow transition duration-300 flex items-center gap-2 cursor-pointer"
+                className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 rounded-lg hover:shadow transition duration-300 flex items-center gap-2 cursor-pointer disabled:cursor-not-allowed"
                 onClick={() => setShowSteps(true)}
+                disabled={!isEdit}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-list-icon lucide-list"><path d="M3 5h.01" /><path d="M3 12h.01" /><path d="M3 19h.01" /><path d="M8 5h13" /><path d="M8 12h13" /><path d="M8 19h13" /></svg>
               </button>
@@ -150,7 +149,8 @@ const UpdateTask: FC<Props> = ({ show, setShow, Data, fetchData }) => {
                 name="status"
                 value={inputs?.status}
                 onChange={handleChange}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer"
+                disabled={!isEdit}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer disabled:cursor-not-allowed"
                 required
               >
                 <option value="">Select status</option>
@@ -177,12 +177,13 @@ const UpdateTask: FC<Props> = ({ show, setShow, Data, fetchData }) => {
                 </svg>
               </div>
               <textarea
-                rows={3}
+                rows={2}
                 name="description"
                 value={inputs?.description}
                 onChange={handleChange}
+                disabled={!isEdit}
                 placeholder="Enter task description, goals, or notes..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none resize-none transition-all duration-200"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none resize-none transition-all duration-200 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -196,13 +197,15 @@ const UpdateTask: FC<Props> = ({ show, setShow, Data, fetchData }) => {
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
-            >
-              {loading ? 'Updatting' : 'Update'}
-            </button>
+            {isEdit && (
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
+              >
+                {loading ? 'Updatting' : 'Update'}
+              </button>
+            )}
           </div>
         </form>
       </div>

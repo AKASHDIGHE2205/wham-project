@@ -1,13 +1,15 @@
+import type React from "react";
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import GoogleLocation from "../../../components/GoogleLocation";
+import { MEDIA_URL } from "../../../constant/Baseurl";
 import { getUniversityDetails, updateUniversity } from "../../../services/master/masterApi";
 import type { SelectedLocation } from "./UniversityAdd";
-import { MEDIA_URL } from "../../../constant/Baseurl";
-import GoogleLocation from "../../Calender-new/GoogleLocation";
-import type React from "react";
 
 const UniversityEdit = () => {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const isEdit = searchParams.get('isEdit');
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [selectedLocations, setSelectedLocations] = useState<SelectedLocation[]>([]);
@@ -109,9 +111,9 @@ const UniversityEdit = () => {
   return (
     <>
       <div className="min-h-screen bg-linear-to-br from-indigo-50 via-purple-50 to-pink-50 py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-2xl mx-auto">
           {/* Header Card */}
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 mb-2 transform hover:shadow-2xl transition-all duration-300">
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-2 mb-2 transform hover:shadow-2xl transition-all duration-300">
             <div className="flex items-center space-x-4">
               <div className="bg-linear-to-r from-indigo-600 to-purple-600 p-4 rounded-2xl shadow-lg">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -173,8 +175,9 @@ const UniversityEdit = () => {
                         name="name"
                         value={inputs.name}
                         onChange={handleInputChange}
+                        disabled={isEdit === 'false'}
                         placeholder="Enter university name"
-                        className="w-full pl-10 px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                        className="w-full pl-10 px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
                         required
                       />
                     </div>
@@ -195,7 +198,8 @@ const UniversityEdit = () => {
                         name="status"
                         value={inputs.status}
                         onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none"
+                        disabled={isEdit === 'false'}
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none disabled:cursor-not-allowed"
                         required
                       >
                         <option value="" disabled>Select status</option>
@@ -237,7 +241,8 @@ const UniversityEdit = () => {
                       <button
                         type="button"
                         onClick={handleLocation}
-                        className="px-4 py-2 bg-linear-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:ring-4 focus:ring-indigo-300 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 whitespace-nowrap"
+                        disabled={isEdit === 'false'}
+                        className="px-4 py-2 bg-linear-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:ring-4 focus:ring-indigo-300 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 whitespace-nowrap disabled:cursor-not-allowed"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-list-icon lucide-list">
                           <path d="M3 5h.01" /><path d="M3 12h.01" /><path d="M3 19h.01" /><path d="M8 5h13" /><path d="M8 12h13" /><path d="M8 19h13" />
@@ -281,8 +286,9 @@ const UniversityEdit = () => {
                             <button
                               type="button"
                               onClick={() => removeSelectedLocation(location.id)}
-                              className="ml-2 p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                              className="ml-2 p-1.5 text-red-500 hover:text-rd-700 hover:bg-red-50 rounded-lg transition-colors duration-200 disabled:cursor-not-allowed"
                               title="Remove location"
+                              disabled={isEdit === 'false'}
                             >
                               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -305,12 +311,14 @@ const UniversityEdit = () => {
                 >
                   Cancel
                 </button>
+                {(isEdit === "true") &&(
                 <button
                   type="submit"
                   className="px-6 py-2.5 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:ring-4 focus:ring-indigo-300 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2 cursor-pointer"
                 >
                   Update
                 </button>
+                )}
               </div>
             </form>
           </div>

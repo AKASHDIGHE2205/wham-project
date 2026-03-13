@@ -1,8 +1,8 @@
 const { hostname } = window.location;
 
 // export const BASE_URL = `https://${hostname}:5172/api`;
-export const BASE_URL = "/api";
 
+export const BASE_URL = `https://${hostname}:5172/api`;
 export const MEDIA_URL = `https://${hostname}:5172`;
 
 export const secretKey = `Malpani@2025`;

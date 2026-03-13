@@ -1,18 +1,20 @@
-import { useEffect, useState, type FC } from "react";
-import { getActiveColleges } from "../../../services/master/masterApi";
 import { Search } from "lucide-react";
+import { useEffect, useState, type FC } from "react";
 import { useDispatch } from "react-redux";
 import { handleSelectCollege } from "../../../feature/masterSlice";
+import { getActiveColleges } from "../../../services/master/masterApi";
 
 interface Props {
   show: boolean;
   setShow: (show: boolean) => void;
 }
+
 interface College {
   clg_id: number;
   clg_name: string;
 }
-const CollegeModal: FC<Props> = ({ show, setShow, }) => {
+
+const SelectCollege: FC<Props> = ({ show, setShow }) => {
   const [data, setData] = useState<College[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -28,17 +30,19 @@ const CollegeModal: FC<Props> = ({ show, setShow, }) => {
       }
     }
     fetchData();
-  }, [])
+  }, []);
 
-  const filteredColleges = data?.filter((items) => items?.clg_name.toLowerCase().includes(search.toLowerCase()));
+  const filteredColleges = data?.filter((items) =>
+    items?.clg_name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const handleSelect = (college: College) => {
+    dispatch(handleSelectCollege({ id: college?.clg_id, name: college?.clg_name }))
+    setShow(false);
+  };
 
   const handleClose = () => {
     dispatch(handleSelectCollege({ id: 0, name: "" }))
-    setShow(false);
-  }
-
-  const handleSelect = (data: College) => {
-    dispatch(handleSelectCollege({ id: data.clg_id || 0, name: data.clg_name || "" }))
     setShow(false);
   }
 
@@ -51,15 +55,12 @@ const CollegeModal: FC<Props> = ({ show, setShow, }) => {
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-linear-to-br from-orange-500 to-purple-600 rounded-xl flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-university-icon lucide-university text-white"><path d="M14 21v-3a2 2 0 0 0-4 0v3" /><path d="M18 12h.01" /><path d="M18 16h.01" /><path d="M22 7a1 1 0 0 0-1-1h-2a2 2 0 0 1-1.143-.359L13.143 2.36a2 2 0 0 0-2.286-.001L6.143 5.64A2 2 0 0 1 5 6H3a1 1 0 0 0-1 1v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2z" /><path d="M6 12h.01" /><path d="M6 16h.01" /><circle cx="12" cy="10" r="2" /></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-university-icon lucide-university text-white"><path d="M14 21v-3a2 2 0 0 0-4 0v3" /><path d="M18 12h.01" /><path d="M18 16h.01" /><path d="M22 7a1 1 0 0 0-1-1h-2a2 2 0 0 1-1.143-.359L13.143 2.36a2 2 0 0 0-2.286-.001L6.143 5.64A2 2 0 0 1 5 6H3a1 1 0 0 0-1 1v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2z" /><path d="M6 12h.01" /><path d="M6 16h.01" /><circle cx="12" cy="10" r="2" /></svg>
             </div>
             <div>
               <h3 className="text-xl font-bold text-gray-900">
-                Select college
+                Select Colleges
               </h3>
-              <p className="text-sm text-gray-600 mt-1">
-                Choose a college from the list below
-              </p>
             </div>
           </div>
           <button
@@ -88,7 +89,7 @@ const CollegeModal: FC<Props> = ({ show, setShow, }) => {
           </div>
         </div>
 
-        {/* Members List */}
+        {/* Colleges List */}
         <div className="p-6">
           {loading ? (
             <div className="flex justify-center items-center py-12">
@@ -96,9 +97,8 @@ const CollegeModal: FC<Props> = ({ show, setShow, }) => {
             </div>
           ) : filteredColleges?.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No members found</p>
               <p className="text-gray-400 text-sm mt-1">
-                {search ? "Try adjusting your search terms" : "No members available"}
+                {search ? "Try adjusting your search terms" : "No active college found."}
               </p>
             </div>
           ) : (
@@ -121,7 +121,10 @@ const CollegeModal: FC<Props> = ({ show, setShow, }) => {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filteredColleges?.map((college) => {
                       return (
-                        <tr key={college?.clg_id} className="hover:bg-gray-50 transition-colors duration-150">
+                        <tr
+                          key={college?.clg_id}
+                          className=''
+                        >
                           <td className="px-4 py-2 whitespace-nowrap text-center">
                             <span className="text-sm text-gray-900">
                               {college?.clg_id}
@@ -135,7 +138,7 @@ const CollegeModal: FC<Props> = ({ show, setShow, }) => {
                           <td className="px-4 py-2 whitespace-nowrap text-left">
                             <button
                               onClick={() => handleSelect(college)}
-                              className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer text-orange-600 bg-orange-50 border border-orange-200 hover:bg-orange-100"
+                              className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer text-orange-600 bg-orange-50 border border-orange-200 hover:bg-orange-100`}
                             >
                               Select
                             </button>
@@ -158,7 +161,7 @@ const CollegeModal: FC<Props> = ({ show, setShow, }) => {
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end items-center p-6 border-t border-gray-200 bg-gray-50">
+        <div className="flex justify-end items-center gap-3 p-6 border-t border-gray-200 bg-gray-50">
           <button
             onClick={handleClose}
             className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer"
@@ -168,7 +171,7 @@ const CollegeModal: FC<Props> = ({ show, setShow, }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CollegeModal
+export default SelectCollege;

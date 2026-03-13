@@ -1,11 +1,11 @@
-import { Plus, Search } from "lucide-react"
-import { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
-import { getAllUniversities } from "../../../services/master/masterApi";
-import CustomPagination from "../../../helper/CustomPagination";
+import { Plus, Search } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import DataLoading from "../../../components/DataLoading";
+import ShowMedia from "../../../components/ShowMedia";
 import { MEDIA_URL } from "../../../constant/Baseurl";
-import ShowMedia from "./ShowMedia";
+import CustomPagination from "../../../helper/CustomPagination";
+import { deactivateUniversity, getAllUniversities } from "../../../services/master/masterApi";
 
 export interface University {
   id: number;
@@ -28,7 +28,7 @@ const UniversityView = () => {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [loading, setLoading] = useState(true);
   const [showImage, setShowImage] = useState(false);
-  const [selectedUniversity, setSelectedUniversity] = useState({})
+  const [selectedUniversity, setSelectedUniversity] = useState({});
 
   const fetchData = async () => {
     setLoading(true);
@@ -62,8 +62,20 @@ const UniversityView = () => {
     setShowImage(true);
   }
 
+  const handleDeactivateUniversity = async (data: University) => {
+    const body = {
+      id: data?.id,
+      status: data?.status === "A" ? "I" : "A"
+    }
+    const response = await deactivateUniversity(body);
+
+    if (response) {
+      fetchData();
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-white border border-orange-300 m-1 rounded-md p-2 sm:p-6">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 border border-orange-300 m-1 rounded-md p-2 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
@@ -76,7 +88,7 @@ const UniversityView = () => {
         {/* Search and Filter Section */}
         <div className="bg-white rounded-xl shadow-xs border border-gray-200 p-4 mb-4">
           <div className="flex flex-col gap-4 justify-between">
-            {/* Search Input - 30% width on large screens */}
+            {/* Search Input*/}
             <div className="w-full lg:w-[30%] relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
                 <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
@@ -84,7 +96,7 @@ const UniversityView = () => {
               <input
                 type="text"
                 placeholder="Search university..."
-                className="block w-full pl-9 sm:pl-10 pr-3 py-2 sm:py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 text-sm sm:text-base"
+                className="block w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 text-sm sm:text-base"
                 onChange={(e) => setSearch(e.target.value)}
                 value={search}
               />
@@ -190,7 +202,7 @@ const UniversityView = () => {
                           <span className="text-sm leading-snug">
                             {item?.address}
                           </span>
-                          <span className="text-xs text-gray-600">
+                          <span className="text-xs text-gray-600 hidden">
                             • lat: {item?.lat} • lng: {item?.lng}
                           </span>
                         </div>
@@ -206,15 +218,26 @@ const UniversityView = () => {
                         </span>
                       </td>
                       <td className="px-3 py-2 text-left whitespace-nowrap">
-                        <Link
-                          to={`/master/edit-university/${item?.id}`}
-                          className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-orange-600 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-all duration-200 cursor-pointer"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-square-pen-icon lucide-square-pen">
-                            <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                            <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" />
-                          </svg>
-                        </Link>
+                        <div className="flex justify-center items-center gap-1">
+                          <Link
+                          to={`/master/edit-university/${item?.id}?isEdit=false`}
+                            className="inline-flex items-center p-1.5 text-sm font-medium text-gray-900 bg-green-50 rounded-lg hover:bg-green-200 transition-all duration-200 cursor-pointer"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" color="green" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye-icon lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" /><circle cx="12" cy="12" r="3" /></svg>
+                          </Link>
+                          <Link
+                            to={`/master/edit-university/${item?.id}?isEdit=true`}
+                            className="inline-flex items-center p-1.5 text-sm font-medium text-gray-900 bg-blue-50 rounded-lg hover:bg-blue-200 transition-all duration-200 cursor-pointer"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" color="#0047B3" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-pencil-line-icon lucide-pencil-line"><path d="M13 21h8" /><path d="m15 5 4 4" /><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /></svg>
+                          </Link>
+                          <button
+                            className="inline-flex items-center p-1.5 text-sm font-medium text-gray-900 bg-red-50 rounded-lg hover:bg-red-200 transition-all duration-200 cursor-pointer"
+                            onClick={() => handleDeactivateUniversity(item)}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" color="red" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-ban-icon lucide-ban"><circle cx="12" cy="12" r="10" /><path d="M4.929 4.929 19.07 19.071" /></svg>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))

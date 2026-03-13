@@ -1,10 +1,10 @@
 import { useState, type FC } from "react";
-import { addDepartment } from "../../../services/master/masterApi";
 import toast from "react-hot-toast";
-import CollegeModal from "./CollegeModal";
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../../store/store";
 import { handleSelectCollege } from "../../../feature/masterSlice";
+import { addDepartment } from "../../../services/master/masterApi";
+import type { RootState } from "../../../store/store";
+import SelectCollege from "./SelectCollege";
 
 interface DepartmentAddProps {
   show: boolean;
@@ -229,7 +229,7 @@ const DepartmentAdd: FC<DepartmentAddProps> = ({ show, setShow, fetchData }) => 
       </div>
 
       {/* College Search Modal */}
-      <CollegeModal
+      <SelectCollege
         show={showCollegeModal}
         setShow={setShowCollegeModal}
       />

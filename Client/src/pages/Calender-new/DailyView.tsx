@@ -1,206 +1,248 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react';
-import { format, isToday } from 'date-fns';
-import moment from 'moment';
-import type { CalendarEvent } from './MonthlyView';
+import { format, isToday } from "date-fns";
+import { Calendar, Clock } from "lucide-react";
+import moment from "moment";
+import React from "react";
+import type { Activities } from "./Calender";
 
 interface DailyViewProps {
   currentDate: Date;
-  selectedDate: Date | null;
-  onDateSelect: (date: Date) => void;
-  onShowModal: (show: boolean) => void;
-  Data: any;
-  setIsEditShowModal: (show: boolean) => void;
-  setEditData: (data: any) => void;
-  setSelectedDate: (date: Date | null) => void;
-  Loading: boolean;
+  Data: Activities[]
+  Loading: boolean
 }
 
-const DailyView: React.FC<DailyViewProps> = ({
-  currentDate,
-  onShowModal,
-  Data,
-  setIsEditShowModal,
-  setEditData,
-  setSelectedDate,
-  Loading
-}) => {
+// Reuse the same activity styles from MonthlyView
+const getActivityStyles = (status: string) => {
+  switch (status) {
+    case 'A':
+      return {
+        bg: 'bg-green-100',
+        border: 'border-green-500',
+        hover: 'hover:bg-green-200',
+        text: 'text-green-800'
+      };
+    case 'P':
+      return {
+        bg: 'bg-yellow-100',
+        border: 'border-yellow-500',
+        hover: 'hover:bg-yellow-200',
+        text: 'text-yellow-800'
+      };
+    case 'R':
+      return {
+        bg: 'bg-red-100',
+        border: 'border-red-500',
+        hover: 'hover:bg-red-200',
+        text: 'text-red-800'
+      };
+    case 'C':
+      return {
+        bg: 'bg-red-100',
+        border: 'border-red-500',
+        hover: 'hover:bg-red-200',
+        text: 'text-red-800'
+      };
+    default:
+      return {
+        bg: 'bg-blue-100',
+        border: 'border-blue-500',
+        hover: 'hover:bg-blue-200',
+        text: 'text-blue-800'
+      };
+  }
+};
+
+const parseDateTime = (dateTimeStr: string): Date => {
+  const isoString = dateTimeStr.replace(' ', 'T');
+  return new Date(isoString);
+};
+
+const formatTime = (date: Date): string => {
+  return format(date, 'HH:mm');
+};
+
+const DailyView: React.FC<DailyViewProps> = ({ currentDate, Data, Loading }) => {
   const hours = Array.from({ length: 24 }, (_, i) => i);
-
-  const safeParseDate = (dateString: string): Date | null => {
-    if (!dateString || dateString.includes("0000-00-00")) return null;
-    const d = new Date(dateString);
-    return isNaN(d.getTime()) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  };
-
-  const getEventsForDate = (date: Date): CalendarEvent[] => {
-    if (!Array.isArray(Data)) return [];
-
-    const targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-
-    return Data.filter((event: CalendarEvent) => {
-      const start = safeParseDate(event?.from_date);
-      const end = safeParseDate(event?.to_date);
-      if (!start || !end) return false;
-
-      return targetDate >= start && targetDate <= end;
-    });
-  };
-
-  const getEventsForHour = (hour: number): CalendarEvent[] => {
-    const dayEvents = getEventsForDate(currentDate);
-
-    return dayEvents.filter((event: CalendarEvent) => {
-      try {
-        const eventStartHour = event?.from_time ? parseInt(event?.from_time.split(':')[0]) : 0;
-        return eventStartHour === hour;
-      } catch (error) {
-        console.error('Error processing event:', error);
-        return false;
-      }
-    });
-  };
-
-  const handleHourClick = (hour: number) => {
-    const selectedDateTime = new Date(currentDate);
-    selectedDateTime.setHours(hour, 0, 0, 0);
-
-    if (isPastDate(selectedDateTime)) return;
-
-    setSelectedDate(selectedDateTime);
-    onShowModal(true);
-  };
-
-  const handleEditEvent = (event: CalendarEvent, e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    if (isEventInPast(event)) return;
-
-    setEditData(event);
-    setIsEditShowModal(true);
-  };
-
-  // Format time from date strings like MonthlyView does
-  const formatTimeFromDate = (dateString: string): string => {
-    if (!dateString || dateString.includes("0000-00-00")) return "All day";
-    try {
-      return moment(dateString).format("HH:mm");
-    } catch {
-      return "All day";
-    }
-  };
 
   const isPastDate = (date: Date): boolean => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
     const target = new Date(date);
     target.setHours(0, 0, 0, 0);
-
     return target < today;
   };
 
-  const isEventInPast = (event: CalendarEvent): boolean => {
-    const eventEnd = safeParseDate(event.to_date);
-    if (!eventEnd) return false;
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    return eventEnd < today;
+  // Get activities for the current day
+  const getActivitiesForDay = (): Activities[] => {
+    return Data.filter(activity => {
+      const startDate = parseDateTime(activity.start_date);
+      const endDate = parseDateTime(activity.end_date);
+      
+      const dayStart = new Date(currentDate);
+      dayStart.setHours(0, 0, 0, 0);
+      
+      const dayEnd = new Date(currentDate);
+      dayEnd.setHours(23, 59, 59, 999);
+      
+      return (
+        (startDate <= dayEnd && endDate >= dayStart) ||
+        (format(startDate, 'yyyy-MM-dd') === format(currentDate, 'yyyy-MM-dd')) ||
+        (format(endDate, 'yyyy-MM-dd') === format(currentDate, 'yyyy-MM-dd'))
+      );
+    });
   };
 
-  // Loading state
+  // Get activities for a specific hour
+  const getActivitiesForHour = (hour: number): Activities[] => {
+    const dayActivities = getActivitiesForDay();
+    
+    return dayActivities.filter(activity => {
+      const startDate = parseDateTime(activity.start_date);
+      const endDate = parseDateTime(activity.end_date);
+      
+      const hourStart = new Date(currentDate);
+      hourStart.setHours(hour, 0, 0, 0);
+      
+      const hourEnd = new Date(currentDate);
+      hourEnd.setHours(hour, 59, 59, 999);
+      
+      // Check if activity overlaps with this hour
+      return (
+        (startDate <= hourEnd && endDate >= hourStart)
+      );
+    });
+  };
+
+  const handleActivityClick = (activity: Activities, e: React.MouseEvent) => {
+    e.stopPropagation();
+    console.log('Activity clicked:', activity);
+  };
+
+  const isPastHour = (hour: number): boolean => {
+    return (
+      isPastDate(currentDate) ||
+      (isToday(currentDate) && hour < new Date().getHours())
+    );
+  };
+
   if (Loading) {
     return (
-      <div className="h-full bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 sm:mx-4 my-2 rounded-xl shadow-md overflow-hidden flex items-center justify-center min-h-[500px]">
-        <div className="flex flex-col items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-          <p className="text-gray-600 text-lg">Loading calendar...</p>
-        </div>
+      <div className="h-full flex items-center justify-center">
+        <div className="text-sm text-gray-500">Loading activities...</div>
       </div>
     );
   }
+
   return (
-    <div className="h-full overflow-y-auto bg-gray-50/30">
-      <div className="text-center py-5 bg-linear-to-br from-blue-50 to-indigo-50 border-b shadow-sm">
-        <div className="text-base text-blue-600 font-medium tracking-wide animate-fade-in">
-          {format(currentDate, 'EEEE')}
+    <div className="h-full bg-white sm:mx-4 my-2 rounded-lg border border-gray-200 overflow-hidden">
+      {/* Header with date */}
+      <div className="bg-gray-50 border-b border-gray-200 p-4 text-center">
+        <div className="text-base text-purple-600 font-medium tracking-wide">
+          {format(currentDate, "EEEE")}
         </div>
         <div className="text-3xl font-bold text-gray-800 mt-1 drop-shadow-sm">
-          {format(currentDate, 'MMMM d, yyyy')}
+          {format(currentDate, "MMMM d, yyyy")}
         </div>
       </div>
 
-      <div className="relative max-w-5xl mx-auto p-2 sm:p-4">
-        {hours?.map(hour => {
-          const hourEvents = getEventsForHour(hour);
-          const isPastHour = isPastDate(currentDate) || (isToday(currentDate) && hour < new Date().getHours());
+      {/* Time slots */}
+      <div className="relative max-w-5xl mx-auto hidden">
+        {hours.map((hour) => {
+          const hourActivities = getActivitiesForHour(hour);
+          const isPastHourSlot = isPastHour(hour);
+          
           return (
             <div
               key={hour}
-              className={`flex border-b min-h-16 sm:min-h-20 group transition-all
-    ${isPastHour ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:bg-blue-50/40'}
-  `}
+              className={`flex border-b border-gray-200 min-h-20 group transition-all 
+                ${isPastHourSlot ? "cursor-not-allowed opacity-60 bg-gray-50" : "hover:bg-gray-50"}`}
             >
-              <div
-                className="w-16 sm:w-24 p-2 sm:p-4 text-xs sm:text-sm text-gray-600 font-medium border-r border-gray-100 bg-white/70 sticky left-0 z-10"
-                onClick={() => {
-                  if (!isPastHour) handleHourClick(hour);
-                }}
-              >
-                {hour === 0 ? '12 AM' : hour < 12 ? `${hour} AM` : hour === 12 ? '12 PM' : `${hour - 12} PM`}
+              {/* Time label */}
+              <div className="w-20 sm:w-24 p-3 text-xs sm:text-sm text-gray-600 font-medium border-r border-gray-200 bg-gray-50/80 sticky left-0">
+                {hour === 0 ? "12 AM"
+                  : hour < 12 ? `${hour} AM`
+                    : hour === 12 ? "12 PM"
+                      : `${hour - 12} PM`}
               </div>
 
-              <div
-                className="flex-1 p-2 sm:p-3 relative"
-                onClick={() => handleHourClick(hour)}
-              >
-                {hourEvents?.map((event) => (
-                  <div
-                    key={event?.id}
-                    className={`text-xs px-1 py-0.5 rounded border truncate
-                        ${isEventInPast(event) ? 'opacity-85 cursor-not-allowed' : 'cursor-pointer'}
-                        ${event?.isapproved === "P" ? "bg-yellow-100 border-yellow-300 text-yellow-800"
-                        : event?.isapproved === "R" ? "bg-red-100 border-red-300 text-red-800"
-                          : event?.isapproved === "A" ? "bg-green-100 border-green-300 text-green-800"
-                            : event?.isapproved === "C" ? "bg-blue-100 border-blue-300 text-blue-800"
-                              : "bg-gray-100 border-gray-300 text-gray-800"
-                      }`}
-                    onClick={(e) => handleEditEvent(event, e)}
-                    title={`Click to edit: ${event?.title}`}
-                  >
-                    <span className="truncate flex-1 font-semibold flex items-center gap-2">
-                      {event?.type === 'task' ?
-                        (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-circle-check-big-icon lucide-circle-check-big"><path d="M21.801 10A10 10 0 1 1 17 3.335" /><path d="m9 11 3 3L22 4" /></svg>) : (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar-icon lucide-calendar"><path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" /></svg>)}
-                      {event?.title}
-                    </span>
-
-                    <div className="flex justify-between text-[10px] mt-1">
-                      <span className="text-gray-600">
-                        {moment(event?.from_date).format('DD/MMM')}
-                        {event?.from_date !== event?.to_date &&
-                          ` to ${moment(event?.to_date).format('DD/MMM')}`}
-                      </span>
-                      <span>
-                        {formatTimeFromDate(event?.from_date)} - {formatTimeFromDate(event?.to_date)}
+              {/* Activities container */}
+              <div className="flex-1 p-2 relative min-h-20">
+                {hourActivities.length > 0 ? (
+                  <div className="space-y-2">
+                    {hourActivities.map((activity, index) => {
+                      const styles = getActivityStyles(activity.status);
+                      const startDate = parseDateTime(activity.start_date);
+                      const endDate = parseDateTime(activity.end_date);
+                      
+                      return (
+                        <div
+                          key={index}
+                          className={`text-xs p-2 rounded border ${styles.bg} ${styles.border} cursor-pointer ${styles.hover} transition-colors`}
+                          title={`Click to Edit`}
+                          onClick={(e) => handleActivityClick(activity, e)}
+                        >
+                          <div className={`truncate font-medium ${styles.text} mb-1`}>#{activity.title}</div>
+                          <div className="text-[10px] flex items-center gap-2 text-gray-600">
+                            <div className="flex items-center gap-1">
+                              <Clock size={10}/> 
+                              {formatTime(startDate)} - {formatTime(endDate)}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  /* Empty state */
+                  !isPastHourSlot && (
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <span className="text-xs text-gray-400 bg-white px-2 py-1 rounded border border-gray-200 shadow-sm">
+                        Click to add event
                       </span>
                     </div>
-                  </div>
-                ))}
-
-                {hourEvents?.length === 0 && (
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                    <span className="text-xs text-gray-400 bg-white/80 px-2 py-1 rounded border">
-                      Click to add event
-                    </span>
-                  </div>
+                  )
                 )}
               </div>
             </div>
           );
         })}
       </div>
+
+      {/* Summary of all-day activities (if any) */}
+      {getActivitiesForDay().length > 0 && (
+        <div className="border-t border-gray-200 p-4 bg-gray-50">
+          <h3 className="text-sm font-medium text-gray-700 mb-2">All activities for {format(currentDate, "MMMM d, yyyy")}</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            {getActivitiesForDay().map((activity, index) => {
+              const styles = getActivityStyles(activity.status);
+              const startDate = parseDateTime(activity.start_date);
+              const endDate = parseDateTime(activity.end_date);
+              
+              return (
+                <div
+                  key={index}
+                  className={`text-xs p-2 rounded border ${styles.bg} ${styles.border} cursor-pointer ${styles.hover} transition-colors`}
+                  onClick={(e) => handleActivityClick(activity, e)}
+                >
+                  <div className={`font-medium ${styles.text} mb-1`}>#{activity.title}</div>
+                  <div className="text-[10px] flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-1">
+                      <Calendar size={10}/> 
+                      {moment(startDate).format('DD/MM')} - {moment(endDate).format('DD/MM')}
+                    </div>
+                  </div>
+                  <div className="text-[10px] flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-1">
+                      <Clock size={10}/> 
+                      {formatTime(startDate)} - {formatTime(endDate)}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

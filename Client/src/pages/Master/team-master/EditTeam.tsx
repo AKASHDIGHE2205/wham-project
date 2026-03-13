@@ -1,19 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState, type FC } from "react";
-import MembersModal from "./MembersModal";
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../../store/store";
+import MembersModal from "../../../components/MembersModal";
 import { handleSelectMember } from "../../../feature/masterSlice";
 import { updateTeam } from "../../../services/master/masterApi";
+import type { RootState } from "../../../store/store";
 
 interface Props {
   show: boolean;
   setShow: (show: boolean) => void;
   data: any;
   fetchData: () => void;
+  isEdit: boolean;
 }
 
-const EditTeam: FC<Props> = ({ show, setShow, data, fetchData }) => {
+const EditTeam: FC<Props> = ({ show, setShow, data, fetchData, isEdit}) => {
   const [inputs, setInputs] = useState({
     id: 0,
     name: "",
@@ -84,7 +85,7 @@ const EditTeam: FC<Props> = ({ show, setShow, data, fetchData }) => {
     <>
       <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
         <div
-          className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
+          className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Modal Header */}
@@ -96,7 +97,7 @@ const EditTeam: FC<Props> = ({ show, setShow, data, fetchData }) => {
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-gray-900">
-                Update Team
+               {isEdit ? "Update Team" : "View Team"}
               </h3>
             </div>
             <button
@@ -127,8 +128,9 @@ const EditTeam: FC<Props> = ({ show, setShow, data, fetchData }) => {
                   name="name"
                   value={inputs.name}
                   onChange={handleChange}
+                  disabled={!isEdit}
                   placeholder="Enter team name"
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
                   required
                 />
               </div>
@@ -144,15 +146,17 @@ const EditTeam: FC<Props> = ({ show, setShow, data, fetchData }) => {
                   <input
                     type="text"
                     value={inputs.managerName}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                    disabled={!isEdit}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200  disabled:cursor-not-allowed"
                     placeholder="Select team manager..."
                     readOnly
                   />
                 </div>
                 <button
                   type="button"
-                  className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 rounded-lg hover:shadow transition duration-300 flex items-center gap-2 cursor-pointer"
+                  className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 rounded-lg hover:shadow transition duration-300 flex items-center gap-2 cursor-pointer  disabled:cursor-not-allowed"
                   onClick={() => setShowMemModal(true)}
+                  disabled={!isEdit}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-list-icon lucide-list"><path d="M3 5h.01" /><path d="M3 12h.01" /><path d="M3 19h.01" /><path d="M8 5h13" /><path d="M8 12h13" /><path d="M8 19h13" /></svg>
                 </button>
@@ -172,10 +176,11 @@ const EditTeam: FC<Props> = ({ show, setShow, data, fetchData }) => {
                 </div>
                 <select
                   name="status"
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer  disabled:cursor-not-allowed"
                   required
                   value={inputs.status}
                   onChange={handleChange}
+                  disabled={!isEdit}
                 >
                   <option value="" disabled>Select status</option>
                   <option value="A">Active</option>
@@ -205,8 +210,9 @@ const EditTeam: FC<Props> = ({ show, setShow, data, fetchData }) => {
                   name="description"
                   value={inputs.description}
                   onChange={handleChange}
+                  disabled={!isEdit}
                   placeholder="Enter team description, goals, or notes..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none resize-none transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none resize-none transition-all duration-200 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
@@ -220,6 +226,7 @@ const EditTeam: FC<Props> = ({ show, setShow, data, fetchData }) => {
               >
                 Cancel
               </button>
+              {isEdit && (
               <button
                 type="submit"
                 disabled={loading}
@@ -227,6 +234,7 @@ const EditTeam: FC<Props> = ({ show, setShow, data, fetchData }) => {
               >
                 {loading ? 'Updatting' : 'Update'}
               </button>
+              )}
             </div>
           </form>
         </div >

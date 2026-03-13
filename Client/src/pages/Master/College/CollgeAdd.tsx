@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import type { SelectedLocation } from "../University/UniversityAdd";
-import { useNavigate } from "react-router-dom";
-import { getUserFromStorage } from "../../../helper/cryptoUser";
-import GoogleLocation from "../../Calender-new/GoogleLocation";
-import UniversityModal from "./UniversityModal";
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../../store/store";
+import { useNavigate } from "react-router-dom";
+import GoogleLocation from "../../../components/GoogleLocation";
+import UniversityModal from "../../../components/UniversityModal";
 import { handleSelectUniversity } from "../../../feature/masterSlice";
+import { getUserFromStorage } from "../../../helper/cryptoUser";
 import { addCollege } from "../../../services/master/masterApi";
+import type { RootState } from "../../../store/store";
+import type { SelectedLocation } from "../University/UniversityAdd";
 
 const CollgeAdd = () => {
   const [inputs, setInputs] = useState({
@@ -109,9 +109,9 @@ const CollgeAdd = () => {
   return (
     <>
       <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 border border-orange-300 m-1 rounded-md p-2 sm:p-6">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-2xl mx-auto">
           {/* Header */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 transform hover:shadow-md transition-all duration-300">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 mb-6 transform hover:shadow-md transition-all duration-300">
             <div className="flex items-center space-x-4">
               <div className="bg-linear-to-r from-orange-500 to-purple-600 p-3 rounded-xl">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -306,7 +306,7 @@ const CollgeAdd = () => {
                         className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 rounded-lg hover:shadow-lg transition duration-300 flex items-center gap-2 cursor-pointer"
                         onClick={() => setShowLocation(true)}
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-map-pin-plus-icon lucide-map-pin-plus"><path d="M19.914 11.105A7.298 7.298 0 0 0 20 10a8 8 0 0 0-16 0c0 4.993 5.539 10.193 7.399 11.799a1 1 0 0 0 1.202 0 32 32 0 0 0 .824-.738" /><circle cx="12" cy="10" r="3" /><path d="M16 18h6" /><path d="M19 15v6" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-map-pin-plus-icon lucide-map-pin-plus"><path d="M19.914 11.105A7.298 7.298 0 0 0 20 10a8 8 0 0 0-16 0c0 4.993 5.539 10.193 7.399 11.799a1 1 0 0 0 1.202 0 32 32 0 0 0 .824-.738" /><circle cx="12" cy="10" r="3" /><path d="M16 18h6" /><path d="M19 15v6" /></svg>
                       </button>
                     </div>
                   </div>

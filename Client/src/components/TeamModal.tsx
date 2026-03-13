@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Search } from "lucide-react";
 import { useEffect, useState, type FC } from "react";
-import { getActiveTeams } from "../../../services/calender/calenderApi";
 import toast from "react-hot-toast";
+import { getActiveTeams } from "../services/calender/calenderApi";
 
 interface Props {
   show: boolean;
@@ -78,6 +78,17 @@ const TeamModal: FC<Props> = ({ show, setShow, setSelectedTeams, selectedTeams }
     toast.success(`Selected ${selectedItems?.length} team(s)`);
     handleClose();
   };
+  const handleSelectAll = () => {
+    if (selectedItems?.length === teams?.length) {
+      setSelectedItems([]);
+    } else {
+      const allTeams = teams?.map(team => ({
+        id: team?.id,
+        name: team?.name
+      }));
+      setSelectedItems(allTeams);
+    }
+  };
 
   const filteredTeams = teams?.filter((team) =>
     team?.id.toString().toLowerCase().includes(search.toString().toLowerCase()) ||
@@ -87,7 +98,7 @@ const TeamModal: FC<Props> = ({ show, setShow, setSelectedTeams, selectedTeams }
   return (
     <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
       <div
-        className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border border-gray-100"
+        className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border border-gray-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
@@ -171,7 +182,7 @@ const TeamModal: FC<Props> = ({ show, setShow, setSelectedTeams, selectedTeams }
         )}
 
         {/* Search Section */}
-        <div className="p-6 border-b border-gray-200 bg-white">
+        <div className="p-2 border-b border-gray-200 bg-white">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-gray-400" />
@@ -202,13 +213,17 @@ const TeamModal: FC<Props> = ({ show, setShow, setSelectedTeams, selectedTeams }
               <table className="w-full">
                 <thead className="bg-orange-100 sticky top-0 z-5">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                      Select
+                    <th className="px-6 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <input
+                        type="checkbox"
+                        onClick={handleSelectAll}
+                        className="h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500 transition-colors duration-200"
+                      />
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-6 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       ID
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-6 py-2 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Team Name
                     </th>
                   </tr>
@@ -228,7 +243,7 @@ const TeamModal: FC<Props> = ({ show, setShow, setSelectedTeams, selectedTeams }
                           }`}
                         onClick={() => toggleSelection(team)}
                       >
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-2">
                           <input
                             type="checkbox"
                             checked={isSelected(team?.id)}
@@ -238,11 +253,11 @@ const TeamModal: FC<Props> = ({ show, setShow, setSelectedTeams, selectedTeams }
                           />
                         </td>
 
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-6 py-2 whitespace-nowrap">
                           <span className="text-sm text-gray-900">{team?.id}</span>
                         </td>
 
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-6 py-2 whitespace-nowrap">
                           <div className="flex items-center space-x-3">
                             <span className="text-sm font-medium text-gray-900">{team?.name}</span>
                           </div>
@@ -257,9 +272,8 @@ const TeamModal: FC<Props> = ({ show, setShow, setSelectedTeams, selectedTeams }
           ) : (
             <div className="flex flex-col items-center justify-center py-12 px-6">
               <div className="text-gray-500 text-center">
-                <p className="font-medium mb-1">No teams found</p>
                 <p className="text-sm">
-                  {search ? "Try adjusting your search terms" : "No teams available"}
+                  {search ? "Try adjusting your search terms" : "No active teams found."}
                 </p>
               </div>
             </div>
@@ -271,14 +285,14 @@ const TeamModal: FC<Props> = ({ show, setShow, setSelectedTeams, selectedTeams }
           <div className="flex gap-3">
             <button
               onClick={handleClose}
-              className="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+              className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
             >
               Cancel
             </button>
             <button
               onClick={handleConfirm}
               disabled={selectedItems?.length === 0}
-              className="px-6 py-3 text-sm font-medium text-white bg-linear-to-r from-orange-500 to-purple-600 rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm flex items-center gap-2 cursor-pointer"
+              className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-orange-500 to-purple-600 rounded-lg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm flex items-center gap-2 cursor-pointer"
             >
               Confirm ({selectedItems?.length}) Selection
             </button>

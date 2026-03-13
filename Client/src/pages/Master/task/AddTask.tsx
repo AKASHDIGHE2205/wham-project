@@ -1,10 +1,10 @@
 import { useState, type FC } from "react";
-import StepModal from "./StepModal";
-import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../../store/store";
-import { addTask } from "../../../services/master/masterApi";
-import { handleSelectStep } from "../../../feature/masterSlice";
 import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import StepModal from "../../../components/StepModal";
+import { handleSelectStep } from "../../../feature/masterSlice";
+import { addTask } from "../../../services/master/masterApi";
+import type { RootState } from "../../../store/store";
 
 interface Props {
   show: boolean;
@@ -35,8 +35,9 @@ const AddTask: FC<Props> = ({ show, setShow, fetchData }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true)
-    if (!inputs.name || !step_id) {
+    if (!inputs.name) {
       toast.error("Please fill all required fields.")
+      setLoading(false);
       return;
     }
     const body = {
@@ -50,12 +51,11 @@ const AddTask: FC<Props> = ({ show, setShow, fetchData }) => {
       setLoading(true)
       handleClose();
     }
-
   }
   return (
     <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
       <div
-        className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
+        className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
       >
         {/* Modal Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">

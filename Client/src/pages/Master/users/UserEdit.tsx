@@ -8,9 +8,10 @@ interface Props {
   show: boolean;
   setShow: (show: boolean) => void;
   fetchData: () => void
+  isEdit?: boolean
 }
 
-const UserEdit: FC<Props> = ({ Data, show, setShow, fetchData }) => {
+const UserEdit: FC<Props> = ({ Data, show, setShow, fetchData, isEdit }) => {
   const [inputs, setInputs] = useState({
     user_id: Data?.user_id || "",
     full_name: Data?.full_name || "",
@@ -66,7 +67,7 @@ const UserEdit: FC<Props> = ({ Data, show, setShow, fetchData }) => {
 
   return (
     <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100">
+      <div className="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100">
         {/* Modal Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
@@ -76,7 +77,7 @@ const UserEdit: FC<Props> = ({ Data, show, setShow, fetchData }) => {
               </svg>
             </div>
             <h3 className="text-xl font-bold text-gray-900">
-              Update User
+              {isEdit ? "Update User" : "View User"}
             </h3>
           </div>
           <button
@@ -105,7 +106,7 @@ const UserEdit: FC<Props> = ({ Data, show, setShow, fetchData }) => {
                 value={inputs.full_name}
                 onChange={handleChange}
                 placeholder="Enter user name"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 bg-gray-100"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 bg-gray-100 cursor-not-allowed"
                 required
                 readOnly
               />
@@ -122,7 +123,7 @@ const UserEdit: FC<Props> = ({ Data, show, setShow, fetchData }) => {
                 value={inputs.email}
                 onChange={handleChange}
                 placeholder="Enter user email"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 bg-gray-100"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 bg-gray-100 cursor-not-allowed"
                 required
                 readOnly
               />
@@ -139,7 +140,7 @@ const UserEdit: FC<Props> = ({ Data, show, setShow, fetchData }) => {
                 value={inputs.phone}
                 onChange={handleChange}
                 placeholder="Enter user phone"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 bg-gray-100"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 bg-gray-100 cursor-not-allowed"
                 required
                 readOnly
               />
@@ -158,10 +159,11 @@ const UserEdit: FC<Props> = ({ Data, show, setShow, fetchData }) => {
                 </div>
                 <select
                   name="is_verified"
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer disabled:cursor-not-allowed"
                   required
                   value={inputs.is_verified}
                   onChange={handleChange}
+                  disabled={!isEdit}
                 >
                   <option value="" disabled>Select status</option>
                   <option value="A">Active</option>
@@ -188,10 +190,11 @@ const UserEdit: FC<Props> = ({ Data, show, setShow, fetchData }) => {
                 </div>
                 <select
                   name="role"
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer disabled:cursor-not-allowed"
                   required
                   value={inputs.role}
                   onChange={handleChange}
+                  disabled={!isEdit}
                 >
                   <option value="" disabled>Select status</option>
                   <option value="User">User</option>
@@ -220,10 +223,11 @@ const UserEdit: FC<Props> = ({ Data, show, setShow, fetchData }) => {
                 </div>
                 <select
                   name="isorganizer"
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer disabled:cursor-not-allowed"
                   required
                   value={inputs.isorganizer}
                   onChange={handleChange}
+                  disabled={!isEdit}
                 >
                   <option value="" disabled>Select status</option>
                   <option value="Y">YES</option>
@@ -248,12 +252,14 @@ const UserEdit: FC<Props> = ({ Data, show, setShow, fetchData }) => {
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
-            >
-              Update
-            </button>
+            {isEdit && (
+              <button
+                type="submit"
+                className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
+              >
+                Update
+              </button>
+            )}
           </div>
         </form>
       </div>

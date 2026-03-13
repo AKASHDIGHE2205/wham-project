@@ -1,62 +1,16 @@
-import db from '../../db.js';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
 import axios from 'axios';
+import bcrypt from 'bcrypt';
 import dotenv from "dotenv";
+import fs from 'fs';
+import jwt from 'jsonwebtoken';
+import path from 'path';
+import db from '../../db.js';
 
 dotenv.config();
 
 const SECRET_KEY = process.env.SECRET_KEY || "Malpani@2025";
 
-// REGISTER USER
 export const registerUser_old = async (req, res) => {
-  try {
-    const { lastName, middleName, firstName, password, email, phone } = req.body;
-
-    if (!firstName || !lastName || !password || !email || !phone) {
-      return res.status(400).json({ message: "Please fill in all required fields." });
-    }
-
-    const checkUserSQL = `SELECT id FROM users WHERE email = ? OR phone = ?`;
-    db.query(checkUserSQL, [email, phone], async (err, results) => {
-      if (err) {
-        console.error("Database error:", err);
-        return res.status(500).json({ message: "Internal server error" });
-      }
-
-      if (results.length > 0) {
-        return res.status(409).json({ message: "User already exists with this email or phone" });
-      }
-
-      try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const insertUserSQL = `
-          INSERT INTO users (first_name, middle_name,last_name, password, email, phone, role, is_verified) VALUES (?, ?, ?, ?, ?, ?,'User', 'I')`;
-
-        db.query(insertUserSQL, [firstName, middleName, lastName, hashedPassword, email, phone], (insertErr, insertResults) => {
-          if (insertErr) {
-            console.error("Insert error:", insertErr);
-            return res.status(500).json({ message: "Error while registering user" });
-          }
-
-          return res.status(201).json({ message: "User registered successfully ✅", userId: insertResults.insertId, });
-        }
-        );
-
-      } catch (hashErr) {
-        console.error("Hashing error:", hashErr);
-        return res.status(500).json({ message: "Error hashing password" });
-      }
-    });
-
-  } catch (error) {
-    console.error("Unexpected server error:", error);
-    return res.status(500).json({ message: "Unexpected server error" });
-  }
-};
-
-export const registerUser = async (req, res) => {
   const { firstName, middleName, lastName, password, email, phone } = req.body;
 
   if (!firstName || !lastName || !password || !email || !phone) {
@@ -152,6 +106,133 @@ export const registerUser = async (req, res) => {
   });
 };
 
+export const registerUser = async (req, res) => {
+  try {
+      const userData = JSON.parse(req.body.userData);
+
+    const { firstName, middleName, lastName, password, email, phone } = userData;
+    const file = req.file;
+
+    if (!firstName || !lastName || !password || !email || !phone) {
+      return res.status(400).json({ message: "Please fill in all required fields." });
+    }
+
+    // Check if user exists
+    const checkUserSQL = `SELECT id FROM users WHERE email = ? OR phone = ?`;
+
+    db.query(checkUserSQL, [email, phone], async (err, results) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Internal server error" });
+      }
+
+      if (results.length > 0) {
+        return res.status(409).json({ message: "User already exists with this email or phone." });
+      }
+
+      try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Handle photo upload if present
+        let savedFilePath = null;
+        if (file) {
+          const basePath = "D:/Projects/Wham/Server/uploads";
+          const profileFolder = path.join(basePath, "users");
+
+          if (!fs.existsSync(profileFolder)) {
+            fs.mkdirSync(profileFolder, { recursive: true });
+          }
+
+          const ext = path.extname(file.originalname);
+          const fileName = `${Date.now()}_${firstName}_${lastName}${ext}`;
+          const fullPath = path.join(profileFolder, fileName);
+
+          fs.writeFileSync(fullPath, file.buffer);
+          savedFilePath = `/uploads/users/${fileName}`;
+        }
+
+        // Get connection from pool
+        db.getConnection((connErr, connection) => {
+          if (connErr) {
+            console.error(connErr);
+            return res.status(500).json({ message: "Database connection failed" });
+          }
+
+          // Start transaction
+          connection.beginTransaction((txErr) => {
+            if (txErr) {
+              connection.release();
+              return res.status(500).json({ message: "Transaction start failed" });
+            }
+
+            // Insert user with profile photo
+            const insertUserSQL = `
+              INSERT INTO users
+              (first_name, middle_name, last_name, password, email, phone, role, is_verified, isorganizer, photo)
+              VALUES (?, ?, ?, ?, ?, ?, 'User', 'I', 'N', ?)
+            `;
+
+            connection.query(insertUserSQL, [firstName, middleName, lastName, hashedPassword, email, phone, savedFilePath], (userErr, userResult) => {
+              if (userErr) {
+                return connection.rollback(() => {
+                  connection.release();
+                  console.error(userErr);
+                  res.status(500).json({ message: "User creation failed" });
+                });
+              }
+
+              const userId = userResult.insertId;
+
+              // Insert member
+              const insertMemberSQL = `
+                INSERT INTO mst_members
+                  (mem_id, first_name, middle_name, last_name, mobile, email, designation, isorganizer, user_id, status)
+                  SELECT IFNULL(MAX(mem_id), 0) + 1, ?, ?, ?, ?, ?, 'Users', 'N', ?, 'A'
+                  FROM mst_members
+              `;
+
+              connection.query(insertMemberSQL, [firstName, middleName, lastName, phone, email, userId,], (memberErr) => {
+                if (memberErr) {
+                  return connection.rollback(() => {
+                    connection.release();
+                    console.error(memberErr);
+                    res.status(500).json({ message: "Member creation failed" });
+                  });
+                }
+
+                // Commit transaction
+                connection.commit((commitErr) => {
+                  if (commitErr) {
+                    return connection.rollback(() => {
+                      connection.release();
+                      res.status(500).json({ message: "Commit failed" });
+                    });
+                  }
+
+                  // Release connection
+                  connection.release();
+
+                  return res.status(201).json({
+                    message: "User registered successfully ✅",
+                    userId,
+                    profilePhoto: savedFilePath
+                  });
+                });
+              });
+            });
+          });
+        });
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Registration failed" });
+      }
+    });
+  } catch (error) {
+    console.error("Registration error:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
 // LOGIN USER
 export const loginUser = (req, res) => {
   try {
@@ -204,6 +285,7 @@ export const loginUser = (req, res) => {
           phone: user.phone,
           role: user.role,
           isorganizer: user.isorganizer,
+          photo:user.photo
         },
       });
     });

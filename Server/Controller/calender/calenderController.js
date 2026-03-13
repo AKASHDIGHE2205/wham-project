@@ -1,4 +1,18 @@
+import fs from 'fs';
+import path from 'path';
 import db from '../../db.js';
+
+const query = (sql, values = []) => {
+  return new Promise((resolve, reject) => {
+    db.query(sql, values, (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result);
+      }
+    });
+  });
+};
 
 export const getActiveTeams = (req, res) => {
   const sql = `SELECT * FROM mst_team WHERE status = ? `;
@@ -611,5 +625,602 @@ export const deleteEvent = (req, res) => {
   } catch (err) {
     console.error("updateEvent Exception:", err);
     return res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// ---------------------------------------------------------------------
+export const getActiveOccasions = (req, res) => {
+  const sql = `SELECT * FROM occasions WHERE status = 'A'`;
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error fetching occasions:', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+    return res.status(200).json({ Occasions: results });
+  });
+}
+
+export const getActiveCompaign = (req, res) => {
+  const sql = `SELECT * FROM compaign WHERE status = 'A'`;
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error fetching compaign:', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+    return res.status(200).json({ Compaigns: results });
+  });
+}
+
+export const addActivity = async (req, res) => {
+  try {
+    const { title, occasion, campaign, colleges, departments, locations, members, teams, subActivities, vehicleType, notes, startDate, endDate, userId } = req.body;
+    const activityDate = new Date().toISOString().split("T")[0];
+
+    // STEP 1 — Parse JSON fields
+    const parsedColleges = colleges ? JSON.parse(colleges) : [];
+    const parsedDepartments = departments ? JSON.parse(departments) : [];
+    const parsedLocations = locations ? JSON.parse(locations) : [];
+    const parsedMembers = members ? JSON.parse(members) : [];
+    const parsedTeams = teams ? JSON.parse(teams) : [];
+    const parsedSubActivities = subActivities ? JSON.parse(subActivities) : [];
+
+    // STEP 2 — Generate Activity ID
+    const idResult = await query(
+      "SELECT IFNULL(MAX(id),0)+1 AS nextId FROM activities"
+    );
+
+    const activityId = idResult[0].nextId;
+
+    // Insert Activity
+    await db.query(
+      `INSERT INTO activities 
+        (id,date,title,occasion_id,campaign_id,start_date,end_date,vehicle_type,notes,status,c_at,c_by,u_at,u_by)
+       VALUES (?,?,?,?,?,?,?,?,?,?,NOW(),?,NOW(),?)`,
+      [activityId, activityDate, title, occasion, campaign, startDate, endDate, vehicleType, notes, 'P', userId, userId]
+    );
+
+    // STEP 3 — Create Activity Folder
+    const activityFolder = path.join("uploads", "activities", `${activityId}-${activityDate}`);
+
+    if (!fs.existsSync(activityFolder)) {
+      fs.mkdirSync(activityFolder, { recursive: true });
+    }
+
+    // Convert req.files array into object map
+    const fileMap = {};
+    if (req.files) {
+      req.files.forEach((file) => {
+        fileMap[file.fieldname] = file;
+      });
+    }
+
+    // STEP 4 — Save Main Files
+    const mainFileFields = ["image", "file"];
+
+    for (const field of mainFileFields) {
+      if (fileMap[field]) {
+        const file = fileMap[field];
+
+        const filePath = path.join(activityFolder, file.originalname);
+
+        fs.writeFileSync(filePath, file.buffer);
+
+        await query(
+          `INSERT INTO activity_files
+   (activity_id,activity_date,file_name,file_path,file_type,uploaded_at)
+   VALUES (?,?,?,?,?,NOW())`,
+          [
+            activityId,
+            activityDate,
+            file.originalname,
+            filePath,
+            file.mimetype
+          ]
+        );
+      }
+    }
+
+    // STEP 5 — Insert Colleges
+    for (const clg of parsedColleges) {
+      await query(
+        `INSERT INTO activity_colleges (activity_id,date,clg_id)
+     VALUES (?,?,?)`,
+        [activityId, activityDate, clg.clg_id]
+      );
+    }
+
+    // STEP 6 — Insert Departments
+    for (const dept of parsedDepartments) {
+      await query(
+        `INSERT INTO activity_departments (activity_id,activity_date,dept_id)
+     VALUES (?,?,?)`,
+        [activityId, activityDate, dept.dept_id]
+      );
+    }
+
+    // STEP 7 — Insert Locations
+    for (const loc of parsedLocations) {
+      await query(
+        `INSERT INTO activity_locations
+     (activity_id,activity_date,lat,lng,address,city,state,pin)
+     VALUES (?,?,?,?,?,?,?,?)`,
+        [
+          activityId,
+          activityDate,
+          loc.lat,
+          loc.lng,
+          loc.address,
+          loc.city,
+          loc.state,
+          loc.pin
+        ]
+      );
+    }
+
+    // STEP 8 — Insert Members
+    for (const member of parsedMembers) {
+      await query(
+        `INSERT INTO activity_members (activity_id,activity_date,member_id)
+     VALUES (?,?,?)`,
+        [activityId, activityDate, member.id]
+      );
+    }
+
+    // STEP 9 — Insert Teams
+    for (const team of parsedTeams) {
+      await query(
+        `INSERT INTO activity_teams (activity_id,activity_date,team_id)
+     VALUES (?,?,?)`,
+        [activityId, activityDate, team.id]
+      );
+    }
+
+    // STEP 10 & 11 — Insert SubActivities + Attachments
+    for (let i = 0; i < parsedSubActivities.length; i++) {
+      const sub = parsedSubActivities[i];
+
+      const srNo = i + 1;
+
+      const subResult = await query(
+        `INSERT INTO sub_activities
+   (activity_id,activity_date,sr_no,task_id,title,start_time,end_time,notes,attachment)
+   VALUES (?,?,?,?,?,?,?,?,?)`,
+        [
+          activityId,
+          activityDate,
+          srNo,
+          sub.taskId,
+          sub.title,
+          sub.startTime,
+          sub.endTime,
+          sub.notes,
+          null
+        ]
+      );
+
+      const subActivityId = subResult.insertId;
+
+
+      const attachmentField = `subActivity_${i}_attachment`;
+
+      if (fileMap[attachmentField]) {
+        const file = fileMap[attachmentField];
+
+        const safeTitle = sub.title.replace(/\s+/g, "-").toLowerCase();
+
+        const subFolder = path.join(activityFolder, `subactivity-${subActivityId}-${safeTitle}`);
+
+        if (!fs.existsSync(subFolder)) {
+          fs.mkdirSync(subFolder, { recursive: true });
+        }
+
+        const filePath = path.join(subFolder, file.originalname);
+
+        fs.writeFileSync(filePath, file.buffer);
+
+        await query(
+          `UPDATE sub_activities
+   SET attachment=?
+   WHERE id=?`,
+          [filePath, subActivityId]
+        );
+      }
+    }
+
+    // STEP 12 — Response
+    res.status(201).json({
+      message: "Activity created successfully",
+      activityId
+    });
+  } catch (error) {
+    console.error("Add Activity Error:", error);
+
+    res.status(500).json({
+      message: "Failed to create activity",
+      error: error.message
+    });
+  }
+};
+
+export const getActivities = async (req, res) => {
+  try {
+    const { userId, role } = req.body;
+
+    // STEP 1 — If Admin roles → Fetch all activities
+    if (["Manager", "Admin", "Master"].includes(role)) {
+      const activities = await query(`
+        SELECT 
+          id,
+          date,
+          title,
+          start_date,
+          end_date,
+          vehicle_type,
+          status
+        FROM activities
+        ORDER BY date DESC
+      `);
+
+      return res.status(200).json({
+        message: "Activities fetched successfully",
+        activities
+      });
+    }
+
+    // STEP 2 — Get Member Details
+    const userResult = await query(`SELECT mem_id FROM mst_members WHERE user_id = ? `, [userId]);
+
+    if (!userResult.length) {
+      return res.status(404).json({
+        message: "Member not found"
+      });
+    }
+
+    const memId = userResult[0].mem_id;
+
+    // STEP 3 — Get Team IDs of Member
+    const teamResult = await query(`SELECT team_id FROM team_members WHERE member_id = ?`, [memId]);
+
+    const teamIds = teamResult.map((t) => t.team_id);
+
+    // STEP 4 — Fetch Activities assigned to Member OR Team
+    let activities;
+
+    if (teamIds.length > 0) {
+      activities = await query(
+        `
+        SELECT DISTINCT A.id,
+               A.date,
+               A.title,
+               A.start_date,
+               A.end_date,
+               A.vehicle_type,
+               A.status
+        FROM activities A
+        LEFT JOIN activity_members AM 
+          ON A.id = AM.activity_id AND A.date = AM.activity_date
+        LEFT JOIN activity_teams AT 
+          ON A.id = AT.activity_id AND A.date = AT.activity_date
+        WHERE 
+            AM.member_id = ?
+        OR AT.team_id IN (?)
+        ORDER BY A.date DESC
+        `,
+        [memId, teamIds]
+      );
+    } else {
+      activities = await query(
+        `
+        SELECT DISTINCT A.id,
+               A.date,
+               A.title,
+               A.start_date,
+               A.end_date,
+               A.vehicle_type,
+               A.status
+        FROM activities A
+        LEFT JOIN activity_members AM 
+          ON A.id = AM.activity_id AND A.date = AM.activity_date
+        WHERE AM.member_id = ?
+        ORDER BY A.date DESC
+        `,
+        [memId]
+      );
+    }
+
+    // STEP 5 — Send Response
+    res.status(200).json({
+      message: "Activities fetched successfully",
+      activities
+    });
+  } catch (error) {
+    console.error("Get Activity Error:", error);
+
+    res.status(500).json({
+      message: "Failed to fetch activities",
+      error: error.message
+    });
+  }
+};
+
+export const getActivityDetails = async (req, res) => {
+  try {
+    const { id, date } = req.body;
+
+    if (!id || !date) {
+      return res.status(400).json({
+        message: "Activity id and date are required"
+      });
+    }
+
+    // 1️⃣ Activity Main Details
+    const activity = await query(
+      `SELECT * 
+       FROM activities 
+       WHERE id = ? AND date = ?`,
+      [id, date]
+    );
+
+    if (!activity.length) {
+      return res.status(404).json({ message: "Activity not found" });
+    }
+
+    // 2️⃣ Files
+    const files = await query(
+      `SELECT file_path,file_type
+       FROM activity_files
+       WHERE activity_id = ? AND activity_date = ?`,
+      [id, date]
+    );
+
+    // 3️⃣ Colleges
+    const colleges = await query(
+      `SELECT a.clg_id,b.clg_name
+       FROM activity_colleges AS a 
+       LEFT JOIN colleges AS b ON a.clg_id = b.clg_id
+       WHERE activity_id = ? AND date = ?`,
+      [id, date]
+    );
+
+    // 4️⃣ Departments
+    const departments = await query(
+      `SELECT a.dept_id,b.dept_name
+       FROM activity_departments AS a 
+       LEFT JOIN departments AS b ON a.dept_id = b.dept_id
+       WHERE activity_id = ? AND activity_date = ?`,
+      [id, date]
+    );
+
+    // 5️⃣ Locations
+    const locations = await query(
+      `SELECT lat,lng,address,city,state,pin
+       FROM activity_locations
+       WHERE activity_id = ? AND activity_date = ?`,
+      [id, date]
+    );
+
+    // 6️⃣ Members
+    const members = await query(
+      `SELECT a.member_id, b.first_name, b.middle_name, b.last_name, CONCAT(b.first_name,' ',b.middle_name,' ', b.last_name) AS full_name
+       FROM activity_members AS a
+       LEFT JOIN mst_members AS b ON a.member_id = b.mem_id
+       WHERE activity_id = ? AND activity_date = ?`,
+      [id, date]
+    );
+
+    // 7️⃣ Teams
+    const teams = await query(
+      `SELECT a.team_id,b.name
+       FROM activity_teams AS a 
+       LEFT JOIN mst_team AS b ON a.team_id = b.id
+       WHERE activity_id = ? AND activity_date = ?`,
+      [id, date]
+    );
+
+    // 8️⃣ Sub Activities
+    const subActivities = await query(
+      `SELECT id,sr_no,task_id,title,start_time,end_time,notes,attachment
+       FROM sub_activities
+       WHERE activity_id = ? AND activity_date = ?
+       ORDER BY sr_no`,
+      [id, date]
+    );
+
+    res.status(200).json({
+      activity: activity[0],
+      files: files[0],
+      colleges,
+      departments,
+      locations,
+      members,
+      teams,
+      subActivities
+    });
+
+  } catch (error) {
+    console.error("Get Activity Details Error:", error);
+
+    res.status(500).json({
+      message: "Failed to fetch activity details",
+      error: error.message
+    });
+  }
+};
+
+export const updateActivity = async (req, res) => {
+  try {
+
+    const {
+      activityId,
+      activityDate,
+      title,
+      occasion,
+      campaign,
+      status,
+      colleges = [],
+      departments = [],
+      locations = [],
+      members = [],
+      teams = [],
+      subActivities = [],
+      vehicleType,
+      notes,
+      startDate,
+      endDate,
+      userId
+    } = req.body;
+
+    if (!activityId || !activityDate) {
+      return res.status(400).json({message: "Please fill all required fields!"});
+    }
+
+    /* ==============================
+       STEP 1 — Update Activity
+    ============================== */
+
+    await query(
+      `UPDATE activities
+       SET title=?,
+           occasion_id=?,
+           campaign_id=?,
+           status = ?,
+           start_date=?,
+           end_date=?,
+           vehicle_type=?,
+           notes=?,
+           u_at=NOW(),
+           u_by=?
+       WHERE id=? AND date=?`,
+      [title, occasion, campaign, status, startDate, endDate, vehicleType, notes, userId, activityId, activityDate]
+    );
+
+    /* ==============================
+       STEP 2 — Delete Old Child Data
+    ============================== */
+
+    await query(`DELETE FROM activity_colleges WHERE activity_id=? AND date=?`, [activityId, activityDate]);
+    await query(`DELETE FROM activity_departments WHERE activity_id=? AND activity_date=?`, [activityId, activityDate]);
+    await query(`DELETE FROM activity_locations WHERE activity_id=? AND activity_date=?`, [activityId, activityDate]);
+    await query(`DELETE FROM activity_members WHERE activity_id=? AND activity_date=?`, [activityId, activityDate]);
+    await query(`DELETE FROM activity_teams WHERE activity_id=? AND activity_date=?`, [activityId, activityDate]);
+    await query(`DELETE FROM sub_activities WHERE activity_id=? AND activity_date=?`, [activityId, activityDate]);
+
+    /* ==============================
+       STEP 3 — Insert Colleges
+    ============================== */
+
+    for (const clg of colleges) {
+      await query(
+        `INSERT INTO activity_colleges (activity_id,date,clg_id)
+         VALUES (?,?,?)`,
+        [activityId, activityDate, clg.clg_id]
+      );
+    }
+
+    /* ==============================
+       STEP 4 — Insert Departments
+    ============================== */
+
+    for (const dept of departments) {
+      await query(
+        `INSERT INTO activity_departments
+         (activity_id,activity_date,dept_id)
+         VALUES (?,?,?)`,
+        [activityId, activityDate, dept.dept_id]
+      );
+    }
+
+    /* ==============================
+       STEP 5 — Insert Locations
+    ============================== */
+
+    for (const loc of locations) {
+      await query(
+        `INSERT INTO activity_locations
+         (activity_id,activity_date,lat,lng,address,city,state,pin)
+         VALUES (?,?,?,?,?,?,?,?)`,
+        [
+          activityId,
+          activityDate,
+          loc.lat,
+          loc.lng,
+          loc.address,
+          loc.city,
+          loc.state,
+          loc.pin
+        ]
+      );
+    }
+
+    /* ==============================
+       STEP 6 — Insert Members
+    ============================== */
+
+    for (const member of members) {
+      await query(
+        `INSERT INTO activity_members
+         (activity_id,activity_date,member_id)
+         VALUES (?,?,?)`,
+        [activityId, activityDate, member.id]
+      );
+    }
+
+    /* ==============================
+       STEP 7 — Insert Teams
+    ============================== */
+
+    for (const team of teams) {
+      await query(
+        `INSERT INTO activity_teams
+         (activity_id,activity_date,team_id)
+         VALUES (?,?,?)`,
+        [activityId, activityDate, team.id]
+      );
+    }
+
+    /* ==============================
+       STEP 8 — Insert SubActivities
+    ============================== */
+
+    for (let i = 0; i < subActivities.length; i++) {
+
+      const sub = subActivities[i];
+      const srNo = i + 1;
+
+      await query(
+        `INSERT INTO sub_activities
+         (activity_id,activity_date,sr_no,task_id,title,start_time,end_time,notes)
+         VALUES (?,?,?,?,?,?,?,?)`,
+        [
+          activityId,
+          activityDate,
+          srNo,
+          sub.taskId,
+          sub.title,
+          sub.startTime,
+          sub.endTime,
+          sub.notes
+        ]
+      );
+    }
+
+    /* ==============================
+       STEP 9 — Response
+    ============================== */
+
+    res.json({
+      message: "Activity updated successfully",
+      activityId
+    });
+
+  } catch (error) {
+
+    console.error("Update Activity Error:", error);
+
+    res.status(500).json({
+      message: "Failed to update activity",
+      error: error.message
+    });
+
   }
 };

@@ -1,8 +1,7 @@
+import { BookUserIcon, CalendarDays, GraduationCap, Home, Layers3, LayoutDashboard, ListChecks, LogOutIcon, MessageCircleQuestionIcon, School, Settings, University, User, UserCheck, Users, UsersRound, Workflow } from "lucide-react";
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import {
-  BarChart3, Bell, CalendarDays, FileBarChart2, FileText, GraduationCap, Home, Layers3, LayoutDashboard, ListChecks, LogOutIcon, School, Settings, University, User, UserCheck, Users, UsersRound, Workflow
-} from "lucide-react";//BookOpen, Contact, HelpCircle, LifeBuoy, Presentation
+import { MEDIA_URL } from "../constant/Baseurl";
 import { getUserFromStorage } from '../helper/cryptoUser';
 
 interface NavLinkItem {
@@ -32,6 +31,7 @@ type NavItem = NavLinkItem | NavDropdownItem;
 const Navbar = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   const handleDropdownToggle = (item: string) => {
     setActiveDropdown(activeDropdown === item ? null : item);
@@ -49,6 +49,12 @@ const Navbar = () => {
 
   const user = getUserFromStorage();
 
+  // Helper function to check role access
+  const hasAccess = (allowedRoles?: string[]): boolean => {
+    if (!allowedRoles || allowedRoles.length === 0) return true;
+    return allowedRoles.some(role => user?.role === role);
+  };
+
   const navItems: NavItem[] = [
     {
       type: 'link',
@@ -64,9 +70,9 @@ const Navbar = () => {
       key: 'University',
       roles: ['Master', 'Manager'],
       items: [
-        { label: 'University', path: '/master/view-universities', icon: University },
-        { label: 'College', path: '/master/view-colleges', icon: School },
-        { label: 'Department', path: '/master/view-departments', icon: Layers3 }
+        { label: 'University', path: '/master/view-universities', icon: University, roles: ['Master', 'Manager'] },
+        { label: 'College', path: '/master/view-colleges', icon: School, roles: ['Master', 'Manager'] },
+        { label: 'Department', path: '/master/view-departments', icon: Layers3, roles: ['Master', 'Manager'] }
       ]
     },
     {
@@ -76,11 +82,12 @@ const Navbar = () => {
       key: 'Master',
       roles: ['Master', 'Admin', 'Manager'],
       items: [
-        { label: 'Users', path: '/master/users-view', icon: Users },
-        { label: 'Member', path: '/master/view-members', icon: UserCheck },
-        { label: 'Team', path: '/master/team-view', icon: UsersRound },
-        { label: 'Steps', path: '/master/view-steps', icon: Workflow },
-        { label: 'Tasks', path: '/master/view-tasks', icon: ListChecks }
+        { label: 'Users', path: '/master/users-view', icon: Users, roles: ['Master', 'Admin', 'Manager'] },
+        { label: 'Member', path: '/master/view-members', icon: UserCheck, roles: ['Master', 'Admin', 'Manager'] },
+        { label: 'Team', path: '/master/team-view', icon: UsersRound, roles: ['Master', 'Admin', 'Manager'] },
+        { label: 'Steps', path: '/master/view-steps', icon: Workflow, roles: ['Master', 'Admin', 'Manager'] },
+        { label: 'Tasks', path: '/master/view-tasks', icon: ListChecks, roles: ['Master', 'Admin', 'Manager'] },
+        { label: 'Faq', path: '/master/view-faq', icon: MessageCircleQuestionIcon, roles: ['Master', 'Admin', 'Manager'] }
       ]
     },
     {
@@ -90,13 +97,17 @@ const Navbar = () => {
       icon: CalendarDays,
       roles: ['Master', 'Admin', 'Manager', 'User']
     },
-    // {
-    //   type: 'link',
-    //   label: 'Trainings',
-    //   path: '/trainings',
-    //   icon: Presentation,
-    //   roles: ['Master', 'Admin', 'Manager', 'User']
-    // },
+    {
+      type: 'dropdown',
+      label: 'Trainings',
+      icon: GraduationCap,
+      key: 'Training',
+      roles: ['Master', 'Admin', 'Manager', 'User'],
+      items: [
+        { label: 'Training Management', path: '/trainings/manage', icon: Settings, roles: ['Master', 'Admin', 'Manager'] },
+        { label: 'My Trainings', path: '/my-trainings', icon: BookUserIcon, roles: ['Master', 'Admin', 'Manager', 'User'] },
+      ]
+    },
     // {
     //   type: 'link',
     //   label: 'Library',
@@ -104,17 +115,27 @@ const Navbar = () => {
     //   icon: BookOpen,
     //   roles: ['Master', 'Admin', 'Manager', 'User']
     // },
-    {
-      type: 'dropdown',
-      label: 'Reports & Analytics',
-      icon: BarChart3,
-      key: 'Reports',
-      roles: ['Master', 'Admin', 'Manager', 'User'],
-      items: [
-        { label: 'Report 1', path: '/report/report1', icon: FileText, roles: ['Master', 'Admin', 'Manager'] },
-        { label: 'Report 2', path: '/report/report2', icon: FileBarChart2 }
-      ]
-    },
+    // {
+    //   type: 'dropdown',
+    //   label: 'Reports & Analytics',
+    //   icon: BarChart3,
+    //   key: 'Reports',
+    //   roles: ['Master', 'Admin', 'Manager'],
+    //   items: [
+    //     {
+    //       label: 'Report 1',
+    //       path: '/report/report1',
+    //       icon: FileText,
+    //       roles: ['Master', 'Admin']
+    //     },
+    //     {
+    //       label: 'Report 2',
+    //       path: '/report/report2',
+    //       icon: FileBarChart2,
+    //       roles: ['Master', 'Manager']
+    //     }
+    //   ]
+    // },
     // {
     //   type: 'dropdown',
     //   label: 'Help',
@@ -122,18 +143,16 @@ const Navbar = () => {
     //   key: 'Help',
     //   roles: ['Master', 'Admin', 'Manager', 'User'],
     //   items: [
-    //     { label: 'Help', path: '/help/faq', icon: LifeBuoy },
-    //     { label: 'FAQs', path: '/help/help', icon: HelpCircle },
-    //     { label: 'Contact Manager', path: '/help/contact', icon: Contact }
+    //     { label: 'Help', path: '/help/faq', icon: LifeBuoy, roles: ['Master', 'Admin'] },
+    //     { label: 'FAQs', path: '/help/help', icon: HelpCircle, roles: ['Master', 'Admin'] },
+    //     { label: 'Contact Manager', path: '/help/contact', icon: Contact, roles: ['Master', 'Admin'] }
     //   ]
     // }
   ];
 
-  // Filter items based on user role
+  // Filter main items based on user role
   const getVisibleItems = (): NavItem[] => {
-    return navItems.filter(item =>
-      item?.roles.some(role => user?.role === role)
-    );
+    return navItems.filter(item => hasAccess(item.roles));
   };
 
   const renderDesktopNav = () => {
@@ -145,9 +164,7 @@ const Navbar = () => {
               to={item?.path}
               className={({ isActive }) =>
                 `flex items-center text-sm space-x-1 px-1 py-1 transition-colors duration-200
-                ${isActive
-                  ? 'bg-orange-100 text-orange-600'
-                  : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'}`
+                ${isActive ? 'bg-orange-100 text-orange-600' : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'}`
               }
             >
               <item.icon size={16} />
@@ -158,20 +175,26 @@ const Navbar = () => {
       }
 
       if (item?.type === 'dropdown') {
+        // Filter sub-items based on role
+        const visibleSubItems = item.items.filter(subItem => hasAccess(subItem.roles));
+
+        // Don't render dropdown if no sub-items are visible
+        if (visibleSubItems.length === 0) return null;
+
         return (
           <div key={item?.label} className="relative">
             <button
               onClick={() => handleDropdownToggle(item?.key)}
-              className={`flex items-center text-sm px-1 py-2 gap-1 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === item?.key
-                ? 'bg-orange-50 text-orange-600 border border-orange-200'
-                : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
+              className={`flex items-center text-sm px-1 py-2 gap-1 rounded-lg transition-all duration-200 cursor-pointer 
+                ${activeDropdown === item?.key
+                  ? 'bg-orange-50 text-orange-600 border border-orange-200'
+                  : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
                 }`}
             >
               <item.icon size={16} />
               <span>{item?.label}</span>
               <svg
-                className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === item?.key ? 'rotate-180' : ''
-                  }`}
+                className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === item?.key ? 'rotate-180' : ''}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -182,28 +205,20 @@ const Navbar = () => {
 
             {activeDropdown === item?.key && (
               <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50">
-                {item?.items?.map((subItem) => {
-                  // Check if subitem has role restrictions
-                  if (subItem?.roles && !subItem.roles.some(role => user?.role === role)) {
-                    return null;
-                  }
-                  return (
-                    <NavLink
-                      key={subItem?.path}
-                      to={subItem?.path}
-                      className={({ isActive }) =>
-                        `flex items-center text-sm space-x-3 px-2 py-2 transition-colors duration-200 border-b border-gray-100
-                        ${isActive
-                          ? 'bg-orange-100 text-orange-600 font-medium'
-                          : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                      }
-                      onClick={closeAllMenus}
-                    >
-                      <subItem.icon size={16} />
-                      <span>{subItem?.label}</span>
-                    </NavLink>
-                  );
-                })}
+                {visibleSubItems.map((subItem) => (
+                  <NavLink
+                    key={subItem?.path}
+                    to={subItem?.path}
+                    className={({ isActive }) =>
+                      `flex items-center text-sm space-x-3 px-2 py-2 transition-colors duration-200 border-b border-gray-100 last:border-b-0
+                      ${isActive ? 'bg-orange-100 text-orange-600 font-medium' : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                    }
+                    onClick={closeAllMenus}
+                  >
+                    <subItem.icon size={16} />
+                    <span>{subItem?.label}</span>
+                  </NavLink>
+                ))}
               </div>
             )}
           </div>
@@ -222,9 +237,7 @@ const Navbar = () => {
               to={item?.path}
               className={({ isActive }) =>
                 `flex items-center text-sm space-x-3 px-2 py-1 gap-2 transition-colors duration-200
-                ${isActive
-                  ? 'bg-orange-100 text-orange-600'
-                  : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+              ${isActive ? 'bg-orange-100 text-orange-600' : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
               }
               onClick={handleMobileLinkClick}
             >
@@ -238,14 +251,21 @@ const Navbar = () => {
       }
 
       if (item?.type === 'dropdown') {
+        // Filter sub-items based on role
+        const visibleSubItems = item.items.filter(subItem => hasAccess(subItem.roles));
+
+        // Don't render dropdown if no sub-items are visible
+        if (visibleSubItems.length === 0) return null;
+
         const mobileKey = `mobile-${item?.key}`;
         return (
           <div key={item?.label} className="border-b border-gray-100 pb-2">
             <button
               onClick={() => handleDropdownToggle(mobileKey)}
-              className={`flex justify-between w-full items-center space-x-1 px-4 py-1 rounded-lg transition-all duration-200 cursor-pointer ${activeDropdown === mobileKey
-                ? 'bg-orange-50 text-orange-600 border border-orange-200'
-                : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
+              className={`flex justify-between w-full items-center space-x-1 px-4 py-3 rounded-lg transition-all duration-200 cursor-pointer 
+                ${activeDropdown === mobileKey
+                  ? 'bg-orange-50 text-orange-600 border border-orange-200'
+                  : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
                 }`}
             >
               <div className='flex justify-center items-center gap-2'>
@@ -253,8 +273,7 @@ const Navbar = () => {
                 {item?.label}
               </div>
               <svg
-                className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === mobileKey ? 'rotate-180' : ''
-                  }`}
+                className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === mobileKey ? 'rotate-180' : ''}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -265,27 +284,20 @@ const Navbar = () => {
 
             {activeDropdown === mobileKey && (
               <div className="mt-2 ml-4 space-y-1">
-                {item?.items?.map((subItem) => {
-                  if (subItem?.roles && !subItem.roles.some(role => user?.role === role)) {
-                    return null;
-                  }
-                  return (
-                    <NavLink
-                      key={subItem?.path}
-                      to={subItem?.path}
-                      className={({ isActive }) =>
-                        `flex items-center text-sm space-x-3 pl-6 px-2 py-2 border-b border-gray-200 gap-2 transition-colors duration-200
-                        ${isActive
-                          ? 'bg-orange-100 text-orange-600'
-                          : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
-                      }
-                      onClick={handleMobileLinkClick}
-                    >
-                      <subItem.icon size={16} />
-                      {subItem?.label}
-                    </NavLink>
-                  );
-                })}
+                {visibleSubItems.map((subItem) => (
+                  <NavLink
+                    key={subItem?.path}
+                    to={subItem?.path}
+                    className={({ isActive }) =>
+                      `flex items-center text-sm space-x-3 pl-6 px-2 py-3 border-b border-gray-200 gap-2 transition-colors duration-200 last:border-b-0
+                      ${isActive ? 'bg-orange-100 text-orange-600' : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'}`
+                    }
+                    onClick={handleMobileLinkClick}
+                  >
+                    <subItem.icon size={16} />
+                    {subItem?.label}
+                  </NavLink>
+                ))}
               </div>
             )}
           </div>
@@ -304,7 +316,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="shrink-0 items-center block sm:hidden">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-linear-to-r from-orange-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
+              <div className="w-8 h-8 bg-linear-to-r from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-sm">E</span>
               </div>
               <span className="text-xl font-bold bg-linear-to-r from-orange-600 to-purple-600 bg-clip-text text-transparent">
@@ -337,64 +349,30 @@ const Navbar = () => {
 
           {/* User Profile - Right */}
           <div className="flex flex-row items-center space-x-1">
-            {/* Notification Menu */}
-            <div className="relative">
-              <button
-                onClick={() => handleDropdownToggle("notification")}
-                className="flex items-center gap-1 px-1 py-1 rounded-full hover:bg-purple-50 transition cursor-pointer text-gray-700 hover:text-purple-600"
-              >
-                <div className="w-9 h-9 bg-linear-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-md relative">
-                  <Bell className="text-white w-4 h-4" />
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 text-white text-[10px] rounded-full flex items-center justify-center">
-                    {/* 3 */}
-                  </span>
-                </div>
-
-                <svg
-                  className={`w-4 h-4 transition-transform ${activeDropdown === "notification" ? "rotate-180" : ""
-                    }`}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                >
-                  <path d="M19 9l-7 7-7-7" strokeWidth="2" />
-                </svg>
-              </button>
-
-              {/* Notification Dropdown */}
-              {activeDropdown === "notification" && (
-                <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
-                  <div className="px-4 py-2 font-semibold">Notifications</div>
-                  <div className="px-4 py-2 hover:bg-gray-50">🔔 New user registered</div>
-                  <div className="px-4 py-2 hover:bg-gray-50">📦 Order completed</div>
-                  <div className="px-4 py-2 hover:bg-gray-50">⚠️ Payment pending</div>
-                </div>
-              )}
-            </div>
 
             {/* Desktop User Menu */}
-            <div className="relative">
+            <div className="relative hidden md:block">
               <button
                 onClick={() => handleDropdownToggle("user")}
                 className="flex items-center gap-1 px-1 py-1 rounded-full hover:bg-purple-50 transition cursor-pointer text-gray-700 hover:text-purple-600"
               >
                 {/* Avatar */}
-                <div className="w-9 h-9 bg-linear-to-r from-indigo-600 to-purple-600 rounded-full flex items-center justify-center shadow-md">
-                  {user?.firstName ? (
-                    <span className="text-white text-sm font-semibold">
-                      {user.firstName[0]}
-                      {user.lastName?.[0]}
-                    </span>
+                <div>
+                  {user?.photo && !imgError ? (
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-md">
+                      <img
+                        src={`${MEDIA_URL}${user?.photo}`}
+                        alt={user?.photo || "User"}
+                        className=" rounded-full"
+                        onError={() => setImgError(true)}
+                      />
+                    </div>
                   ) : (
-                    <User className="text-white w-4 h-4" />
+                    <div className="bg-linear-to-r from-indigo-600 to-purple-600 w-10 h-10 rounded-full flex items-center justify-center shadow-md">
+                      <User className="text-white" />
+                    </div>
                   )}
                 </div>
-
-                {/* Welcome Text */}
-                <span className="text-sm font-medium text-gray-700 whitespace-nowrap hidden sm:inline">
-                  Welcome{user?.firstName ? `, ${user.firstName}` : ""}!
-                </span>
-
                 {/* Arrow */}
                 <svg
                   className={`w-4 h-4 transition-transform ${activeDropdown === "user" ? "rotate-180" : ""
@@ -482,24 +460,30 @@ const Navbar = () => {
                 className="w-full flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors duration-200"
               >
                 <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-linear-to-r from-indigo-600 to-purple-600 rounded-full flex items-center justify-center shadow-md">
-                    {user?.firstName ? (
-                      <span className="text-white text-sm font-semibold">
-                        {(user?.firstName?.[0] || '').toUpperCase()}
-                        {(user?.lastName?.[0] || '').toUpperCase()}
-                      </span>
+                  <div className="w-12 h-12 bg-linear-to-r from-indigo-600 to-purple-600 rounded-full flex items-center justify-center shadow-md">
+                    {user?.photo && !imgError ? (
+                      <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-md">
+                        <img
+                          src={`${MEDIA_URL}${user?.photo}`}
+                          alt={user?.photo || "User"}
+                          className=" rounded-full"
+                          onError={() => setImgError(true)}
+                        />
+                      </div>
                     ) : (
-                      <User className="text-white w-4 h-4" />
+                      <div className="bg-linear-to-r from-indigo-600 to-purple-600 w-10 h-10 rounded-full flex items-center justify-center shadow-md">
+                        <User className="text-white" />
+                      </div>
                     )}
                   </div>
-                  <span className="font-medium text-gray-700">
-                    {user?.firstName} {user?.lastName}
+                  <span className="font-medium text-orange-600">
+                    Welcome, {user?.firstName} {user?.lastName}!
                   </span>
                 </div>
 
                 <svg
-                  className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === "mobile-user" ? "rotate-180" : ""
-                    }`}
+                  className={`w-4 h-4 transition-transform duration-200 
+                            ${activeDropdown === "mobile-user" ? "rotate-180" : ""}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -510,7 +494,7 @@ const Navbar = () => {
 
               {activeDropdown === "mobile-user" && (
                 <div className="mt-3 ml-4 space-y-1">
-                  <div className="px-4 py-2">
+                  <div className="px-4 py-2" hidden>
                     <p className="text-sm font-semibold text-gray-900">
                       {user?.firstName} {user?.lastName}
                     </p>

@@ -1,10 +1,10 @@
 import { useEffect, useState, type FC } from "react";
 import toast from "react-hot-toast";
-import { updateDepartment } from "../../../services/master/masterApi";
-import CollegeModal from "./CollegeModal";
 import { useDispatch, useSelector } from "react-redux";
 import { handleSelectCollege } from "../../../feature/masterSlice";
+import { updateDepartment } from "../../../services/master/masterApi";
 import type { RootState } from "../../../store/store";
+import SelectCollege from "./SelectCollege";
 
 export interface Department {
   dept_id: number;
@@ -25,9 +25,10 @@ interface DepartmentEditProps {
   setShow: (show: boolean) => void;
   departmentData: Department | null;
   fetchData: () => void;
+  isEdit?: boolean;
 }
 
-const DepartmentEdit: FC<DepartmentEditProps> = ({ show, setShow, departmentData, fetchData }) => {
+const DepartmentEdit: FC<DepartmentEditProps> = ({ show, setShow, departmentData, fetchData, isEdit }) => {
   const [inputs, setInputs] = useState({
     dept_id: departmentData?.dept_id || 0,
     dept_name: departmentData?.dept_name || '',
@@ -85,7 +86,7 @@ const DepartmentEdit: FC<DepartmentEditProps> = ({ show, setShow, departmentData
     <>
       <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
         <div
-          className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
+          className="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Modal Header */}
@@ -97,7 +98,7 @@ const DepartmentEdit: FC<DepartmentEditProps> = ({ show, setShow, departmentData
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-gray-900">
-                Update Department
+                {isEdit ? 'Update' : 'View'} Department
               </h3>
             </div>
             <button
@@ -129,8 +130,9 @@ const DepartmentEdit: FC<DepartmentEditProps> = ({ show, setShow, departmentData
                   name="dept_name"
                   value={inputs.dept_name}
                   onChange={handleInputChange}
+                  disabled={!isEdit}
                   placeholder="Enter department name"
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
                   required
                 />
               </div>
@@ -151,6 +153,7 @@ const DepartmentEdit: FC<DepartmentEditProps> = ({ show, setShow, departmentData
                   <input
                     type="text"
                     value={clg_name}
+                    disabled={!isEdit}
                     placeholder="Select college"
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
                     readOnly
@@ -159,7 +162,8 @@ const DepartmentEdit: FC<DepartmentEditProps> = ({ show, setShow, departmentData
                 <button
                   type="button"
                   onClick={() => setShowCollegeModal(true)}
-                  className="px-4 py-2 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 text-white font-medium rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer whitespace-nowrap"
+                  disabled={!isEdit}
+                  className="px-4 py-2 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 text-white font-medium rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer whitespace-nowrap disabled:cursor-not-allowed"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M3 5h.01" /><path d="M3 12h.01" /><path d="M3 19h.01" /><path d="M8 5h13" /><path d="M8 12h13" /><path d="M8 19h13" />
@@ -184,9 +188,10 @@ const DepartmentEdit: FC<DepartmentEditProps> = ({ show, setShow, departmentData
                   name="student_strength"
                   value={inputs.student_strength}
                   onChange={handleInputChange}
+                  disabled={!isEdit}
                   placeholder="Enter student strength"
                   min="0"
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
@@ -204,10 +209,11 @@ const DepartmentEdit: FC<DepartmentEditProps> = ({ show, setShow, departmentData
                 </div>
                 <select
                   name="status"
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer disabled:cursor-not-allowed"
                   required
                   value={inputs.status}
                   onChange={handleInputChange}
+                  disabled={!isEdit}
                 >
                   <option value="">Select status</option>
                   <option value="A">Active</option>
@@ -230,20 +236,23 @@ const DepartmentEdit: FC<DepartmentEditProps> = ({ show, setShow, departmentData
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
-              >
-                {loading ? 'Updating...' : 'Update'}
-              </button>
+              {isEdit && (
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
+                >
+                  {loading ? 'Updating...' : 'Update'}
+                </button>
+              )}
+
             </div>
           </form>
         </div>
       </div>
 
       {/* College Search Modal */}
-      <CollegeModal
+      <SelectCollege
         show={showCollegeModal}
         setShow={setShowCollegeModal}
       />
