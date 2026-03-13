@@ -1,3 +1,4 @@
+import { Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getUserFromStorage } from "../helper/cryptoUser";
@@ -109,7 +110,7 @@ const Sidebar = () => {
           </div>
           <span>Sidebar content is here.</span>
           {/* Search Section */}
-          {/* <div className="p-4 border-b border-gray-100" >
+          <div className="p-4 border-b border-gray-100" >
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-4 w-4 text-gray-400" />
@@ -133,7 +134,7 @@ const Sidebar = () => {
             </div>
           </div>
 
-          
+
           <div className="flex-1 overflow-y-auto">
             {loading ? (
               <div className="text-center py-12">
@@ -165,20 +166,20 @@ const Sidebar = () => {
                       className="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-md transition-all duration-300 hover:border-purple-300 group"
                     >
                       <div className="flex items-center gap-3">
-                        
+
                         <div className="w-10 h-10 bg-linear-to-br from-indigo-600 to-purple-600 rounded-full flex items-center justify-center shadow-md shrink-0">
                           <span className="text-white font-bold text-sm">
                             {initials}
                           </span>
                         </div>
 
-                          <div className="flex-1 min-w-0">
-                          
+                        <div className="flex-1 min-w-0">
+
                           <h4 className="text-sm font-semibold text-gray-800 truncate mb-1">
                             {member?.mem_name}
                           </h4>
 
-                          
+
                           <div className="flex items-center gap-1 mb-2">
                             <div className="flex items-center p-1 bg-gray-100">
                               <span className="text-xs text-black">Total :</span>
@@ -200,26 +201,26 @@ const Sidebar = () => {
                             </div>
                           </div>
 
-          <div className="space-y-1">
-            <div className="flex justify-between text-xs text-gray-500">
-              <span>Progress</span>
-              <span>{progressPercentage}%</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-1.5">
-              <div
-                className="bg-orange-500 h-1.5 rounded-full"
-                style={{ width: `${progressPercentage}%` }}
-              ></div>
-            </div>
-          </div>
-        </div>
-    </div>
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-xs text-gray-500">
+                              <span>Progress</span>
+                              <span>{progressPercentage}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-1.5">
+                              <div
+                                className="bg-orange-500 h-1.5 rounded-full"
+                                style={{ width: `${progressPercentage}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div >
                   );
                 })}
               </div >
             )}
-          </div > */}
+          </div >
         </>
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">

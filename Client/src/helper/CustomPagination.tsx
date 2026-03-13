@@ -1,8 +1,7 @@
-
 interface PaginationProps {
   currentPage: number;
   itemPerPage: number;
-  totalItems: number; // use totalItems from API
+  totalItems: number;
   handlePageChange: (pageNumber: number) => void;
 }
 

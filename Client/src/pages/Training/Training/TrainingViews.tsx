@@ -30,7 +30,7 @@ const TrainingViews: React.FC = () => {
     const fetchData = async () => {
       const response = await getActiveFaqs();
       if (response) {
-        setFaq(response?.data)
+        setFaq(response?.data || [])
       }
     }
     fetchData();
@@ -69,9 +69,8 @@ const TrainingViews: React.FC = () => {
         <div className="space-y-6">
           {/* top row */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {Data.map((card) => {
+            {Data?.map((card) => {
               return (
-
                 <div
                   key={card.training_id}
                   className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition"
@@ -139,9 +138,8 @@ const TrainingViews: React.FC = () => {
           </h2>
 
           <div className="space-y-2">
-            {Faq.map((item, index) => {
+            {Faq?.map((item, index) => {
               const isOpen = openFaqIndex === index;
-
               return (
                 <div
                   key={index}

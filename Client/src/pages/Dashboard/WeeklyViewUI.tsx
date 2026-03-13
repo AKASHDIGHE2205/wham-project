@@ -68,6 +68,10 @@ const WeeklyViewUI: React.FC<WeeklyViewUIProps> = ({ events, currentWeekStart = 
     }
   };
 
+  const handleEventClick = (data: any) => {
+     navigate(`/update-activity/${data?.id}/${data?.date}`);
+  }
+
   return (
     <div className="bg-linear-to-b from-white to-blue-50/30 rounded-lg">
 
@@ -119,7 +123,7 @@ const WeeklyViewUI: React.FC<WeeklyViewUIProps> = ({ events, currentWeekStart = 
                 className="bg-white border border-gray-200 rounded p-2 min-h-[90px] cursor-pointer hover:bg-blue-50/50 transition-colors"
                 onClick={() => {
                   if (!date.isBefore(moment(), "day")) {
-                    handleDateClick(date);
+                    handleDateClick(date)
                   }
                 }}
               >
@@ -133,13 +137,12 @@ const WeeklyViewUI: React.FC<WeeklyViewUIProps> = ({ events, currentWeekStart = 
                     <div className="space-y-1">
                       {dayEvents?.slice(0, 3).map((event, i) => {
                         const styles = getActivityStyles(event?.status);
-
                         return (
                           <div
                             key={i}
                             className={`text-xs p-1 rounded border truncate ${styles.bg} ${styles.border} ${styles.hover} ${styles.text}`}
                             title={event?.title}
-                            onClick={(e) => e.stopPropagation()} // Prevent event bubbling when clicking on an event
+                            onClick={() => handleEventClick(event)}
                           >
                             <div className="truncate">#{event?.title}</div>
                             <div className="text-[10px] flex flex-col justify-between">
@@ -152,7 +155,7 @@ const WeeklyViewUI: React.FC<WeeklyViewUIProps> = ({ events, currentWeekStart = 
                               </div>
 
                               <div className="flex justify-start items-center">
-                                <Clock size={10}/>
+                                <Clock size={10} />
                                 <span>
                                   {moment(event?.start_date).format("HH:mm")} -{" "}
                                   {moment(event?.end_date).format("HH:mm")}

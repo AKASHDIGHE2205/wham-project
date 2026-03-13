@@ -15,9 +15,13 @@ const getHeaders = () => {
 
 export const addTraining = async (data: FormData) => {
   try {
-    const response = await axios.post(`${BASE_URL}/training/addTraining`, data, {
-      ...getHeaders(),
-    });
+    const response = await axios.post(
+      `${BASE_URL}/training/addTraining`,
+      data,
+      {
+        ...getHeaders(),
+      },
+    );
     if (response.status === 201) {
       toast.success(response.data.message || "Training added successfully");
       return response.data;
@@ -43,7 +47,7 @@ export const getTrainingDetails = async (id: number) => {
   try {
     const response = await axios.get(
       `${BASE_URL}/training/getTrainingDetails/${id}`,
-      { ...getHeaders() }
+      { ...getHeaders() },
     );
     return response.data;
   } catch (error: any) {
@@ -56,7 +60,7 @@ export const updateTraining = async (data: any) => {
     const response = await axios.put(
       `${BASE_URL}/training/updateTraining`,
       data,
-      { ...getHeaders() }
+      { ...getHeaders() },
     );
     if (response.status === 200) {
       toast.success(response.data.message || "Training updated successfully");
@@ -71,7 +75,7 @@ export const getActiveTrainings = async () => {
   try {
     const response = await axios.get(
       `${BASE_URL}/training/getActiveTrainings`,
-      { ...getHeaders() }
+      { ...getHeaders() },
     );
     return response.data;
   } catch (error: any) {
@@ -84,7 +88,7 @@ export const deactivateTraining = async (data: any) => {
     const response = await axios.put(
       `${BASE_URL}/training/deactivateTraining`,
       data,
-      { ...getHeaders() }
+      { ...getHeaders() },
     );
     if (response.status === 200) {
       toast.success(response.data.message || "Training updated successfully");

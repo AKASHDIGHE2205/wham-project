@@ -2,6 +2,7 @@ import { Check } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { getUserFromStorage } from '../../../helper/cryptoUser';
 import { getActivityDetails } from '../../../services/calender/calenderApi';
 import type { College, Department, SelectedMember, SelectedTeam } from '../../../types/activity.types';
 import { ActivityStep1 } from './ActivityStep1';
@@ -125,11 +126,12 @@ const initialFormData = {
 export default function UpdateActivityPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState(initialFormData);
-  const [isEdit,setIsEdit] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
   const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 5));
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
   const navigate = useNavigate();
   const { id, date } = useParams();
+  const user = getUserFromStorage();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -137,9 +139,9 @@ export default function UpdateActivityPage() {
       const response: ActivityDetailsResponse = await getActivityDetails(body);
       if (response) {
         const { activity, colleges, departments, locations, members, teams, subActivities, files } = response;
-         if (activity?.status ==='A' || activity?.status ==='C') {
-            setIsEdit(true);
-          }
+        if ((activity?.status === 'A' || activity?.status === 'C') || (user?.role === 'Manager' || user?.role === 'Master')) {
+          setIsEdit(true);
+        }
         setFormData({
           title: activity?.title,
           occasion: activity?.occasion_id,
@@ -237,7 +239,6 @@ export default function UpdateActivityPage() {
               Delete
             </button>
           </div>
-
         </header>
 
         {/* Stepper Navigation */}
