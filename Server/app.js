@@ -27,16 +27,17 @@ app.use('/api/auth', authRoutes);
 app.use('/api/calendar', calenderRoutes);
 app.use('/api/master', masterRoutes);
 app.use('/api/dashboard', DashboardRoutes);
-app.use('/api/reports', ReportRoutes);
 app.use('/api/training', TrainingRoutes);
+app.use('/api/reports', ReportRoutes);
+
 
 // 🔹 Serve React build
-const __dirname = path.resolve();
-app.use(express.static(path.join(__dirname, "../client/dist")));
+// const __dirname = path.resolve();
+// app.use(express.static(path.join(__dirname, "../client/dist")));
 
-app.get(/.*/, (req, res) => {
-  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
-});
+// app.get(/.*/, (req, res) => {
+//   res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+// });
 
 // SSL (only if you really want Node HTTPS)
 const sslOptions = {

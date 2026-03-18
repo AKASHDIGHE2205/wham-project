@@ -3,6 +3,7 @@ import { eachDayOfInterval, endOfMonth, endOfWeek, format, isSameMonth, isToday,
 import { CalendarHeart, Clock } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import DataLoading from '../../components/DataLoading';
 import type { Activities } from './Calender';
 
 interface MonthlyViewProps {
@@ -17,35 +18,35 @@ const getActivityStyles = (status: string) => {
     case 'A':
       return {
         bg: 'bg-green-100',
-        border: 'border-green-500',
+        border: 'border-green-100',
         hover: 'hover:bg-green-200',
         text: 'text-green-800'
       };
     case 'P':
       return {
         bg: 'bg-yellow-100',
-        border: 'border-yellow-500',
+        border: 'border-yellow-100',
         hover: 'hover:bg-yellow-200',
         text: 'text-yellow-800'
       };
     case 'R':
       return {
         bg: 'bg-red-100',
-        border: 'border-red-500',
+        border: 'border-red-100',
         hover: 'hover:bg-red-200',
         text: 'text-red-800'
       };
     case 'C':
       return {
         bg: 'bg-blue-100',
-        border: 'border-blue-500',
+        border: 'border-blue-100',
         hover: 'hover:bg-blue-200',
         text: 'text-blue-800'
       };
     default:
       return {
         bg: 'bg-gray-100',
-        border: 'border-gray-500',
+        border: 'border-gray-100',
         hover: 'hover:bg-gray-200',
         text: 'text-gray-800'
       };
@@ -109,7 +110,7 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ currentDate, Data, Loading, o
   if (Loading) {
     return (
       <div className="h-full flex items-center justify-center">
-        <div className="text-sm text-gray-500">Loading activities...</div>
+        <DataLoading/>
       </div>
     );
   }
@@ -120,7 +121,7 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ currentDate, Data, Loading, o
       <div className="overflow-x-auto hide-scrollbar flex-1">
         <div className="min-w-[700px] sm:min-w-full">
           {/* Header - Days of week */}
-          <div className="grid grid-cols-7 bg-gray-50 border-b border-gray-200 text-xs sm:text-sm font-medium text-gray-600 sticky top-0 z-10">
+          <div className="grid grid-cols-7 bg-gray-50 border-b border-gray-200 text-xs sm:text-sm font-medium text-gray-600 sticky top-0 ">
             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
               <div key={day} className="text-center py-3 px-1">{day}</div>
             ))}
@@ -141,18 +142,16 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ currentDate, Data, Loading, o
                     ${isPast && isCurrentMonth ? 'opacity-60' : ''}
                     transition-colors duration-200 overflow-hidden`}
                 >
-                  {isToday(day) && (
-                    <div className="absolute inset-0 border border-purple-500 pointer-events-none"></div>
-                  )}
+                  {isToday(day) && (<div className="absolute inset-0 border border-purple-500 pointer-events-none"></div>)}
 
                   {/* Date Number */}
                   <div className="relative z-10 flex justify-between items-start">
                     <div
-                      className={`flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full text-sm sm:text-base 
-                        ${isToday(day) ? "bg-indigo-600 text-white" :
-                          isCurrentMonth ? "text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 cursor-pointer" :
+                      className={`flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full text-sm sm:text-base cursor-pointer
+                          ${isToday(day) ? "bg-indigo-600 text-white" :
+                          isCurrentMonth ? "text-gray-700 hover:bg-indigo-50 hover:text-indigo-600" :
                             "text-gray-400"} transition-colors duration-200`}
-                      onClick={() => { if (!isPast && isCurrentMonth) handleClickDate(day) }}
+                      onClick={() => { if (!isPast) handleClickDate(day) }}
                       title={isPast ? "Unable to select past date" : "Click to add event"}
                     >
                       {format(day, "d")}
@@ -172,7 +171,6 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ currentDate, Data, Loading, o
                       const styles = getActivityStyles(activity.status);
                       const startDate = parseDateTime(activity.start_date);
                       const endDate = parseDateTime(activity.end_date);
-
                       return (
                         <div
                           key={index}

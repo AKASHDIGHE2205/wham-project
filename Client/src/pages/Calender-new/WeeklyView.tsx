@@ -2,6 +2,7 @@
 import { eachDayOfInterval, endOfWeek, format, isToday, startOfWeek } from 'date-fns';
 import { CalendarHeart, Clock } from 'lucide-react';
 import React from 'react';
+import DataLoading from '../../components/DataLoading';
 import type { Activities } from './Calender';
 
 interface WeeklyViewProps {
@@ -17,35 +18,35 @@ const getActivityStyles = (status: string) => {
     case 'A':
       return {
         bg: 'bg-green-100',
-        border: 'border-green-500',
+        border: 'border-green-100',
         hover: 'hover:bg-green-200',
         text: 'text-green-800'
       };
     case 'P':
       return {
         bg: 'bg-yellow-100',
-        border: 'border-yellow-500',
+        border: 'border-yellow-100',
         hover: 'hover:bg-yellow-200',
         text: 'text-yellow-800'
       };
     case 'R':
       return {
         bg: 'bg-red-100',
-        border: 'border-red-500',
+        border: 'border-red-100',
         hover: 'hover:bg-red-200',
         text: 'text-red-800'
       };
     case 'C':
       return {
         bg: 'bg-red-100',
-        border: 'border-red-500',
+        border: 'border-red-100',
         hover: 'hover:bg-red-200',
         text: 'text-red-800'
       };
     default:
       return {
         bg: 'bg-blue-100',
-        border: 'border-blue-500',
+        border: 'border-blue-100',
         hover: 'hover:bg-blue-200',
         text: 'text-blue-800'
       };
@@ -112,7 +113,7 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({ currentDate, Data, Loading, onc
   if (Loading) {
     return (
       <div className="h-full flex items-center justify-center">
-        <div className="text-sm text-gray-500">Loading activities...</div>
+        <DataLoading/>
       </div>
     );
   }

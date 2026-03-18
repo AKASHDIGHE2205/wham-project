@@ -68,7 +68,7 @@ const DepartmentAdd: FC<DepartmentAddProps> = ({ show, setShow, fetchData }) => 
 
   return (
     <>
-      <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+      <div className="fixed inset-0 bg-indigo-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
         <div
           className="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
           onClick={(e) => e.stopPropagation()}
@@ -76,7 +76,7 @@ const DepartmentAdd: FC<DepartmentAddProps> = ({ show, setShow, fetchData }) => 
           {/* Modal Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-linear-to-br from-orange-500 to-purple-600 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-linear-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
                 <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
                 </svg>
@@ -102,7 +102,7 @@ const DepartmentAdd: FC<DepartmentAddProps> = ({ show, setShow, fetchData }) => 
             {/* Department Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Department Name <span className="text-orange-600">*</span>
+                Department Name <span className="text-red-600">*</span>
               </label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -116,7 +116,7 @@ const DepartmentAdd: FC<DepartmentAddProps> = ({ show, setShow, fetchData }) => 
                   value={inputs.dept_name}
                   onChange={handleInputChange}
                   placeholder="Enter department name"
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200"
                   required
                 />
               </div>
@@ -125,7 +125,7 @@ const DepartmentAdd: FC<DepartmentAddProps> = ({ show, setShow, fetchData }) => 
             {/* College Selection */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                College <span className="text-orange-600">*</span>
+                College <span className="text-red-600">*</span>
               </label>
               <div className="flex gap-2">
                 <div className="relative flex-1 group">
@@ -172,7 +172,7 @@ const DepartmentAdd: FC<DepartmentAddProps> = ({ show, setShow, fetchData }) => 
                   onChange={handleInputChange}
                   placeholder="Enter student strength"
                   min="0"
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200"
                 />
               </div>
             </div>
@@ -180,7 +180,7 @@ const DepartmentAdd: FC<DepartmentAddProps> = ({ show, setShow, fetchData }) => 
             {/* Status Dropdown */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Status <span className="text-orange-600">*</span>
+                Status <span className="text-red-600">*</span>
               </label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -190,7 +190,7 @@ const DepartmentAdd: FC<DepartmentAddProps> = ({ show, setShow, fetchData }) => 
                 </div>
                 <select
                   name="status"
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white cursor-pointer"
                   required
                   value={inputs.status}
                   onChange={handleInputChange}
@@ -211,7 +211,7 @@ const DepartmentAdd: FC<DepartmentAddProps> = ({ show, setShow, fetchData }) => 
             <div className="flex items-center justify-end space-x-3 pt-6 border-t border-gray-200">
               <button
                 type="button"
-                className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200"
+                className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transition-all duration-200"
                 onClick={handleClose}
               >
                 Cancel
@@ -219,7 +219,7 @@ const DepartmentAdd: FC<DepartmentAddProps> = ({ show, setShow, fetchData }) => 
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
+                className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
               >
                 {loading ? 'Submitting...' : 'Submit'}
               </button>

@@ -1,592 +1,489 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import moment from 'moment';
-import StepsModal from './StepsModal';
-import UpdateStep from './UpdateStep';
+import { BarChart } from '@mui/x-charts/BarChart';
+import { LineChart } from '@mui/x-charts/LineChart';
+import { PieChart } from '@mui/x-charts/PieChart';
+import { AlertCircle, BarChart2, Bell, Box, Calendar as CalendarIcon, Check, CheckCircle2, ChevronRight, Clock, Package, Plus, X } from 'lucide-react';
+import moment from "moment";
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import AttendenceModal from './AttendenceModal';
-import { getTeamMembers } from '../../services/auth/authApi';
-import type { Member } from '../Master/member-master/EditMember';
-import { Calendar, BarChart3, Users, Rocket, ChevronRight, Clock, MapPin, Calendar1 } from 'lucide-react';
-import { getActiveEvents, getEventForAttend, getMemberDetailsForDashboard, getUpcomingEvents } from '../../services/dashboard/DashboardApi';
-import { getUserFromStorage } from '../../helper/cryptoUser';
-import Loadings from '../../components/Loadings';
+import DataLoading from "../../components/DataLoading";
+import { getUserFromStorage } from "../../helper/cryptoUser";
+import { getActiveTeams, getActivities } from "../../services/calender/calenderApi";
+import type { Activities } from "../Calender-new/Calender";
+import WeeklyViewUI from './WeeklyViewUI';
 
-export interface EventMember {
-  event_id: number;
-  id: number;
-  first_name: string;
-  middle_name: string | null;
-  last_name: string;
-  designation: string | null;
-  full_name: string;
-}
-
-export interface EventTeam {
-  event_id: number;
+interface Teams {
   id: number;
   name: string;
-}
-
-export interface EventLocation {
-  event_id: number;
-  id: number;
-  address: string;
-  lng: string;
-  lat: string;
-  city: string;
-  postal_code: number;
-}
-
-export interface UpcomingEvent {
-  event_id: number;
-  title: string;
   description: string;
-  from_date: string;
-  to_date: string;
-  isapproved: string;
-  type: string;
-  isdeleted: string;
-  approved_by: number | null;
-  created_by: number;
-  created_at: string;
-  updated_by: number;
-  updated_at: string;
-
-  members: EventMember[];
-  teams: EventTeam[];
-  locations: EventLocation[];
+  manager_id: number;
+  status: string;
 }
 
-export interface EventForAttend {
-  event_id: number;
-  event_Date: string;
-  title: string;
-  description: string | null;
-  from_date: string;
-  to_date: string;
-  isapproved: string | null;
-  type: string;
-  isdeleted: string;
-  approved_by: number | null;
-  created_by: number;
-  created_at: string;
-  updated_by: number | null;
-  updated_at: string;
-
-  // Task fields
-  sr_no: number | null;
-  dt_event_id: number | null;
-  event_date: string | null;
-  step_no: number | null;
-  task_id: number | null;
-  task_desc: string | null;
-  dt_status: string | null;
-  step_name: string | null;
-  task_name: string | null;
-}
-
-const Dashboard = () => {
-  const [teams, setTeams] = useState([]);
-  const [upcomingEvent, setUpcomingEvent] = useState<UpcomingEvent[]>([]);
-  const [ActiveEvent, setActiveEvent] = useState<UpcomingEvent[]>([]);
-  const [showAttend, setShowAttend] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState({})
-  const [showAddSteps, setShowAddSteps] = useState(false);
-  const [data, setData] = useState<Member | null>(null);
-  const [attendEvents, setAttendEvents] = useState<EventForAttend[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showUpdate, setShowUpdate] = useState(false);
-
-  const stats = [
-    {
-      label: 'Active Events',
-      value: ActiveEvent?.length || 0,
-      icon: Rocket,
-      color: 'bg-orange-500',
-      bgcolor: 'bg-linear-to-r from-orange-100 to-orange-50'
-    },
-    {
-      label: 'Upcoming Events',
-      value: upcomingEvent?.length || 0,
-      icon: BarChart3,
-      color: 'bg-yellow-500',
-      bgcolor: 'bg-linear-to-r from-yellow-100 to-yellow-50'
-    },
-    {
-      label: 'Tasks To Attend',
-      value: attendEvents.length || 0,
-      icon: Users,
-      color: 'bg-green-500',
-      bgcolor: 'bg-linear-to-r from-green-100 to-green-50'
-    },
-    {
-      label: 'Team Members',
-      value: teams?.length || 0,
-      icon: Users,
-      color: 'bg-purple-500',
-      bgcolor: 'bg-linear-to-r from-purple-100 to-purple-50'
-    },
-  ];
-
+export default function Dashboard() {
   const user = getUserFromStorage();
+  const [currentWeekStart, setCurrentWeekStart] = useState(moment().startOf("week"));
+  const [activities, setActivities] = useState<Activities[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showAddStock, setshowAddStock] = useState(false);
+  const [teams, setTeams] = useState<Teams[]>([]);
 
-  const fetchAllData = async () => {
-    setLoading(true);
-
-    try {
-      const id = user?.id || 0;
-
-      const body = {
-        userId: id || 0,
-        role: user?.role || 'User',
-        isOrganizer: data?.isorganizer || 'N'
-      };
-
-      if (!id) return;
-
-      const memberResponse = await getMemberDetailsForDashboard(id);
-      setData(memberResponse?.member || []);
-
-      const teamsResponse = await getTeamMembers({ userId: id || 0 });
-      setTeams(teamsResponse.teams || []);
-
-      const upcomingEventsResponse = await getUpcomingEvents(body);
-      setUpcomingEvent(upcomingEventsResponse.events || []);
-
-      const activeEventsResponse = await getActiveEvents(body);
-      setActiveEvent(activeEventsResponse.events || []);
-
-      const attendEventsResponse = await getEventForAttend(body);
-      setAttendEvents(attendEventsResponse.events || []);
-
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-    } finally {
-      setLoading(false);
+  const fetchData = async () => {
+    setLoading(true)
+    const body = {
+      userId: user?.id || 0,
+      role: user?.role || ''
     }
-  };
+    const response = await getActivities(body);
+    setLoading(false);
+    if (response) {
+      setActivities(response?.activities || [])
+    }
+  }
+
+  const fetchTeams = async () => {
+    setLoading(true)
+    const response = await getActiveTeams();
+    setLoading(false);
+    if (response) {
+      setTeams(response?.Teams || [])
+    }
+  }
 
   useEffect(() => {
-    fetchAllData();
-  }, []);
+    fetchData();
+    fetchTeams();
+  }, [])
 
-  const handleAddAttend = (data: any) => {
-    setShowAttend(true);
-    setSelectedEvent(data);
-  }
+  const handleWeekChange = (direction: "prev" | "next") => {
+    setCurrentWeekStart((prev) =>
+      direction === "prev"
+        ? moment(prev).subtract(1, "week")
+        : moment(prev).add(1, "week")
+    );
+  };
 
-  const handleAddSteps = (data: any) => {
-    setShowAddSteps(true);
-    setSelectedEvent(data);
-  }
+  const handleSetCurrentWeek = () => {
+    setCurrentWeekStart(moment().startOf("week"));
+  };
 
-  const handleUpdate = (data: any) => {
-    setSelectedEvent(data);
-    setShowUpdate(true);
-  }
+  const getCurrentMonth = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    return `${year}-${month}`;
+  };
+  const currentTime = moment().format("HH:mm:ss");
 
-  // Show loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-white to-orange-50/30 flex items-center justify-center">
-        <div className="text-center">
-          <Loadings />
-        </div>
+      <div className="flex justify-center items-center h-screen w-full">
+        <DataLoading />
       </div>
-    );
+    )
   }
 
   return (
-    <>
-      <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 border border-orange-300 m-1 rounded-md">
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-          {/* Welcome Section */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
-              Welcome back, <span className=" text-orange-600">{user?.firstName}</span>
+    <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-slate-800">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">
+              {(() => {
+                const hour = parseInt(currentTime.split(":")[0]);
+                if (hour >= 5 && hour < 12) return "Good Morning";
+                if (hour >= 12 && hour < 17) return "Good Afternoon";
+                if (hour >= 17 && hour < 21) return "Good Evening";
+                return "Good Night";
+              })()}
+              , <span className="text-[#3636fa]">{user.firstName}!</span>
             </h1>
-            <p className="text-gray-600 text-lg">Ready to plan your next mission? 🚀</p>
+            <p className="text-gray-600">Ready to plan your next mission? 🚀</p>
+            <p className="text-slate-500 text-sm mt-1" hidden>Here is your weekly overview.</p>
           </div>
-
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {stats?.map((stat, index) => (
-              <div
-                key={index}
-                className={`${stat?.bgcolor} rounded-2xl p-6 shadow-3xl border border-orange-200 transition-all duration-300 hover:shadow-[0_0_40px_rgba(249,115,22,0.4)] hover:border-orange-300 relative`}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 text-sm font-medium">{stat?.label}</p>
-                    <p className="text-2xl font-bold text-gray-900 mt-1">#{stat?.value}</p>
-                  </div>
-                  <div className={`${stat?.color} p-3 rounded-xl text-white`}>
-                    <stat.icon className="w-6 h-6" />
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="text-sm font-semibold text-slate-700">
+            {moment().format("dddd, MMMM D, YYYY")}
           </div>
+        </header>
 
-          {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="bg-white rounded-2xl shadow-sm border border-orange-200 overflow-hidden">
-              {/* Active Events */}
-              <div>
-                <div className="px-6 py-4 border-b border-orange-100 flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-orange-500" />
-                    Active Events
-                  </h2>
-                  <Link
-                    to="/calender"
-                    className="text-orange-600 hover:text-orange-700 text-sm font-medium flex items-center"
-                  >
-                    View Calendar <ChevronRight className="w-4 h-4 ml-1" />
-                  </Link>
-                </div>
-
-                <div className="p-6 space-y-4">
-                  {ActiveEvent.length === 0 && (
-                    <p className="text-orange-600">No active events available</p>
-                  )
-                  }
-                  {ActiveEvent?.map((event) => (
-                    <div
-                      key={event?.event_id}
-                      className="bg-orange-50 border border-orange-100 rounded-xl p-4 hover:shadow-md transition"
-                    >
-                      <div className="flex gap-4">
-                        {/* Date Badge */}
-                        <div className="flex flex-col justify-center items-center w-12 h-12 bg-linear-to-br from-orange-500 to-yellow-500 rounded-xl text-white">
-                          <span className="text-xl font-bold">{new Date(event?.from_date).getDate()}</span>
-                          <span className="text-xs uppercase">
-                            {new Date(event?.from_date).toLocaleDateString('en', { month: 'short' })}
-                          </span>
-                        </div>
-
-                        {/* Details */}
-                        <div className="flex-1 space-y-1">
-                          <div className="flex justify-between items-start">
-                            <h3 className="font-semibold text-gray-900">
-                              Title : {event?.title}
-                            </h3>
-
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs border font-semibold ${event?.isapproved === "A"
-                                ? "bg-green-100 text-green-700 border-green-200"
-                                : event?.isapproved === "P"
-                                  ? "bg-yellow-100 text-yellow-700 border-yellow-200"
-                                  : event?.isapproved === "C"
-                                    ? "bg-blue-100 text-blue-700 border-blue-200"
-                                    : "bg-red-100 text-red-700 border-red-200"
-                                }`}
-                            >
-                              {event?.isapproved === "A"
-                                ? "Approved"
-                                : event?.isapproved === "P"
-                                  ? "Pending"
-                                  : event?.isapproved === "C"
-                                    ? "Completed"
-                                    : "Rejected"}
-                            </span>
-                          </div>
-
-                          <div className="flex items-center text-xs text-gray-600">
-                            <Clock className="w-4 h-4 mr-2 text-orange-500" />
-                            {moment(event?.from_date).format("hh:mm A")} -{" "}
-                            {moment(event?.to_date).format("hh:mm A")}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            <Calendar1 className="w-4 h-4 mr-2 text-orange-500 inline" />
-                            {moment(event?.from_date).format("DD/MMM/YYYY")} - {" "}
-                            {moment(event?.to_date).format("DD/MMM/YYYY")}
-                          </div>
-                          {(event.teams).length > 0 && (
-                            <div className="flex items-center text-sm text-gray-600">
-                              <Users className="w-4 h-4 mr-2 text-orange-500" />
-                              <span className="font-medium mr-1">Teams:</span>
-                              {event?.teams.map((t) => t.name).join(", ")}
-                            </div>
-                          )}
-                          {(event.members).length > 0 && (
-                            <div className="flex items-center text-sm text-gray-600">
-                              <Users className="w-4 h-4 mr-2 text-orange-500" />
-                              <span className="font-medium mr-1">Members:</span>
-                              {event?.members.map((m) => m.full_name).join(", ")}
-                            </div>
-                          )}
-
-                          {/* FIXED Venue icon layout */}
-                          <div className="flex text-sm text-gray-600 gap-2">
-                            <MapPin className="w-5 h-5 text-orange-500 mt-0.5" />
-                            <span className="font-medium mr-1">Venue:</span>
-                            <div className="flex flex-col">
-                              {event?.locations.map((loc, index) => (
-                                <span
-                                  key={index}
-                                  className="line-clamp-2"
-                                >
-                                  • {loc.address}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-
-                          <div className="flex justify-end items-center gap-4 space-y-2 ">
-                            {user && (["Admin", "Manager", "Master"].includes(user?.role) || data?.isorganizer === "A") && (
-                              <button
-                                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow hover:shadow-lg text-sm cursor-pointer"
-                                onClick={() => handleAddSteps(event)}
-                              >
-                                Add Task
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+        {(user?.role === 'Master' || user?.role === 'Manager') && (
+          <section className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+            {/* Team Analytics */}
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <BarChart2 className="w-5 h-5 text-indigo-600" /> Team Analytics
+              </h2>
+              <div className="flex gap-3">
+                <input
+                  type="month"
+                  defaultValue={getCurrentMonth()}
+                  className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 bg-white outline-none focus:ring-2 focus:ring-indigo-500/20"
+                />
+                <select className="border border-slate-200 sm:w-40 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 bg-white outline-none focus:ring-2 focus:ring-indigo-500/20">
+                  {teams?.map((item) => <option value={item?.id}>{item?.name}</option>)}
+                </select>
               </div>
-
-              {/* Attend Events */}
-              <div>
-                <div className="px-6 py-4 border-b border-orange-100 flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-orange-500" />
-                    Attend Events
-                  </h2>
-                </div>
-
-                <div className="p-4 space-y-2">
-                  {attendEvents.length === 0 && (
-                    <p className="text-orange-600">No events available</p>
-                  )
-                  }
-                  {attendEvents?.map((event, index) => (
-                    <div
-                      key={index}
-                      className="bg-orange-50 hover:bg-orange-100 border border-orange-100 rounded-xl p-2 hover:shadow-md transition"
-                    >
-                      <div className="flex gap-2">
-                        {/* Date Badge */}
-                        <div className="flex flex-col justify-center items-center w-12 h-12 bg-linear-to-br from-orange-500 to-yellow-500 rounded-xl text-white">
-                          <span className="text-xl font-bold">{new Date(event?.from_date).getDate()}</span>
-                          <span className="text-xs uppercase">
-                            {new Date(event?.from_date).toLocaleDateString('en', { month: 'short' })}
-                          </span>
-                        </div>
-
-                        {/* Details */}
-                        <div className="flex-1 space-y-0">
-                          <div className="flex justify-between items-start">
-                            <h3 className="font-semibold text-gray-900">
-                              Title : {event?.title}
-                            </h3>
-                            <p className={`px-2 py-1 rounded-full text-xs border font-semibold 
-                            ${event?.dt_status === "S"
-                                ? "bg-green-100 text-green-700 border-green-200"
-                                : event?.dt_status === "P"
-                                  ? "bg-yellow-100 text-yellow-700 border-yellow-200"
-                                  : event?.dt_status === "C"
-                                    ? "bg-blue-100 text-blue-700 border-blue-200"
-                                    : "bg-red-100 text-red-700 border-red-200"
-                              }`}>
-                              {
-                                event?.dt_status === "P" ? "In Progress" :
-                                  event?.dt_status === "S" ? "Started" :
-                                    event?.dt_status === "C" ? "Completed" : ""
-                              }
-                            </p>
-                          </div>
-
-                          <div>
-                            <p className="text-sm text-gray-800 truncate  max-w-[200px] sm:max-w-[400px] "><span className='font-medium'>Step : </span>{event?.step_name}</p>
-                            <p className="text-xs text-gray-800 truncate max-w-[200px] sm:max-w-[400px]"><span className='font-medium '>Task : </span>{event?.task_name}</p>
-                          </div>
-
-                          <div className="flex justify-end items-center gap-4">
-                            {event?.isapproved === "A" && (
-                              <button
-                                onClick={() => handleAddAttend(event)}
-                                className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg shadow hover:shadow-lg text-sm cursor-pointer"
-                              >
-                                Attend
-                              </button>
-                            )}
-                            {((user?.role === 'Manager' || user?.role === 'Admin' || user?.role === 'Master') && (event?.isapproved === "A")) && (
-                              <button
-                                onClick={() => handleUpdate(event)}
-                                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow hover:shadow-lg text-sm cursor-pointer"
-                              >
-                                Update
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
             </div>
 
-            {/* Upcoming Events */}
-            <div className="bg-white rounded-2xl shadow-sm border border-orange-200 overflow-hidden">
-              <div className="px-6 py-4 border-b border-orange-100 flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-orange-500" />
-                  Upcoming Events
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Total Samples */}
+              <div className="bg-[#f0f4ff] rounded-2xl p-8 flex flex-col items-center justify-center text-center">
+                <h3 className="text-indigo-600 font-bold text-sm tracking-wider mb-4">TOTAL SAMPLES (CANS)</h3>
+                <div className="text-6xl font-bold text-indigo-900 mb-2">0.0</div>
+                <p className="text-indigo-400 text-sm font-medium">Based on 0 pouches</p>
+              </div>
+
+              {/* Samples by Occasion */}
+              <div className="border border-slate-100 rounded-2xl p-5 flex flex-col">
+                <h3 className="text-xs font-bold text-slate-500 tracking-wider mb-4 uppercase">Samples by Occasion</h3>
+                <div className="flex-1 min-h-40 -ml-4">
+                  <LineChart
+                    xAxis={[{ data: [1, 2, 3, 4, 5], valueFormatter: () => '' }]}
+                    series={[{ data: [null, null, null, null, null] }]}
+                    margin={{ top: 10, bottom: 20, left: 30, right: 10 }}
+                    sx={{ '.MuiLineElement-root': { stroke: '#e2e8f0', strokeWidth: 2 }, }}
+                  />
+                </div>
+              </div>
+
+              {/* Demographics */}
+              <div className="border border-slate-100 rounded-2xl p-5 flex flex-col">
+                <h3 className="text-xs font-bold text-slate-500 tracking-wider mb-4 uppercase">Demographics (Gender)</h3>
+                <div className="flex-1 flex flex-col justify-end items-center pb-2">
+                  <div className="flex gap-6 text-xs font-medium">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-2 h-2 bg-pink-400 rounded-sm"></div>
+                      <span className="text-pink-400">Female</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-2 h-2 bg-blue-500 rounded-sm"></div>
+                      <span className="text-blue-500">Male</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Main Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Column */}
+          <div className="lg:col-span-8 space-y-6">
+            {/* Stats Row */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <StatCard icon={<Clock className="w-5 h-5 text-blue-600" />} bg="bg-blue-50" title="Hours" value="9" />
+              <StatCard icon={<Package className="w-5 h-5 text-purple-600" />} bg="bg-purple-50" title="Samples" value="1250" />
+              <StatCard icon={<CheckCircle2 className="w-5 h-5 text-emerald-600" />} bg="bg-emerald-50" title="Activities" value="3" />
+              <StatCard icon={<AlertCircle className="w-5 h-5 text-amber-600" />} bg="bg-amber-50" title="Pending" value="1" />
+            </div>
+
+            {/* Calendar */}
+            <section className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                  <CalendarIcon className="w-5 h-5 text-indigo-600" /> This Week
                 </h2>
-                <Link
-                  to="/calender"
-                  className="text-orange-600 hover:text-orange-700 text-sm font-medium flex items-center"
-                >
-                  View Calendar <ChevronRight className="w-4 h-4 ml-1" />
-                </Link>
-              </div>
-
-              <div className="p-6 space-y-4">
-                {upcomingEvent?.length === 0 && (
-                  <p className="text-orange-600">No upcoming events available</p>
-                )
-                }
-                {upcomingEvent?.map((event) => (
-                  <div
-                    key={event?.event_id}
-                    className="bg-orange-50 border border-orange-100 rounded-xl p-4 hover:shadow-md transition"
+                <div className='flex justify-center gap-1 items-center'>
+                  <Link
+                    className='text-blue-500 underline hover:text-blue-600'
+                    to={'/calender'}
                   >
-                    <div className="flex gap-4">
-                      <div className="flex flex-col justify-center items-center w-12 h-12 bg-linear-to-br from-orange-500 to-yellow-500 rounded-xl text-white">
-                        <span className="text-xl font-bold">{new Date(event?.from_date).getDate()}</span>
-                        <span className="text-xs uppercase">
-                          {new Date(event?.from_date).toLocaleDateString("en", { month: "short" })}
-                        </span>
-                      </div>
-
-                      <div className="flex-1 space-y-2">
-                        <div className="flex justify-between items-start">
-                          <h3 className="font-semibold text-gray-900">Title : {event?.title}</h3>
-
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs border font-semibold ${event?.isapproved === "A"
-                              ? "bg-green-100 text-green-700 border-green-200"
-                              : event?.isapproved === "P"
-                                ? "bg-yellow-100 text-yellow-700 border-yellow-200"
-                                : event?.isapproved === "C"
-                                  ? "bg-blue-100 text-blue-700 border-blue-200"
-                                  : "bg-red-100 text-red-700 border-red-200"
-                              }`}
-                          >
-                            {event?.isapproved === "A"
-                              ? "Approved"
-                              : event?.isapproved === "P"
-                                ? "Pending"
-                                : event?.isapproved === "C"
-                                  ? "Completed"
-                                  : "Rejected"}
-                          </span>
-                        </div>
-
-                        <div className="text-sm text-gray-600 flex items-center">
-                          <Clock className="w-4 h-4 mr-2 text-orange-500" />
-                          {moment(event?.from_date).format("hh:mm A")} —{" "}
-                          {moment(event?.to_date).format("hh:mm A")}
-                        </div>
-                        <div className="text-sm text-gray-600 flex items-center">
-                          <Calendar className="w-4 h-4 mr-2 text-orange-500" />
-                          {moment(event?.from_date).format("DD/MMM/YYYY")} —{" "}
-                          {moment(event?.to_date).format("DD/MMM/YYYY ")}
-                        </div>
-
-                        {(event.teams).length > 0 && (
-                          <div className="flex items-center text-sm text-gray-600">
-                            <Users className="w-4 h-4 mr-2 text-orange-500" />
-                            <span className="font-medium mr-1">Teams:</span>
-                            {event?.teams.map((t) => t.name).join(", ")}
-                          </div>
-                        )}
-                        {(event.members).length > 0 && (
-                          <div className="flex items-center text-sm text-gray-600">
-                            <Users className="w-4 h-4 mr-2 text-orange-500" />
-                            <span className="font-medium mr-1">Members:</span>
-                            {event?.members.map((m) => m.full_name).join(", ")}
-                          </div>
-                        )}
-
-                        {/* FIXED Venue Layout */}
-                        <div className="flex text-sm text-gray-600 gap-2">
-                          <MapPin className="w-5 h-5 text-orange-500 mt-0.5" />
-                          <span className="font-medium mr-1">Venue:</span>
-
-                          <div className="flex flex-col">
-                            {event?.locations.map((loc, index) => (
-                              <p
-                                key={index}
-                                className="line-clamp-2"
-                              >
-                                • {loc.address}
-                              </p>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="flex justify-end items-center gap-4 space-y-2 ">
-                          {user && (["Admin", "Manager", "Master"].includes(user?.role) || data?.isorganizer === "A") && (
-                            <button
-                              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow hover:shadow-lg text-sm cursor-pointer"
-                              onClick={() => handleAddSteps(event)}
-                            >
-                              Add Task
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                    View full Calendar
+                  </Link>
+                  <div className="flex items-center justify-center">
+                    <button
+                      onClick={() => handleWeekChange("prev")}
+                      className="rounded-md bg-white/20 hover:bg-white/30 text-black cursor-pointer"
+                    >
+                      <ChevronRight className="w-4 h-4 rotate-180" />
+                    </button>
+                    <button
+                      onClick={handleSetCurrentWeek}
+                      className="text-xs font-medium cursor-pointer px-2 py-1 bg-[#5555fa] text-white rounded-md"
+                    >
+                      Current Week
+                    </button>
+                    <button
+                      onClick={() => handleWeekChange("next")}
+                      className="rounded-md bg-white/20 hover:bg-white/30 text-black cursor-pointer"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
                   </div>
-                ))}
+                </div>
               </div>
-            </div>
+              <div>
+                <WeeklyViewUI
+                  events={activities}
+                  currentWeekStart={currentWeekStart}
+                />
+              </div>
+            </section>
 
+            {/* Bottom Charts */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Activity by Occasion */}
+              <section className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                <h2 className="text-base font-bold text-slate-800 mb-6">Activity by Occasion</h2>
+                <div className="flex flex-col items-center">
+                  <PieChart
+                    series={[
+                      {
+                        data: [
+                          { id: 0, value: 40, color: '#f59e0b', label: 'Party & Socializing' },
+                          { id: 1, value: 30, color: '#10b981', label: 'Sports' },
+                          { id: 2, value: 30, color: '#3b82f6', label: 'Study' },
+                        ],
+                        innerRadius: 60,
+                        outerRadius: 100,
+                        paddingAngle: 2,
+                        cornerRadius: 4,
+                      },
+                    ]}
+                    height={220}
+                  />
+                  <div className="flex gap-4 mt-4 text-xs font-medium">
+                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 bg-amber-500 rounded-sm"></div><span className="text-amber-500">Party & Socializing</span></div>
+                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 bg-emerald-500 rounded-sm"></div><span className="text-emerald-500">Sports</span></div>
+                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 bg-blue-500 rounded-sm"></div><span className="text-blue-500">Study</span></div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Performance */}
+              <section className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                <h2 className="text-base font-bold text-slate-800 mb-6">Performance</h2>
+                <div className="-ml-4">
+                  <BarChart
+                    xAxis={[{ scaleType: 'band', data: ['Coffee', 'Mint', 'Bubble', 'Rage'] }]}
+                    series={[{ data: [400, 300, 200, 350], color: '#6366f1' }]}
+                    height={250}
+                    margin={{ left: 40, right: 10, top: 10, bottom: 20 }}
+                    borderRadius={4}
+                  />
+                </div>
+              </section>
+            </div>
           </div>
 
+          {/* Right Column */}
+          <div className="lg:col-span-4 space-y-6">
+            {/* Stock Management */}
+            <section className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                  <Box className="w-5 h-5 text-indigo-600" />
+                  Stock Management
+                </h2>
+
+                <button
+                  type="button"
+                  onClick={() => setshowAddStock(!showAddStock)}
+                  className="border border-slate-200 rounded-lg px-3 py-1 text-sm text-white bg-[#3333ff] cursor-pointer"
+                >
+                  <span className="flex justify-center items-center gap-1">
+                    <Plus size={18} />
+                    Add
+                  </span>
+                </button>
+              </div>
+
+              {/* Add Stock Form */}
+              {showAddStock && (
+                <div className="bg-[#f1f4fc] p-3 w-full max-w-md rounded-md mb-4">
+                  <div className="grid grid-cols-12 gap-3 items-end">
+                    <div className="col-span-8">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Edition
+                      </label>
+                      <select className="w-full h-6 px-3 border border-gray-300 rounded-md bg-white text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option>Cool Mint</option>
+                        <option>Bubblegum</option>
+                        <option>Red Bull</option>
+                        <option>Coffee</option>
+                      </select>
+                    </div>
+
+                    <div className="col-span-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Qty (Cans)
+                      </label>
+                      <input
+                        type="number"
+                        value="0"
+                        className="w-full h-6 px-3 border border-gray-300 rounded-md bg-white text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end items-center gap-4 mt-4">
+                    <button
+                      type="button"
+                      onClick={() => setshowAddStock(false)}
+                      className="text-sm text-gray-500 hover:text-gray-700 cursor-pointer h-6"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-5 h-6 rounded-md cursor-pointer"
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Stock Cards */}
+              <div className="grid grid-cols-2 gap-4">
+                <StockCard
+                  title="Cool Mint"
+                  balance="50.0"
+                  inVal="50"
+                  outVal="0.0"
+                  badgeBg="bg-emerald-50"
+                  badgeColor="text-emerald-600"
+                />
+                <StockCard
+                  title="Bubblegum"
+                  balance="30.0"
+                  inVal="30"
+                  outVal="0.0"
+                  badgeBg="bg-pink-50"
+                  badgeColor="text-pink-600"
+                />
+                <StockCard
+                  title="Rage Bull"
+                  balance="0.0"
+                  inVal="0"
+                  outVal="0.0"
+                  badgeBg="bg-rose-50"
+                  badgeColor="text-rose-600"
+                />
+                <StockCard
+                  title="Coffee"
+                  balance="0.0"
+                  inVal="0"
+                  outVal="0.0"
+                  badgeBg="bg-amber-50"
+                  badgeColor="text-amber-700"
+                />
+              </div>
+            </section>
+
+            {/* Pending Requests */}
+            <section className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+              <h2 className="text-xs font-bold text-slate-500 tracking-wider mb-4 flex items-center gap-2 uppercase">
+                <Clock className="w-4 h-4" /> My Requests
+              </h2>
+              <div className="border-l-2 border-rose-200 pl-4 py-1 flex justify-between items-center">
+                <div>
+                  <div className="text-sm font-medium text-slate-800">
+                    Sarah Teammate <span className="font-bold">40</span> Rage Bull
+                  </div>
+                  <div className="text-xs text-slate-400 mt-1">10/2/2024</div>
+                </div>
+                <div className="flex gap-2">
+                  <button className="w-6 h-6 rounded bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-100 transition-colors">
+                    <Check className="w-4 h-4" />
+                  </button>
+                  <button className="w-6 h-6 rounded bg-rose-50 text-rose-600 flex items-center justify-center hover:bg-rose-100 transition-colors">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            {/* Action Items */}
+            <section className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-md font-bold text-slate-800 flex items-center gap-2">
+                  <Bell className="w-5 h-5 text-indigo-600" /> Notification
+                </h2>
+                <span className="bg-rose-50 text-rose-600 text-xs font-bold px-2 py-1 rounded-full">2</span>
+              </div>
+              <div className="space-y-3">
+                <ActionItem
+                  status="APPROVAL NEEDED"
+                  date="2026-03-17"
+                  title="Waiting for Approval"
+                  desc='Sarah Teammate submitted "Football Match Activation".'
+                  borderColor="border-amber-200"
+                  bgColor="bg-amber-50/50"
+                  statusColor="text-amber-600"
+                />
+                <ActionItem
+                  status="REVIEW NEEDED"
+                  date="2026-03-16"
+                  title="Pending Review"
+                  desc='"Finals Week Sampling" by Alex Student is complete.'
+                  borderColor="border-blue-200"
+                  bgColor="bg-blue-50/50"
+                  statusColor="text-blue-600"
+                />
+              </div>
+            </section>
+          </div>
         </div>
-      </div >
-      {showAttend && (
-        <AttendenceModal
-          show={showAttend}
-          setShow={setShowAttend}
-          Data={selectedEvent}
-          Member={data}
-          setSelectedEvent={setSelectedEvent}
-          fetchAllData={fetchAllData}
-        />
-      )}
-      {showAddSteps && (
-        <StepsModal
-          show={showAddSteps}
-          setShow={setShowAddSteps}
-          Data={selectedEvent}
-          Member={data}
-          setSelectedEvent={setSelectedEvent}
-          fetchAllData={fetchAllData}
-        />
-      )}
-      {showUpdate && (
-        <UpdateStep
-          show={showUpdate}
-          setShow={setShowUpdate}
-          Data={selectedEvent}
-          User={user}
-          fetchAllData={fetchAllData}
-        />
-      )}
-    </>
-  )
+      </div>
+    </div>
+  );
 }
 
-export default Dashboard
+// Sub-components
+function StatCard({ icon, bg, title, value }: { icon: React.ReactNode, bg: string, title: string, value: string }) {
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 flex items-center gap-4">
+      <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${bg}`}>
+        {icon}
+      </div>
+      <div>
+        <div className="text-xs font-medium text-slate-500 mb-0.5">{title}</div>
+        <div className="text-xl font-bold text-slate-800 leading-none">{value}</div>
+      </div>
+    </div>
+  );
+}
+
+function StockCard({ title, balance, inVal, outVal, badgeBg, badgeColor }: { title: string, balance: string, inVal: string, outVal: string, badgeBg: string, badgeColor: string }) {
+  return (
+    <div className="border border-slate-100 rounded-xl p-4 flex flex-col">
+      <div className="flex justify-end mb-2">
+        <span className={`text-[10px] px-2 py-0.5 rounded font-bold tracking-wide ${badgeBg} ${badgeColor}`}>
+          {title}
+        </span>
+      </div>
+      <div className="mb-4">
+        <div className="text-[10px] text-slate-400 font-bold tracking-wider mb-0.5">BALANCE</div>
+        <div className="text-xl font-bold text-slate-800 flex items-baseline gap-1">
+          {balance} <span className="text-[10px] text-slate-400 font-medium">Cans</span>
+        </div>
+      </div>
+      <div className="flex justify-between text-xs border-t border-slate-50 pt-3 mt-auto">
+        <div>
+          <div className="text-slate-400 text-[10px] font-medium mb-0.5">In</div>
+          <div className="text-emerald-500 font-semibold">+{inVal}</div>
+        </div>
+        <div className="text-right">
+          <div className="text-slate-400 text-[10px] font-medium mb-0.5">Out</div>
+          <div className="text-rose-500 font-semibold">-{outVal}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ActionItem({ status, date, title, desc, borderColor, bgColor, statusColor }: { status: string, date: string, title: string, desc: string, borderColor: string, bgColor: string, statusColor: string }) {
+  return (
+    <div className={`border rounded-xl p-4 ${borderColor} ${bgColor}`}>
+      <div className="flex justify-between items-start mb-2">
+        <span className={`text-[10px] font-bold tracking-wider ${statusColor}`}>{status}</span>
+        <span className="text-[10px] text-slate-400 font-medium">{date}</span>
+      </div>
+      <h3 className="text-sm font-bold text-slate-800 mb-1">{title}</h3>
+      <p className="text-xs text-slate-500">{desc}</p>
+    </div>
+  );
+}

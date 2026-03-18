@@ -87,13 +87,12 @@ const TeamView = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 p-2 sm:p-6 border border-orange-300 m-1 rounded-md">
+      <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-indigo-50 p-2 sm:p-6 border border-indigo-300 m-1 rounded-md">
         <div className="max-w-5xl mx-auto">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-bold text-orange-600">Team List</h1>
-              <p className="text-orange-400 mt-1 text-sm">Manage your organization teams.</p>
+              <h1 className="text-2xl font-bold text-indigo-600">Team List</h1>
             </div>
           </div>
 
@@ -108,11 +107,11 @@ const TeamView = () => {
                 <input
                   type="text"
                   placeholder="Search teams..."
-                  className="block w-full pl-9 sm:pl-10 pr-3 py-2 sm:py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 text-sm sm:text-base"
+                  className="block w-full pl-9 sm:pl-10 pr-3 py-2 sm:py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 text-sm sm:text-base"
                   onChange={(e) => setSearch(e.target.value)}
                   value={search}
                 />
-                <button className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-orange-600 cursor-pointer font-bold" onClick={() => setSearch("")}>
+                <button className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-indigo-600 cursor-pointer font-bold" onClick={() => setSearch("")}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
                 </button>
               </div>
@@ -124,7 +123,7 @@ const TeamView = () => {
                   <div className="relative">
                     <select
                       name="itemsPerPage"
-                      className="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer text-sm sm:text-base"
+                      className="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white cursor-pointer text-sm sm:text-base"
                       required
                       onChange={(e: any) => setItemsPerPage(Number(e.target.value))}
                     >
@@ -160,7 +159,7 @@ const TeamView = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[400px]">
-                <thead className="bg-linear-to-r from-purple-50 to-orange-50">
+                <thead className="bg-linear-to-r from-purple-50 to-indigo-50">
                   <tr>
                     <th className="px-2 py-3 text-center  text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       ID
@@ -234,7 +233,7 @@ const TeamView = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={5} className="text-center py-4 text-orange-600">
+                      <td colSpan={5} className="text-center py-4 text-indigo-600">
                         No Records Found
                       </td>
                     </tr>

@@ -1,16 +1,9 @@
 import express from 'express';
 import multer from 'multer';
-import {
-  addTraining,
-  deactivateTraining,
-  getActiveTrainings,
-  getAllTrainings,
-  getTrainingDetails,
-  updateTraining
-} from '../Controller/training/trainingController.js';
+import { addTraining, deactivateTraining, getActiveTrainings, getAllTrainings, getTrainingDetails, updateTraining } from '../Controller/training/trainingController.js';
 import { verifyToken } from '../middleware/verifyToken.js';
-const router = express.Router();
 
+const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.post("/addTraining", verifyToken, upload.single("file"), addTraining);

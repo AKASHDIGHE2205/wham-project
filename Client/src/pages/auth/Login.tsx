@@ -1,8 +1,8 @@
-import { ArrowRight, BarChart3, Calendar, Eye, EyeOff, Image, LayoutDashboard, Lock, Mail, MessageSquare } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom'; //useNavigate
+import { Link } from 'react-router-dom';
 import { login } from '../../feature/authSlice';
 import { loginApi } from '../../services/auth/authApi';
 
@@ -14,7 +14,6 @@ const Login: React.FC = () => {
   });
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
-  // const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -34,7 +33,6 @@ const Login: React.FC = () => {
       setLoading(true);
       const response = await loginApi(body);
       dispatch(login({ data: response }));
-      // navigate("/");
     } catch (error) {
       console.error("Login failed:", error);
     } finally {
@@ -42,177 +40,106 @@ const Login: React.FC = () => {
     }
   }
 
-  const platformFeatures = [
-    { icon: LayoutDashboard, name: "Dashboard", description: "Central hub with overview and recent activity" },
-    { icon: Calendar, name: "Schedule", description: "Calendar with daily and weekly views" },
-    { icon: MessageSquare, name: "Communications", description: "Updates, messages and announcements" },
-    { icon: BarChart3, name: "Statistics", description: "Performance metrics and analytics" },
-    { icon: Image, name: "Media Gallery", description: "Pictures, videos and documents" }
-  ];
-
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-50 to-orange-50 flex">
-      {/* Left Side - Updated Platform Overview */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-linear-to-br from-purple-900 to-black">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-64 h-64 border-2 border-orange-400 rounded-full animate-bounce" />
-          <div className="absolute bottom-20 right-20 w-48 h-48 border-2 border-yellow-400 rounded-full animate-bounce" />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 border-2 border-purple-400 rounded-full animate-bounce" />
-        </div>
-
-        <div className="relative z-10 flex flex-col justify-center items-center w-full p-12 text-white">
-          <div className="max-w-2xl text-center" data-aos="fade-right">
-            {/* Platform Icon Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-6">
-              {platformFeatures.map((feature, index) => {
-                const IconComponent = feature.icon;
-                return (
-                  <div
-                    key={feature.name}
-                    className="p-6 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 hover:border-orange-400/30 transition-all duration-300 group"
-                    data-aos="zoom-in"
-                    data-aos-delay={index * 100}
-                  >
-                    <div className="flex flex-col items-center space-y-3">
-                      <div className="p-3 bg-white/10 rounded-xl group-hover:bg-orange-500/20 transition-colors">
-                        <IconComponent className="w-6 h-6 text-orange-400" />
-                      </div>
-                      <div className="text-center">
-                        <h3 className="font-semibold text-white text-xs mb-1">{feature.name}</h3>
-                        <p className="text-xs text-gray-300 leading-tight">{feature.description}</p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <h1 className="text-2xl font-bold mb-6 text-white" data-aos="fade-up" data-aos-delay="200">
-              Welcome <span className="text-orange-400">Back</span>
-            </h1>
-
-            <p className="text-lg text-gray-300 mb-8 leading-relaxed" data-aos="fade-up" data-aos-delay="400">
-              Sign in to access your personalized dashboard and continue your journey with our comprehensive platform.
-            </p>
-
-            <div className="space-y-4 text-left mb-8" >
-              {[
-                { text: "Access your personalized Dashboard", color: "text-purple-400" },
-                { text: "Check your Schedule and calendar", color: "text-orange-400" },
-                { text: "View recent Communications", color: "text-yellow-400" },
-                { text: "Continue your Courses and learning", color: "text-white" },
-                { text: "Track your Statistics and progress", color: "text-purple-300" },
-                { text: "Browse your Media Gallery files", color: "text-orange-300" }
-              ].map((feature) => (
-                <div key={feature.text} className="flex items-center space-x-3">
-                  <div className={`w-2 h-2 rounded-full ${feature.color.replace("text", "bg")}`} />
-                  <span className="text-gray-300 text-md">{feature.text}</span>
+    <div className="min-h-screen bg-linear-to-r from-purple-50 to-indigo-50 flex items-center justify-center">
+      {/* Centered Login Card with Shadow */}
+      <div className="w-full max-w-lg px-6 py-8" data-aos="fade-up">
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          {/* Header with W and WHam Energy */}
+          <div className="text-center mb-8">
+            <div className="flex flex-col items-center justify-center space-x-2">
+              <div className="flex items-center gap-2 group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg mb-3">
+                <div className="w-16 h-16 bg-[#3232ff] rounded-lg flex items-center justify-center shadow-sm group-hover:shadow transition-all">
+                  <span className="text-white font-bold text-xl">W</span>
                 </div>
-              ))}
+              </div>
+              <span className="text-xl font-bold bg-linear-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                WHam Energy
+              </span>
             </div>
 
+            <h2 className="text-sm font-semibold text-gray-500 mb-2 mt-1">
+              SAP Portal Login
+            </h2>
           </div>
-        </div>
-      </div>
 
-      {/* Right Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 lg:p-8">
-        <div className="w-full max-w-md" data-aos="fade-left">
-          <div className="bg-white rounded-2xl shadow-xl p-6 lg:p-8 border border-gray-100">
-            <div className="text-center mb-4">
-              <div
-                className="w-16 h-16 bg-linear-to-br from-orange-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg"
-                data-aos="zoom-in"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className=" text-white lucide lucide-user-key-icon lucide-user-key"><path d="M20 11v6" /><path d="M20 13h2" /><path d="M3 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 2.072.578" /><circle cx="10" cy="7" r="4" /><circle cx="20" cy="19" r="2" /></svg>
-              </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-2">
-                Sign In to <span className="text-orange-600">Your Account</span>
-              </h2>
+          {/* Login Form */}
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            {/* Login ID Field */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Login ID
+              </label>
+              <input
+                type="text"
+                name="email"
+                value={inputs.email}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-1 h-12 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-gray-50"
+                placeholder="Enter your username (Email/Mobile)"
+              />
             </div>
-            <hr className='text-orange-600 mb-4' />
-            {/* Login Form */}
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              <div className="space-y-6">
-                {/* Email Field */}
-                <div className="space-y-2">
-                  <label className="text-xs font-medium text-gray-700">Email/Mobile <span className='text-red-600'>*</span> </label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Mail className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                      type="text"
-                      name='email'
-                      onChange={handleChange}
-                      value={inputs.email}
-                      required
-                      className="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
-                      placeholder="Enter your email/mobile"
-                    />
-                  </div>
-                </div>
 
-                {/* Password Field */}
-                <div className="space-y-2">
-                  <label className="text-xs font-medium text-gray-700">Password <span className='text-red-600'>*</span></label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      name='password'
-                      onChange={handleChange}
-                      value={inputs.password}
-                      required
-                      className="block w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
-                      placeholder="Enter your password"
-                    />
-                    <button
-                      type="button"
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-orange-600 hover:text-gray-600"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Remember Me & Forgot Password */}
-              <div className="flex items-center justify-between" >
-                <Link
-                  to="/auth/forgot-password"
-                  className="text-sm text-orange-600 hover:underline font-medium"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-
-              {/* Submit Button */}
-              <div className="space-y-4" >
+            {/* Password Field */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={inputs.password}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 h-12 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-gray-50"
+                  placeholder="**********"
+                />
                 <button
-                  type="submit"
-                  className="w-full bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-colors"
                 >
-                  {loading ? 'Signing In' : "Sign In"}
-
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
                 </button>
-                <hr className='text-orange-600 mb-4' />
-                {/* Sign Up Link */}
-                <p className="text-center text-gray-600">
-                  Don't have an account?{" "}
-                  <Link
-                    to="/auth/register"
-                    className="text-orange-600 hover:underline font-medium"
-                  >
-                    Sign up here
-                  </Link>
-                </p>
               </div>
-            </form>
+            </div>
+
+            {/* Forgot Password Link */}
+            <div className="text-end">
+              <Link
+                to="/auth/forgot-password"
+                className="text-sm text-indigo-600 hover:text-indigo-700 hover:underline"
+              >
+                Forgot Password?
+              </Link>
+            </div>
+
+            {/* Sign In Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#3232ff] hover:bg-[#2424fa] text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 shadow-lg shadow-indigo-500/25 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? "Signing In..." : "Sign In"}
+            </button>
+
+            {/* Forgot Password Link */}
+            <div className=" flex justify-center items-center text-center gap-1">
+              <span className='text-sm text-gray-700'>Don't have an account?</span>
+              <Link
+                to="/auth/register"
+                className="text-sm text-indigo-600 hover:text-indigo-700 hover:underline"
+              >
+                Sign up here
+              </Link>
+            </div>
+          </form>
+
+          {/* Footer */}
+          <div className="mt-8 pt-6 border-t border-gray-200 text-center text-xs text-gray-400">
+            © 2024 WHam Energy. All rights reserved.
           </div>
         </div>
       </div>

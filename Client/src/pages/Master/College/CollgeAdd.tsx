@@ -108,19 +108,19 @@ const CollgeAdd = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 border border-orange-300 m-1 rounded-md p-2 sm:p-6">
+      <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-indigo-50 border border-indigo-300 m-1 rounded-md p-2 sm:p-6">
         <div className="max-w-2xl mx-auto">
           {/* Header */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 mb-6 transform hover:shadow-md transition-all duration-300">
             <div className="flex items-center space-x-4">
-              <div className="bg-linear-to-r from-orange-500 to-purple-600 p-3 rounded-xl">
+              <div className="bg-linear-to-r from-indigo-500 to-purple-600 p-3 rounded-xl">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-orange-600">Add New College</h1>
-                <p className="text-orange-500">Create a new College profile</p>
+                <h1 className="text-2xl font-bold text-indigo-600">Add New College</h1>
+                <p className="text-indigo-500">Create a new College profile</p>
               </div>
             </div>
           </div>
@@ -130,12 +130,12 @@ const CollgeAdd = () => {
             <form className="space-y-6" onSubmit={handleSubmit}>
               {/* Photo Upload Section */}
               <div className="border-b border-gray-200 pb-4">
-                <h2 className="text-lg font-semibold text-orange-600 mb-4">College Photo</h2>
+                <h2 className="text-lg font-semibold text-indigo-600 mb-4">College Photo</h2>
                 <div className="flex items-center space-x-6">
                   <div className="shrink-0">
                     {photoPreview ? (
                       <img
-                        className="h-24 w-24 object-cover rounded-lg border-2 border-orange-300"
+                        className="h-24 w-24 object-cover rounded-lg border-2 border-indigo-300"
                         src={photoPreview}
                         alt="College preview"
                       />
@@ -187,7 +187,7 @@ const CollgeAdd = () => {
                         value={inputs.name}
                         onChange={handleChange}
                         placeholder="Enter College name"
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200"
                         required
                       />
                     </div>
@@ -211,7 +211,7 @@ const CollgeAdd = () => {
                         onChange={handleChange}
                         placeholder="Enter Student count"
                         min="0"
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200"
                         required
                       />
                     </div>
@@ -235,7 +235,7 @@ const CollgeAdd = () => {
                         name="status"
                         value={inputs.status}
                         onChange={handleChange}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white cursor-pointer"
                         required
                       >
                         <option value="" disabled>Select status</option>
@@ -260,7 +260,7 @@ const CollgeAdd = () => {
                         <div className="flex-1">
                           <input
                             type="text"
-                            className="w-full px-4 py-2 border border-gray-300 text-orange-600 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 bg-gray-50"
+                            className="w-full px-4 py-2 border border-gray-300 text-indigo-600 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 bg-gray-50"
                             placeholder="Select university..."
                             value={university_name || ''}
                             readOnly
@@ -295,7 +295,7 @@ const CollgeAdd = () => {
                       <div className="flex-1">
                         <input
                           type="text"
-                          className="w-full px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 cursor-pointer bg-gray-50"
+                          className="w-full px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 cursor-pointer bg-gray-50"
                           placeholder={selectedLocations.length === 0 ? "Select addresses..." : `${selectedLocations.length} location(s) selected`}
                           value={selectedLocations.length > 0 ? `${selectedLocations.length} location(s) selected` : ''}
                           readOnly
@@ -357,14 +357,14 @@ const CollgeAdd = () => {
               <div className="flex items-center justify-end space-x-3 pt-6">
                 <button
                   type="button"
-                  className="px-6 py-2 text-sm font-medium text-black bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200"
+                  className="px-6 py-2 text-sm font-medium text-black bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transition-all duration-200"
                   onClick={handleCancel}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (

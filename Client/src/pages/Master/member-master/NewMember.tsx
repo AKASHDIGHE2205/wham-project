@@ -82,19 +82,19 @@ const NewMember = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-white border border-orange-300 m-1 rounded-md p-2 sm:p-6">
+      <div className="min-h-screen bg-white border border-indigo-300 m-1 rounded-md p-2 sm:p-6">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 transform hover:shadow-md transition-all duration-300">
             <div className="flex items-center space-x-4">
-              <div className="bg-linear-to-r from-orange-500 to-purple-600 p-3 rounded-xl">
+              <div className="bg-linear-to-r from-indigo-500 to-purple-600 p-3 rounded-xl">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                 </svg>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-orange-600">Add New Member</h1>
-                <p className="text-orange-500">Create a new team member profile</p>
+                <h1 className="text-2xl font-bold text-indigo-600">Add New Member</h1>
+                <p className="text-indigo-500">Create a new team member profile</p>
               </div>
             </div>
           </div>
@@ -104,7 +104,7 @@ const NewMember = () => {
             <form className="space-y-6" onSubmit={handleSubmit}>
               {/* Personal Information Section */}
               <div className="border-b border-gray-200 pb-4">
-                <h2 className="text-lg font-semibold text-orange-600 mb-4">Personal Information</h2>
+                <h2 className="text-lg font-semibold text-indigo-600 mb-4">Personal Information</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* First Name */}
                   <div>
@@ -123,7 +123,7 @@ const NewMember = () => {
                         value={inputs.first_name}
                         onChange={handleChange}
                         placeholder="Enter first name"
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200"
                         required
                       />
                     </div>
@@ -140,7 +140,7 @@ const NewMember = () => {
                       value={inputs.middle_name}
                       onChange={handleChange}
                       placeholder="Enter middle name"
-                      className="w-full px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                      className="w-full px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200"
                     />
                   </div>
 
@@ -155,7 +155,7 @@ const NewMember = () => {
                       value={inputs.last_name}
                       onChange={handleChange}
                       placeholder="Enter last name"
-                      className="w-full px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                      className="w-full px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200"
                       required
                     />
                   </div>
@@ -178,7 +178,7 @@ const NewMember = () => {
                         name="gender"
                         value={inputs.gender}
                         onChange={handleChange}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white cursor-pointer"
                       >
                         <option value="" disabled>Select gender</option>
                         <option value="M">Male</option>
@@ -209,7 +209,7 @@ const NewMember = () => {
                         name="birth_date"
                         value={inputs.birth_date}
                         onChange={handleChange}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200"
                       />
                     </div>
                   </div>
@@ -240,7 +240,7 @@ const NewMember = () => {
                         value={inputs.mobile}
                         onChange={handleChange}
                         placeholder="Enter mobile number"
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200"
                         required
                       />
                     </div>
@@ -263,7 +263,7 @@ const NewMember = () => {
                         value={inputs.email}
                         onChange={handleChange}
                         placeholder="Enter email address"
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200"
                         required
                       />
                     </div>
@@ -288,7 +288,7 @@ const NewMember = () => {
                       value={inputs.address}
                       onChange={handleChange}
                       placeholder="Enter complete address"
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none resize-none transition-all duration-200"
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none transition-all duration-200"
                     />
                   </div>
                 </div>
@@ -316,7 +316,7 @@ const NewMember = () => {
                         value={inputs.designation}
                         onChange={handleChange}
                         placeholder="Enter designation"
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200"
                         required
                       />
                     </div>
@@ -337,7 +337,7 @@ const NewMember = () => {
                         name="isOrganizer"
                         value={inputs.isOrganizer}
                         onChange={handleChange}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white cursor-pointer"
                         required
                       >
                         <option value="" disabled>Select option</option>
@@ -365,7 +365,7 @@ const NewMember = () => {
                         <div className="flex-1">
                           <input
                             type="text"
-                            className="w-full px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 cursor-pointer bg-white"
+                            className="w-full px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 cursor-pointer bg-white"
                             placeholder="Select teams..."
                             value={`${selectedTeams.length} teams selected`}
                             readOnly
@@ -388,15 +388,15 @@ const NewMember = () => {
 
                 {/* Selected Teams Preview */}
                 {selectedTeams.length > 0 && (
-                  <div className="bg-linear-to-r from-orange-50 to-purple-50 border-b border-orange-200 p-4 m-4">
+                  <div className="bg-linear-to-r from-indigo-50 to-purple-50 border-b border-indigo-200 p-4 m-4">
 
                     {/* Header */}
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <span className="flex items-center justify-center w-6 h-6 bg-linear-to-br from-orange-500 to-purple-600 text-white text-sm font-bold rounded-full shadow-sm">
+                        <span className="flex items-center justify-center w-6 h-6 bg-linear-to-br from-indigo-500 to-purple-600 text-white text-sm font-bold rounded-full shadow-sm">
                           {selectedTeams.length}
                         </span>
-                        <span className="text-sm font-semibold text-orange-800">
+                        <span className="text-sm font-semibold text-indigo-800">
                           Selected Teams
                         </span>
                       </div>
@@ -422,7 +422,7 @@ const NewMember = () => {
                       {selectedTeams.map((team) => (
                         <div
                           key={`team-${team.id}`}
-                          className="bg-orange-100 border border-orange-200 text-orange-800 rounded-full px-3 py-2 shadow-sm flex items-center gap-2 group hover:shadow-md transition-all duration-200"
+                          className="bg-indigo-100 border border-indigo-200 text-indigo-800 rounded-full px-3 py-2 shadow-sm flex items-center gap-2 group hover:shadow-md transition-all duration-200"
                         >
                           <span className="text-sm font-medium">
                             👥 {team.name}
@@ -434,7 +434,7 @@ const NewMember = () => {
                               e.stopPropagation();
                               removeTeam(team.id);
                             }}
-                            className="p-0.5 rounded-full transition-colors text-orange-600 hover:text-orange-800 hover:bg-orange-200"
+                            className="p-0.5 rounded-full transition-colors text-indigo-600 hover:text-indigo-800 hover:bg-indigo-200"
                           >
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path
@@ -456,14 +456,14 @@ const NewMember = () => {
               <div className="flex items-center justify-end space-x-3 pt-6">
                 <button
                   type="button"
-                  className="px-6 py-2 text-sm font-medium text-black bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200"
+                  className="px-6 py-2 text-sm font-medium text-black bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transition-all duration-200"
                   onClick={handleCancel}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
+                  className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
                 >
                   Submit
                 </button>

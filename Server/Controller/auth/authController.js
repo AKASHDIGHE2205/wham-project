@@ -105,22 +105,21 @@ export const registerUser_old = async (req, res) => {
     }
   });
 };
-
 export const registerUser = async (req, res) => {
   try {
-      const userData = JSON.parse(req.body.userData);
 
+    const userData = JSON.parse(req.body.userData);
     const { firstName, middleName, lastName, password, email, phone } = userData;
-    const file = req.file;
+    const file = req.file;   // may be undefined
 
     if (!firstName || !lastName || !password || !email || !phone) {
       return res.status(400).json({ message: "Please fill in all required fields." });
     }
 
-    // Check if user exists
     const checkUserSQL = `SELECT id FROM users WHERE email = ? OR phone = ?`;
 
     db.query(checkUserSQL, [email, phone], async (err, results) => {
+
       if (err) {
         console.error(err);
         return res.status(500).json({ message: "Internal server error" });
@@ -130,49 +129,54 @@ export const registerUser = async (req, res) => {
         return res.status(409).json({ message: "User already exists with this email or phone." });
       }
 
-      try {
-        const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Handle photo upload if present
-        let savedFilePath = null;
-        if (file) {
-          const basePath = "D:/Projects/Wham/Server/uploads";
-          const profileFolder = path.join(basePath, "users");
+      let savedFilePath = null;
 
-          if (!fs.existsSync(profileFolder)) {
-            fs.mkdirSync(profileFolder, { recursive: true });
-          }
+      // ✅ Only run if file exists
+      if (file) {
 
-          const ext = path.extname(file.originalname);
-          const fileName = `${Date.now()}_${firstName}_${lastName}${ext}`;
-          const fullPath = path.join(profileFolder, fileName);
+        const basePath = "D:/Projects/Wham/Server/uploads";
+        const profileFolder = path.join(basePath, "users");
 
-          fs.writeFileSync(fullPath, file.buffer);
-          savedFilePath = `/uploads/users/${fileName}`;
+        if (!fs.existsSync(profileFolder)) {
+          fs.mkdirSync(profileFolder, { recursive: true });
         }
 
-        // Get connection from pool
-        db.getConnection((connErr, connection) => {
-          if (connErr) {
-            console.error(connErr);
-            return res.status(500).json({ message: "Database connection failed" });
+        const ext = path.extname(file.originalname);
+        const fileName = `${Date.now()}_${firstName}_${lastName}${ext}`;
+        const fullPath = path.join(profileFolder, fileName);
+
+        fs.writeFileSync(fullPath, file.buffer);
+
+        savedFilePath = `/uploads/users/${fileName}`;
+      }
+
+      db.getConnection((connErr, connection) => {
+
+        if (connErr) {
+          console.error(connErr);
+          return res.status(500).json({ message: "Database connection failed" });
+        }
+
+        connection.beginTransaction((txErr) => {
+
+          if (txErr) {
+            connection.release();
+            return res.status(500).json({ message: "Transaction start failed" });
           }
 
-          // Start transaction
-          connection.beginTransaction((txErr) => {
-            if (txErr) {
-              connection.release();
-              return res.status(500).json({ message: "Transaction start failed" });
-            }
+          const insertUserSQL = `
+            INSERT INTO users
+            (first_name, middle_name, last_name, password, email, phone, role, is_verified, isorganizer, photo)
+            VALUES (?, ?, ?, ?, ?, ?, 'User', 'I', 'N', ?)
+          `;
 
-            // Insert user with profile photo
-            const insertUserSQL = `
-              INSERT INTO users
-              (first_name, middle_name, last_name, password, email, phone, role, is_verified, isorganizer, photo)
-              VALUES (?, ?, ?, ?, ?, ?, 'User', 'I', 'N', ?)
-            `;
+          connection.query(
+            insertUserSQL,
+            [firstName, middleName, lastName, hashedPassword, email, phone, savedFilePath], // null if no photo
+            (userErr, userResult) => {
 
-            connection.query(insertUserSQL, [firstName, middleName, lastName, hashedPassword, email, phone, savedFilePath], (userErr, userResult) => {
               if (userErr) {
                 return connection.rollback(() => {
                   connection.release();
@@ -183,50 +187,53 @@ export const registerUser = async (req, res) => {
 
               const userId = userResult.insertId;
 
-              // Insert member
               const insertMemberSQL = `
                 INSERT INTO mst_members
-                  (mem_id, first_name, middle_name, last_name, mobile, email, designation, isorganizer, user_id, status)
-                  SELECT IFNULL(MAX(mem_id), 0) + 1, ?, ?, ?, ?, ?, 'Users', 'N', ?, 'A'
-                  FROM mst_members
+                (mem_id, first_name, middle_name, last_name, mobile, email, designation, isorganizer, user_id, status)
+                SELECT IFNULL(MAX(mem_id),0)+1, ?, ?, ?, ?, ?, 'Users', 'N', ?, 'A'
+                FROM mst_members
               `;
 
-              connection.query(insertMemberSQL, [firstName, middleName, lastName, phone, email, userId,], (memberErr) => {
-                if (memberErr) {
-                  return connection.rollback(() => {
-                    connection.release();
-                    console.error(memberErr);
-                    res.status(500).json({ message: "Member creation failed" });
-                  });
-                }
+              connection.query(
+                insertMemberSQL,
+                [firstName, middleName, lastName, phone, email, userId],
+                (memberErr) => {
 
-                // Commit transaction
-                connection.commit((commitErr) => {
-                  if (commitErr) {
+                  if (memberErr) {
                     return connection.rollback(() => {
                       connection.release();
-                      res.status(500).json({ message: "Commit failed" });
+                      console.error(memberErr);
+                      res.status(500).json({ message: "Member creation failed" });
                     });
                   }
 
-                  // Release connection
-                  connection.release();
+                  connection.commit((commitErr) => {
 
-                  return res.status(201).json({
-                    message: "User registered successfully ✅",
-                    userId,
-                    profilePhoto: savedFilePath
+                    if (commitErr) {
+                      return connection.rollback(() => {
+                        connection.release();
+                        res.status(500).json({ message: "Commit failed" });
+                      });
+                    }
+
+                    connection.release();
+
+                    return res.status(201).json({
+                      message: "User registered successfully ✅",
+                      userId,
+                      profilePhoto: savedFilePath // null if not uploaded
+                    });
+
                   });
-                });
-              });
-            });
-          });
+                }
+              );
+            }
+          );
         });
-      } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Registration failed" });
-      }
+      });
+
     });
+
   } catch (error) {
     console.error("Registration error:", error);
     return res.status(500).json({ message: "Server error" });
@@ -285,7 +292,7 @@ export const loginUser = (req, res) => {
           phone: user.phone,
           role: user.role,
           isorganizer: user.isorganizer,
-          photo:user.photo
+          photo: user.photo
         },
       });
     });
@@ -654,4 +661,118 @@ export const refreshToken = async (req, res) => {
   } catch (error) {
     return res.status(401).json({ message: 'Invalid refresh token' });
   }
+};
+export const getUserProfile = (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(400).json({ message: "User ID is required" });
+  }
+
+  // STEP 1: Get user profile
+  const profileSql = `
+    SELECT 
+      b.mem_id,
+      b.user_id, 
+      b.first_name,
+      b.middle_name,
+      b.last_name,
+      b.mobile,
+      b.email,
+      b.education_year,
+      b.join_date,
+      b.birth_date,
+      b.clg_id,
+      c.clg_name,
+      b.dept_id,
+      d.dept_name,
+      a.role,
+      a.isorganizer,
+      a.photo
+    FROM users AS a 
+    LEFT JOIN mst_members AS b ON a.id = b.user_id
+    LEFT JOIN colleges AS c ON b.clg_id = c.clg_id
+    LEFT JOIN departments AS d ON b.dept_id = d.dept_id
+    WHERE a.id = ?
+  `;
+
+  db.query(profileSql, [id], (err, profileResults) => {
+    if (err) return res.status(500).json({ message: "Server error" });
+
+    if (!profileResults.length) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const user = profileResults[0];
+
+    // STEP 2: Get member IDs
+    const memberSql = `SELECT mem_id FROM mst_members WHERE user_id = ?`;
+
+    db.query(memberSql, [id], (err, memberResults) => {
+      if (err) return res.status(500).json({ message: "Server error" });
+
+      if (!memberResults.length) {
+        return res.status(200).json({ user, teams: [] });
+      }
+
+      const memberIds = memberResults.map(m => m.mem_id);
+
+      // STEP 3: Get teams
+      const teamSql = `
+        SELECT DISTINCT t.id AS team_id, t.name AS team_name, t.manager_id
+        FROM mst_team t
+        JOIN team_members tm ON tm.team_id = t.id
+        WHERE tm.member_id IN (?)
+      `;
+
+      db.query(teamSql, [memberIds], (err, teamResults) => {
+        if (err) return res.status(500).json({ message: "Server error" });
+
+        if (!teamResults.length) {
+          return res.status(200).json({ user, teams: [] });
+        }
+
+        const teamIds = teamResults.map(t => t.team_id);
+
+        // STEP 4: Get team members
+        const memberSql2 = `
+          SELECT
+            m.mem_id,
+            CONCAT(m.first_name, ' ', m.middle_name, ' ', m.last_name) AS mem_name,
+            m.user_id,
+            tm.team_id
+          FROM team_members tm
+          JOIN mst_members m ON m.mem_id = tm.member_id
+          WHERE tm.team_id IN (?) AND m.user_id <> ?
+        `;
+
+        db.query(memberSql2, [teamIds, id], (err, memberResults2) => {
+          if (err) return res.status(500).json({ message: "Server error" });
+
+          const memberMap = {};
+
+          memberResults2.forEach(member => {
+            if (!memberMap[member.mem_id]) {
+              memberMap[member.mem_id] = {
+                mem_id: member.mem_id,
+                mem_name: member.mem_name,
+                user_id: member.user_id,
+                teams: []
+              };
+            }
+
+            const team = teamResults.find(t => t.team_id === member.team_id);
+            if (team) {
+              memberMap[member.mem_id].teams.push(team);
+            }
+          });
+
+          return res.status(200).json({
+            user,
+            teamMembers: Object.values(memberMap)
+          });
+        });
+      });
+    });
+  });
 };

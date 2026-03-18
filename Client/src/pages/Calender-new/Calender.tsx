@@ -1,7 +1,7 @@
-import { endOfWeek, format, startOfWeek } from "date-fns";
+import { endOfMonth, endOfWeek, endOfYear, format, startOfMonth, startOfWeek, startOfYear } from "date-fns";
 import { ChevronDown } from "lucide-react";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getUserFromStorage } from "../../helper/cryptoUser";
 import { getActivities } from "../../services/calender/calenderApi";
@@ -10,9 +10,6 @@ import MonthlyView from "./MonthlyView";
 import WeeklyView from "./WeeklyView";
 import YearlyView from "./YearlyView";
 export type CalendarView = "daily" | "weekly" | "monthly" | "yearly";
-
-interface CalendarProps {
-}
 
 export interface Activities {
   id: number;
@@ -24,7 +21,7 @@ export interface Activities {
   status: 'A' | 'p' | 'R' | '';
 }
 
-const Calendar: React.FC<CalendarProps> = () => {
+const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState<CalendarView>("monthly");
   const [activities, setActivities] = useState<Activities[]>([]);
@@ -32,37 +29,76 @@ const Calendar: React.FC<CalendarProps> = () => {
   const [loading, setLoading] = useState(true);
   const redirect = useNavigate();
 
+ const getDateRange = () => {
+    switch (view) {
+      case "daily":
+        return {
+          startDate: format(currentDate, 'yyyy-MM-dd'),
+          endDate: format(currentDate, 'yyyy-MM-dd')
+        };
+
+      case "weekly":
+        return {
+          startDate: format(startOfWeek(currentDate), 'yyyy-MM-dd'),
+          endDate: format(endOfWeek(currentDate), 'yyyy-MM-dd')
+        };
+
+      case "monthly":
+        return {
+          startDate: format(startOfMonth(currentDate), 'yyyy-MM-dd'),
+          endDate: format(endOfMonth(currentDate), 'yyyy-MM-dd')
+        };
+
+      case "yearly":
+        return {
+          startDate: format(startOfYear(currentDate), 'yyyy-MM-dd'),
+          endDate: format(endOfYear(currentDate), 'yyyy-MM-dd')
+        };
+
+      default:
+        return {
+          startDate: format(startOfMonth(currentDate), 'yyyy-MM-dd'),
+          endDate: format(endOfMonth(currentDate), 'yyyy-MM-dd')
+        };
+    }
+  };
+
   const fetchData = async () => {
-    setLoading(true)
+    setLoading(true);
+    const { startDate, endDate } = getDateRange();
+
     const body = {
       userId: user?.id || 0,
-      role: user?.role || ''
-    }
+      role: user?.role || '',
+      startDate: startDate,
+      endDate: endDate,
+      view: view
+    };
+
     const response = await getActivities(body);
     setLoading(false);
+
     if (response) {
-      setActivities(response?.activities || [])
+      setActivities(response?.activities || []);
     }
-  }
+  };
+
   useEffect(() => {
     fetchData();
-  }, [])
+  }, [view, currentDate])
 
   const navigate = (direction: "prev" | "next") => {
     const multiplier = direction === "prev" ? -1 : 1;
-
     const newDate = new Date(currentDate);
 
     if (view === "daily") newDate.setDate(currentDate.getDate() + multiplier);
-    if (view === "weekly")
-      newDate.setDate(currentDate.getDate() + multiplier * 7);
-    if (view === "monthly")
-      newDate.setMonth(currentDate.getMonth() + multiplier);
-    if (view === "yearly")
-      newDate.setFullYear(currentDate.getFullYear() + multiplier);
+    if (view === "weekly") newDate.setDate(currentDate.getDate() + multiplier * 7);
+    if (view === "monthly") newDate.setMonth(currentDate.getMonth() + multiplier);
+    if (view === "yearly") newDate.setFullYear(currentDate.getFullYear() + multiplier);
 
     setCurrentDate(newDate);
   };
+
 
   const renderCurrentView = () => {
     switch (view) {
@@ -112,7 +148,6 @@ const Calendar: React.FC<CalendarProps> = () => {
 
   const goToToday = () => {
     setCurrentDate(new Date());
-    fetchData();
   };
 
   const handleClickDate = (date: Date) => {

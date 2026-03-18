@@ -844,9 +844,18 @@ export const addActivity = async (req, res) => {
 
 export const getActivities = async (req, res) => {
   try {
-    const { userId, role } = req.body;
+    const { userId, role, startDate, endDate } = req.body;
+    
+    let dateFilter = '';
+    if (startDate && endDate) {
+      dateFilter = `AND (
+        DATE(A.start_date) BETWEEN '${startDate}' AND '${endDate}'
+        OR DATE(A.end_date) BETWEEN '${startDate}' AND '${endDate}'
+        OR ('${startDate}' BETWEEN DATE(A.start_date) AND DATE(A.end_date))
+      )`;
+    }
 
-    // STEP 1 — If Admin roles → Fetch all activities
+    // STEP 1 — If Admin roles → Fetch activities with date filter
     if (["Manager", "Admin", "Master"].includes(role)) {
       const activities = await query(`
         SELECT 
@@ -857,7 +866,8 @@ export const getActivities = async (req, res) => {
           end_date,
           vehicle_type,
           status
-        FROM activities
+        FROM activities A
+        WHERE 1=1 ${dateFilter}
         ORDER BY date DESC
       `);
 
@@ -880,10 +890,9 @@ export const getActivities = async (req, res) => {
 
     // STEP 3 — Get Team IDs of Member
     const teamResult = await query(`SELECT team_id FROM team_members WHERE member_id = ?`, [memId]);
-
     const teamIds = teamResult.map((t) => t.team_id);
 
-    // STEP 4 — Fetch Activities assigned to Member OR Team
+    // STEP 4 — Fetch Activities with date filter
     let activities;
 
     if (teamIds.length > 0) {
@@ -902,8 +911,8 @@ export const getActivities = async (req, res) => {
         LEFT JOIN activity_teams AT 
           ON A.id = AT.activity_id AND A.date = AT.activity_date
         WHERE 
-            AM.member_id = ?
-        OR AT.team_id IN (?)
+            (AM.member_id = ? OR AT.team_id IN (?))
+            ${dateFilter}
         ORDER BY A.date DESC
         `,
         [memId, teamIds]
@@ -922,6 +931,7 @@ export const getActivities = async (req, res) => {
         LEFT JOIN activity_members AM 
           ON A.id = AM.activity_id AND A.date = AM.activity_date
         WHERE AM.member_id = ?
+        ${dateFilter}
         ORDER BY A.date DESC
         `,
         [memId]
@@ -935,7 +945,6 @@ export const getActivities = async (req, res) => {
     });
   } catch (error) {
     console.error("Get Activity Error:", error);
-
     res.status(500).json({
       message: "Failed to fetch activities",
       error: error.message

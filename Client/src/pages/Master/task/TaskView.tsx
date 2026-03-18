@@ -91,12 +91,12 @@ const TaskView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 p-2 sm:p-6 border border-orange-300 rounded-md m-1">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-indigo-50 p-2 sm:p-6 border border-indigo-300 rounded-md m-1">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-orange-600">Tasks List.</h1>
+            <h1 className="text-2xl font-bold text-indigo-600">Tasks List.</h1>
           </div>
         </div>
 
@@ -111,11 +111,11 @@ const TaskView = () => {
               <input
                 type="text"
                 placeholder="Search tasks..."
-                className="block w-full pl-9 sm:pl-10 pr-3 py-2 sm:py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 text-sm sm:text-base"
+                className="block w-full pl-9 sm:pl-10 pr-3 py-2 sm:py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 text-sm sm:text-base"
                 value={searchTerm}
                 onChange={handleSearchChange}
               />
-              <button className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-orange-600 cursor-pointer font-bold" onClick={() => setSearchTerm("")}>
+              <button className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-indigo-600 cursor-pointer font-bold" onClick={() => setSearchTerm("")}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
               </button>
             </div>
@@ -127,7 +127,7 @@ const TaskView = () => {
                 <div className="relative">
                   <select
                     name="itemsPerPage"
-                    className="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer text-sm sm:text-base"
+                    className="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white cursor-pointer text-sm sm:text-base"
                     value={itemsPerPage}
                     onChange={handleItemsPerPageChange}
                     required
@@ -164,7 +164,7 @@ const TaskView = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[500px] divide-y divide-gray-200 p-4">
-              <thead className="bg-linear-to-r from-purple-50 to-orange-50">
+              <thead className="bg-linear-to-r from-purple-50 to-indigo-50">
                 <tr>
                   <th className="px-3 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     ID
@@ -196,7 +196,7 @@ const TaskView = () => {
                   </tr>
                 ) : data.length > 0 ? (
                   data.map((task: Task) => (
-                    <tr key={task.id} className="hover:bg-orange-50 transition-colors duration-150">
+                    <tr key={task.id} className="hover:bg-indigo-50 transition-colors duration-150">
                       <td className="px-3 py-3 text-left text-sm text-gray-900 whitespace-nowrap">{task.id}</td>
                       <td className="px-3 py-3 text-left text-sm text-gray-900">{task.task_name}</td>
                       <td className="px-3 py-3 text-left text-sm text-gray-900">{task.step_name}</td>
@@ -239,7 +239,7 @@ const TaskView = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="text-center py-4 text-orange-600">
+                    <td colSpan={5} className="text-center py-4 text-indigo-600">
                       No Records Found
                     </td>
                   </tr>

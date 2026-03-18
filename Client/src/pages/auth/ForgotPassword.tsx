@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useEffect } from 'react';
-import { Lock, ArrowRight, Shield, Zap, Sparkles, ArrowLeft, Key, Phone, EyeOff, Eye } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { ArrowRight, CheckCircle, Clock, Eye, EyeOff, Lock, Phone } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { Link, useNavigate } from 'react-router-dom';
 import { sendOtp, UpdateOtp, ValidateOtp } from '../../services/auth/authApi';
 
 const ForgotPassword: React.FC = () => {
@@ -112,6 +112,13 @@ const ForgotPassword: React.FC = () => {
       return;
     }
 
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+      toast.error('Invalid format.');
+      return;
+    }
+
     setLoading(prev => ({ ...prev, resetPassword: true }));
 
     try {
@@ -167,291 +174,261 @@ const ForgotPassword: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-50 to-orange-50 flex">
-      {/* Left Side */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-linear-to-br from-purple-900 to-black">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-64 h-64 border-2 border-orange-400 rounded-full" />
-          <div className="absolute bottom-20 right-20 w-48 h-48 border-2 border-yellow-400 rounded-full" />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 border-2 border-purple-400 rounded-full" />
-        </div>
-
-        <div className="relative z-10 flex flex-col justify-center items-center w-full p-12 text-white">
-          <div className="max-w-md text-center">
-            <div className="flex justify-center space-x-6 mb-8">
-              <div className="p-4 bg-white/10 rounded-xl backdrop-blur-sm border border-white/20">
-                <Shield className="w-8 h-8 text-orange-400" />
+    <div className="min-h-screen bg-linear-to-r from-purple-50 to-indigo-50 flex items-center justify-center">
+      {/* Centered Floating Card */}
+      <div className="w-full max-w-lg px-6 py-8" data-aos="fade-up">
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          {/* Header with Logo */}
+          <div className="text-center mb-8">
+            <div className="flex flex-col items-center justify-center">
+              <div className="flex items-center gap-2 group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg mb-3">
+                <div className="w-16 h-16 bg-[#3232ff] rounded-lg flex items-center justify-center shadow-sm group-hover:shadow transition-all">
+                  <span className="text-white font-bold text-xl">W</span>
+                </div>
               </div>
-              <div className="p-4 bg-white/10 rounded-xl backdrop-blur-sm border border-white/20">
-                <Zap className="w-8 h-8 text-yellow-400" />
-              </div>
-              <div className="p-4 bg-white/10 rounded-xl backdrop-blur-sm border border-white/20">
-                <Sparkles className="w-8 h-8 text-purple-400" />
-              </div>
+              <span className="text-xl font-bold bg-linear-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                WHam Energy
+              </span>
             </div>
 
-            <h1 className="text-3xl font-bold mb-6 text-white">
-              Reset Your <span className="text-orange-400">Password</span>
-            </h1>
+            <h2 className="text-sm font-semibold text-gray-500 mb-2 mt-1">
+              {step === 1 && "Reset Your Password"}
+              {step === 2 && "Verify OTP"}
+              {step === 3 && "Create New Password"}
+            </h2>
+          </div>
 
-            <p className="text-md text-gray-300 mb-8 leading-relaxed">
-              Secure password reset process with OTP verification to protect your account.
-            </p>
-
-            <div className="space-y-4 text-left mb-8">
-              {[
-                { text: "Instant OTP delivery", color: "text-purple-400" },
-                { text: "Secure verification process", color: "text-orange-400" },
-                { text: "Real-time validation", color: "text-yellow-400" },
-                { text: "Encrypted data protection", color: "text-white" }
-              ].map((feature) => (
-                <div key={feature.text} className="flex items-center space-x-3">
-                  <div className={`w-2 h-2 rounded-full ${feature.color.replace("text", "bg")}`} />
-                  <span className="text-gray-300">{feature.text}</span>
-                </div>
+          {/* Step Progress Indicator */}
+          <div className="flex justify-center mb-8">
+            <div className="flex items-center">
+              {[1, 2, 3].map((stepNumber) => (
+                <React.Fragment key={stepNumber}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
+                    ${step >= stepNumber
+                      ? 'bg-[#3232ff] text-white shadow-md shadow-indigo-500/30'
+                      : 'bg-gray-100 text-gray-400 border border-gray-200'
+                    }`}>
+                    {step > stepNumber ? (
+                      <CheckCircle className="w-4 h-4" />
+                    ) : (
+                      stepNumber
+                    )}
+                  </div>
+                  {stepNumber < 3 && (
+                    <div className={`w-12 h-1 mx-1 rounded-full ${step > stepNumber ? 'bg-[#3232ff]' : 'bg-gray-200'
+                      }`} />
+                  )}
+                </React.Fragment>
               ))}
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Right Side */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 lg:p-8">
-        <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl shadow-xl p-6 lg:p-8 border border-gray-100">
-
-            <div className="mb-6 hidden">
-              <Link
-                to="/auth/login"
-                className="flex items-center text-sm text-black hover:text-orange-600 hover:underline transition-colors duration-200"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back to Sign In
-              </Link>
-            </div>
-
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-linear-to-br from-orange-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                <Key className="w-8 h-8 text-white" />
-              </div>
-              <h2 className="text-xl font-bold text-orange-600 mb-2">
-                Reset Your Password
-              </h2>
-              <p className="text-gray-600">
-                {step === 1 && "Enter your mobile number to receive OTP"}
-                {step === 2 && "Enter the OTP sent to your mobile"}
-                {step === 3 && "Set your new password"}
-              </p>
-            </div>
-
-            {/* Step Progress Indicator */}
-            <div className="flex justify-center mb-8">
-              <div className="flex items-center">
-                {[1, 2, 3].map((stepNumber) => (
-                  <React.Fragment key={stepNumber}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= stepNumber
-                      ? 'bg-orange-500 text-white'
-                      : 'bg-gray-200 text-gray-500'
-                      }`}>
-                      {stepNumber}
+          {/* Form */}
+          <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+            {/* Step 1: Mobile Input */}
+            {step === 1 && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Mobile Number
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Phone className="h-5 w-5 text-gray-400" />
                     </div>
-                    {stepNumber < 3 && (
-                      <div className={`w-12 h-1 mx-2 ${step > stepNumber ? 'bg-orange-500' : 'bg-gray-200'
-                        }`} />
+                    <input
+                      type="tel"
+                      onChange={(e: any) => setMobile(e.target.value)}
+                      maxLength={10}
+                      minLength={10}
+                      required
+                      className="w-full pl-10 pr-4 py-2 h-12 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-gray-50"
+                      placeholder="Enter 10-digit mobile number"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    We'll send a verification code to this number
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleSendOtp}
+                  disabled={loading.sendOtp}
+                  className="w-full bg-[#3232ff] hover:bg-[#2424fa] text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 shadow-lg shadow-indigo-500/25 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {loading.sendOtp ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      Send OTP
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+
+            {/* Step 2: OTP Verification */}
+            {step === 2 && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Enter OTP
+                  </label>
+                  <input
+                    type="text"
+                    onChange={(e: any) => setOtp(e.target.value)}
+                    maxLength={6}
+                    className="w-full px-4 py-2 h-12 text-center text-2xl tracking-[0.5em] font-mono border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-gray-50"
+                    placeholder="••••••"
+                  />
+                  <p className="text-xs text-gray-500">
+                    OTP sent to {maskedMobile}
+                  </p>
+                </div>
+
+                {/* Timer and Resend */}
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-gray-500" />
+                    <span className="text-sm text-gray-600">
+                      Code expires in
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={`font-mono font-bold ${timeLeft < 60 ? 'text-red-600' : 'text-[#3232ff]'}`}>
+                      {formatTime(timeLeft)}
+                    </span>
+                    {!isTimerRunning && (
+                      <button
+                        type="button"
+                        onClick={handleResendOtp}
+                        disabled={loading.resendOtp}
+                        className="text-sm text-[#3232ff] hover:text-[#2424fa] font-medium disabled:opacity-50"
+                      >
+                        {loading.resendOtp ? 'Sending...' : 'Resend'}
+                      </button>
                     )}
-                  </React.Fragment>
-                ))}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleVerifyOtp}
+                  disabled={loading.verifyOtp}
+                  className="w-full bg-[#3232ff] hover:bg-[#2424fa] text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 shadow-lg shadow-indigo-500/25 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {loading.verifyOtp ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Verifying...
+                    </>
+                  ) : (
+                    <>
+                      Verify OTP
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
               </div>
-            </div>
+            )}
 
-            <form className="space-y-6">
-              {/* Step 1: Mobile Input */}
-              {step === 1 && (
-                <div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-medium text-gray-700">Mobile Number</label>
-
-                    <div className="flex space-x-2">
-                      <div className="relative group flex-1">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Phone className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                          type="tel"
-                          onChange={(e: any) => setMobile(e.target.value)}
-                          maxLength={10}
-                          minLength={10}
-                          required
-                          className="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
-                          placeholder="Enter your mobile number"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleSendOtp}
-                        disabled={loading.sendOtp}
-                        className="px-4 py-2 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors duration-200 whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-w-[90px]"
-                      >
-                        {loading.sendOtp ? (
-                          'Sending OTP'
-                        ) : (
-                          'Send OTP'
-                        )}
-                      </button>
+            {/* Step 3: New Password */}
+            {step === 3 && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    New Password
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Lock className="h-5 w-5 text-gray-400" />
                     </div>
-                  </div>
-                </div>
-
-              )}
-
-              {/* Step 2: OTP Verification */}
-              {step === 2 && (
-                <div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-medium text-gray-700">OTP Verification</label>
-                    <div className="flex space-x-2">
-                      <div className="relative group flex-1">
-                        <input
-                          type="number"
-                          onChange={(e: any) => setOtp(e.target.value)}
-                          className="block w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
-                          placeholder="Enter OTP"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleVerifyOtp}
-                        disabled={loading.verifyOtp}
-                        className="px-4 py-2 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors duration-200 whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-w-[100px]"
-                      >
-                        {loading.verifyOtp ? (
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        ) : (
-                          'Verify OTP'
-                        )}
-                      </button>
-                    </div>
-
-                    {/* Timer and Resend OTP */}
-                    <div className="flex justify-between items-center mt-2">
-                      <span className="text-xs text-gray-500">
-                        OTP sent to your mobile number {maskedMobile}
-                      </span>
-                      <div className="flex items-center space-x-2">
-                        {isTimerRunning ? (
-                          <span className={`text-xs font-medium ${timeLeft < 60 ? 'text-red-600' : 'text-orange-600'}`}>
-                            {formatTime(timeLeft)}
-                          </span>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={handleResendOtp}
-                            disabled={loading.resendOtp || (isTimerRunning && timeLeft > 0)}
-                            className="text-xs text-orange-600 hover:text-orange-700 font-medium underline disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-                          >
-                            {loading.resendOtp ? (
-                              <>
-                                <div className="w-3 h-3 border-2 border-orange-600 border-t-transparent rounded-full animate-spin mr-1"></div>
-                                Sending...
-                              </>
-                            ) : (
-                              'Resend OTP'
-                            )}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Step 3: New Password */}
-              {step === 3 && (
-                <>
-                  <div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-gray-700">Password <span className='text-red-600'>*</span></label>
-                      <div className="relative group">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Lock className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                          type={showPass ? "text" : "password"}
-                          name='password'
-                          onChange={(e: any) => setPassword(e.target.value)}
-                          required
-                          className="block w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
-                          placeholder="Enter your password"
-                        />
-                        <button
-                          type="button"
-                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-orange-600 hover:text-gray-600"
-                          onClick={() => setShowPass(!showPass)}
-                        >
-                          {showPass ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-gray-700">Confirm New Password</label>
-                      <div className="relative group">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Lock className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                          type="password"
-                          onChange={(e: any) => setCPassword(e.target.value)}
-                          className="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none"
-                          placeholder="Confirm new password"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-
-                  <div>
+                    <input
+                      type={showPass ? "text" : "password"}
+                      onChange={(e: any) => setPassword(e.target.value)}
+                      required
+                      className="w-full pl-10 pr-12 py-2 h-12 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-gray-50"
+                      placeholder="Enter new password"
+                    />
                     <button
                       type="button"
-                      onClick={handleResetPassword}
-                      disabled={loading.resetPassword}
-                      className="w-full bg-linear-to-r from-orange-500 to-purple-600 text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center hover:shadow-lg transition-shadow duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
+                      onClick={() => setShowPass(!showPass)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-colors"
                     >
-                      {loading.resetPassword ? (
-                        <>
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                          Resetting...
-                        </>
-                      ) : (
-                        <>
-                          Reset Password
-                          <ArrowRight className="w-4 h-4 ml-2" />
-                        </>
-                      )}
+                      {showPass ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
                   </div>
-                </>
-              )}
+                </div>
 
-              {/* Login Link */}
-              <div className="text-center">
-                <p className="text-gray-600">
-                  Remember your password?{" "}
-                  <Link to="/auth/login" className="text-orange-600 hover:underline font-medium">
-                    Back to Sign In
-                  </Link>
-                </p>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Confirm New Password
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Lock className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="password"
+                      onChange={(e: any) => setCPassword(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 h-12 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-gray-50"
+                      placeholder="Confirm new password"
+                    />
+                  </div>
+                </div>
+
+                {/* Password Hint */}
+                <div className="p-3 bg-blue-50 rounded-lg">
+                  <p className="text-xs text-blue-700">
+                    <span className="font-semibold">Password must:</span> Be at least 8 characters, include uppercase, lowercase, number, and special character.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleResetPassword}
+                  disabled={loading.resetPassword}
+                  className="w-full bg-[#3232ff] hover:bg-[#2424fa] text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 shadow-lg shadow-indigo-500/25 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {loading.resetPassword ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Resetting...
+                    </>
+                  ) : (
+                    <>
+                      Reset Password
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
               </div>
+            )}
 
-            </form>
+            {/* Back to Login Link */}
+            <div className="text-center">
+              <Link
+                to="/auth/login"
+                className="text-sm text-indigo-600 hover:text-indigo-700 hover:underline"
+              >
+                ← Back to Sign In
+              </Link>
+            </div>
+          </form>
+
+          {/* Footer */}
+          <div className="mt-8 pt-6 border-t border-gray-200 text-center text-xs text-gray-400">
+            © 2024 WHam Energy. All rights reserved.
           </div>
         </div>
       </div>
     </div>
   );
-
 };
 
 export default ForgotPassword;

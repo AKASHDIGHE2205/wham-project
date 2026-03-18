@@ -1,7 +1,7 @@
 import { Check } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getUserFromStorage } from '../../../helper/cryptoUser';
 import { getActivityDetails } from '../../../services/calender/calenderApi';
 import type { College, Department, SelectedMember, SelectedTeam } from '../../../types/activity.types';
@@ -214,12 +214,12 @@ export default function UpdateActivityPage() {
       <div className="max-w-5xl mx-auto shadow-2xl ">
         <header className="mb-8 p-4 flex items-center justify-between gap-4">
           <div className='flex justify-start items-center gap-2'>
-            <Link
-              to={'/calender'}
+            <button
+              onClick={() => navigate(-1)}
               className='px-2 py-1 border border-gray-300 rounded-md cursor-pointer flex justify-center items-center gap-1 hover:bg-gray-100'
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-left-icon lucide-chevron-left"><path d="m15 18-6-6 6-6" /></svg>
-            </Link>
+            </button>
             <h1 className="text-sm font-semibold text-gray-900 flex-1">
               Update Activity: {formData?.title || ''}
             </h1>

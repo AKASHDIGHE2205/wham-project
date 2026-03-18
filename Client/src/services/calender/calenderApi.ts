@@ -139,7 +139,13 @@ export const addActivity = async (data: any) => {
     console.log(error);
   }
 };
-export const getActivities = async (data: any) => {
+export const getActivities = async (data:  {
+  userId: number;
+  role: string;
+  startDate?: string;
+  endDate?: string;
+  view?: string;
+}) => {
   try {
     const response = await axios.post(
       `${BASE_URL}/calendar/getActivities`,

@@ -62,7 +62,7 @@ export const getTeamMembers = async (data: any) => {
   } catch (error: any) {
     toast.error(
       error.response?.data?.message ||
-        "failed to fetch team member. Please try again.",
+      "failed to fetch team member. Please try again.",
     );
     throw error;
   }
@@ -93,7 +93,7 @@ export const UpdateOtp = async (data: any) => {
   } catch (error: any) {
     toast.error(
       error.response?.data?.message ||
-        "failed to reset password. Please try again.",
+      "failed to reset password. Please try again.",
     );
     throw error;
   }
@@ -114,3 +114,13 @@ export const verifyTokenApi = async (token: string) => {
     return null;
   }
 };
+
+export const getUserProfile = async (id: any) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/auth/getUserProfile/${id}`);
+    return response.data;
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || "Failed to fetch user details");
+    console.log(error);
+  }
+}

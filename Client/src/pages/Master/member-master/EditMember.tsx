@@ -215,19 +215,19 @@ const EditMember = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 p-2 sm:p-6">
+      <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-indigo-50 p-2 sm:p-6">
         <div className="max-w-3xl mx-auto">
           {/* Header */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 mb-6 transform hover:shadow-md transition-all duration-300">
             <div className="flex items-center space-x-4">
-              <div className="bg-linear-to-r from-orange-500 to-purple-600 p-3 rounded-xl">
+              <div className="bg-linear-to-r from-indigo-500 to-purple-600 p-3 rounded-xl">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                 </svg>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-orange-600">Update Member</h1>
-                <p className="text-orange-500">Update member profile.</p>
+                <h1 className="text-2xl font-bold text-indigo-600">Update Member</h1>
+                <p className="text-indigo-500">Update member profile.</p>
               </div>
             </div>
           </div>
@@ -258,7 +258,7 @@ const EditMember = () => {
                         onChange={handleChange}
                         disabled={isEdit === 'false'}
                         placeholder="Enter first name"
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
                       />
                     </div>
                   </div>
@@ -275,7 +275,7 @@ const EditMember = () => {
                       onChange={handleChange}
                       disabled={isEdit === 'false'}
                       placeholder="Enter middle name"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
                     />
                   </div>
 
@@ -291,7 +291,7 @@ const EditMember = () => {
                       onChange={handleChange}
                       disabled={isEdit === 'false'}
                       placeholder="Enter last name"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
                     />
                   </div>
                 </div>
@@ -314,7 +314,7 @@ const EditMember = () => {
                         value={inputs.gender}
                         onChange={handleChange}
                         disabled={isEdit === 'false'}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer disabled:cursor-not-allowed"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white cursor-pointer disabled:cursor-not-allowed"
                       >
                         <option value="" disabled>Select gender</option>
                         <option value="M">Male</option>
@@ -346,7 +346,7 @@ const EditMember = () => {
                         value={inputs.birth_date}
                         onChange={handleChange}
                         disabled={isEdit === 'false'}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
                       />
                     </div>
                   </div>
@@ -368,7 +368,7 @@ const EditMember = () => {
                         value={inputs.join_date}
                         onChange={handleChange}
                         disabled={isEdit === 'false'}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
                       />
                     </div>
                   </div>
@@ -401,7 +401,7 @@ const EditMember = () => {
                         onChange={handleChange}
                         disabled={isEdit === 'false'}
                         placeholder="Enter mobile number"
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
                       />
                     </div>
                   </div>
@@ -424,7 +424,7 @@ const EditMember = () => {
                         onChange={handleChange}
                         disabled={isEdit === 'false'}
                         placeholder="Enter email address"
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
                       />
                     </div>
                   </div>
@@ -449,7 +449,7 @@ const EditMember = () => {
                       onChange={handleChange}
                       disabled={isEdit === 'false'}
                       placeholder="Enter complete address"
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none resize-none transition-all duration-200 disabled:cursor-not-allowed"
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none transition-all duration-200 disabled:cursor-not-allowed"
                     />
                   </div>
                 </div>
@@ -477,7 +477,7 @@ const EditMember = () => {
                         onChange={handleChange}
                         disabled={isEdit === "false"}
                         placeholder="Enter designation"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 bg-white"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 bg-white"
                       />
                     </div>
                   </div>
@@ -491,7 +491,7 @@ const EditMember = () => {
                     <div className="flex gap-2">
                       <input
                         type="text"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 bg-white"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 bg-white"
                         value={`${selectedTeams.length} teams selected`}
                         readOnly
                       />
@@ -511,7 +511,7 @@ const EditMember = () => {
                         {selectedTeams.map((team) => (
                           <div
                             key={team.team_id}
-                            className="flex items-center gap-2 px-3 py-1 text-sm bg-orange-100 text-orange-800 border border-orange-200 rounded-full"
+                            className="flex items-center gap-2 px-3 py-1 text-sm bg-indigo-100 text-indigo-800 border border-indigo-200 rounded-full"
                           >
                             👥 {team.name}
 
@@ -519,7 +519,7 @@ const EditMember = () => {
                               type="button"
                               onClick={() => removeTeam(team.team_id)}
                               disabled={isEdit === "false"}
-                              className="text-orange-600 hover:text-red-600"
+                              className="text-indigo-600 hover:text-red-600"
                             >
                               ✕
                             </button>
@@ -548,7 +548,7 @@ const EditMember = () => {
                           <input
                             type="text"
                             value={dept_name}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 bg-white"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 bg-white"
                             placeholder="Select teams..."
                             readOnly
                           />
@@ -576,7 +576,7 @@ const EditMember = () => {
                           <input
                             type="text"
                             value={clg_name}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 bg-white"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 bg-white"
                             placeholder="Select teams..."
                             readOnly
                           />
@@ -611,7 +611,7 @@ const EditMember = () => {
                         value={inputs.education_year}
                         onChange={handleChange}
                         disabled={isEdit === 'false'}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer disabled:cursor-not-allowed"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white cursor-pointer disabled:cursor-not-allowed"
                       >
                         <option value="" disabled>Select Year</option>
                         <option value="1">First Year</option>
@@ -648,7 +648,7 @@ const EditMember = () => {
                       </div>
                       <select
                         name="role"
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer disabled:cursor-not-allowed"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white cursor-pointer disabled:cursor-not-allowed"
                         value={inputs.role}
                         onChange={handleChange}
 
@@ -678,7 +678,7 @@ const EditMember = () => {
                           <input
                             type="text"
                             value={user_name}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 bg-white"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 bg-white"
                             placeholder="Select user..."
                             readOnly
                           />
@@ -717,7 +717,7 @@ const EditMember = () => {
               <div className="flex items-center justify-end space-x-3 pt-6">
                 <button
                   type="button"
-                  className="px-6 py-2 text-sm font-medium text-gray-800 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200"
+                  className="px-6 py-2 text-sm font-medium text-gray-800 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transition-all duration-200"
                   onClick={handleCancel}
                 >
                   Cancel
@@ -726,7 +726,7 @@ const EditMember = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
+                    className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
                   >
                     {loading ? 'Updating' : 'Update'}
                   </button>

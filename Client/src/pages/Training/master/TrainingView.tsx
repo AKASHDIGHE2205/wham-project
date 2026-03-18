@@ -87,13 +87,13 @@ const TrainingView = () => {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 border border-orange-300 m-1 rounded-md p-2 sm:p-6">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-indigo-50 border border-indigo-300 m-1 rounded-md p-2 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
           <div>
-            <h1 className="text-lg sm:text-xl font-bold text-orange-600">Training List</h1>
-            <p className="text-orange-400 mt-1 text-md">Manage training materials</p>
+            <h1 className="text-lg sm:text-xl font-bold text-indigo-600">Training List</h1>
+            <p className="text-indigo-400 mt-1 text-md">Manage training materials</p>
           </div>
         </div>
 
@@ -108,12 +108,12 @@ const TrainingView = () => {
               <input
                 type="text"
                 placeholder="Search training..."
-                className="block w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 text-sm sm:text-base"
+                className="block w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 text-sm sm:text-base"
                 onChange={(e) => setSearch(e.target.value)}
                 value={search}
               />
               <button
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-orange-600 cursor-pointer font-bold"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-indigo-600 cursor-pointer font-bold"
                 onClick={() => setSearch("")}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
@@ -127,7 +127,7 @@ const TrainingView = () => {
                 <div className="relative">
                   <select
                     name="itemsPerPage"
-                    className="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer text-sm sm:text-base"
+                    className="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white cursor-pointer text-sm sm:text-base"
                     required
                     onChange={(e) => setItemsPerPage(Number(e.target.value))}
                   >
@@ -163,7 +163,7 @@ const TrainingView = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[500px]">
-              <thead className="bg-linear-to-r from-purple-50 to-orange-50">
+              <thead className="bg-linear-to-r from-purple-50 to-indigo-50">
                 <tr>
                   <th className="px-2 py-3 text-center text-xs font-semibold text-gray-900 uppercase tracking-wider">
                     ID
@@ -194,7 +194,7 @@ const TrainingView = () => {
                   </tr>
                 ) : data?.length > 0 ? (
                   data?.map((item) => (
-                    <tr key={item?.training_id} className="hover:bg-orange-50 transition-colors duration-150">
+                    <tr key={item?.training_id} className="hover:bg-indigo-50 transition-colors duration-150">
                       <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-black">{item?.training_id}</td>
                       <td className="px-1 py-1 text-center whitespace-nowrap text-sm text-black cursor-pointer"
                         onClick={() => item.file_path && handleMediaShow(item)}
@@ -247,7 +247,7 @@ const TrainingView = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={6} className="text-center py-4 text-orange-600">
+                    <td colSpan={6} className="text-center py-4 text-indigo-600">
                       No Records Found
                     </td>
                   </tr>

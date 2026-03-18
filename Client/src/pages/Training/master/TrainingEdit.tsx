@@ -164,7 +164,7 @@ const TrainingEdit = () => {
                       onChange={handleInputChange}
                       disabled={isEdit === 'false'}
                       placeholder="Enter training title"
-                      className="w-full pl-10 px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
+                      className="w-full pl-10 px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
                       required
                     />
                   </div>
@@ -188,7 +188,7 @@ const TrainingEdit = () => {
                       disabled={isEdit === 'false'}
                       rows={4}
                       placeholder="Enter training description"
-                      className="w-full pl-10 px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 resize-none disabled:cursor-not-allowed"
+                      className="w-full pl-10 px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 resize-none disabled:cursor-not-allowed"
                     />
                   </div>
                 </div>
@@ -209,7 +209,7 @@ const TrainingEdit = () => {
                       value={inputs.status}
                       onChange={handleInputChange}
                       disabled={isEdit === 'false'}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none disabled:cursor-not-allowed"
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none disabled:cursor-not-allowed"
                       required
                     >
                       <option value="" disabled>Select status</option>

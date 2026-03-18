@@ -48,12 +48,12 @@ const SelectDept: FC<Props> = ({ show, setShow }) => {
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-indigo-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100">
         {/* Modal Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-linear-to-br from-orange-500 to-purple-600 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-linear-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-university-icon lucide-university text-white">
                 <path d="M14 21v-3a2 2 0 0 0-4 0v3" />
                 <path d="M18 12h.01" />
@@ -91,7 +91,7 @@ const SelectDept: FC<Props> = ({ show, setShow }) => {
               placeholder="Search by name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+              className="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200"
             />
           </div>
         </div>
@@ -100,7 +100,7 @@ const SelectDept: FC<Props> = ({ show, setShow }) => {
         <div className="p-6">
           {loading ? (
             <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
             </div>
           ) : filteredDepartments?.length === 0 ? (
             <div className="text-center py-12">
@@ -112,7 +112,7 @@ const SelectDept: FC<Props> = ({ show, setShow }) => {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-linear-to-r from-purple-50 to-orange-50">
+                  <thead className="bg-linear-to-r from-purple-50 to-indigo-50">
                     <tr>
                       <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
                         ID
@@ -145,7 +145,7 @@ const SelectDept: FC<Props> = ({ show, setShow }) => {
                           <td className="px-4 py-2 whitespace-nowrap text-left">
                             <button
                               onClick={() => handleSelect(department)}
-                              className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer text-orange-600 bg-orange-50 border border-orange-200 hover:bg-orange-100`}
+                              className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer text-indigo-600 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100`}
                             >
                               Select
                             </button>

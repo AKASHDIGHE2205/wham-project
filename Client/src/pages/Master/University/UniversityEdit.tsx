@@ -177,7 +177,7 @@ const UniversityEdit = () => {
                         onChange={handleInputChange}
                         disabled={isEdit === 'false'}
                         placeholder="Enter university name"
-                        className="w-full pl-10 px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
+                        className="w-full pl-10 px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
                         required
                       />
                     </div>
@@ -199,7 +199,7 @@ const UniversityEdit = () => {
                         value={inputs.status}
                         onChange={handleInputChange}
                         disabled={isEdit === 'false'}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none disabled:cursor-not-allowed"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none disabled:cursor-not-allowed"
                         required
                       >
                         <option value="" disabled>Select status</option>
@@ -232,7 +232,7 @@ const UniversityEdit = () => {
                           </div>
                           <input
                             type="text"
-                            className="w-full pl-10 px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200"
+                            className="w-full pl-10 px-4 py-2 border border-gray-300 text-black rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200"
                             placeholder={selectedLocations.length > 0 ? `${selectedLocations.length} address${selectedLocations.length > 1 ? 'es' : ''} selected` : "No addresses selected"}
                             readOnly
                           />

@@ -65,12 +65,12 @@ const UpdateTask: FC<Props> = ({ show, setShow, Data, fetchData, isEdit }) => {
     }
   }
   return (
-    <div className="fixed inset-0 bg-orange-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-indigo-100/20 backdrop-blur-xs flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100">
         {/* Modal Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-linear-to-br from-orange-500 to-purple-600 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-linear-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar-check-icon lucide-calendar-check text-white"><path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" /><path d="m9 16 2 2 4-4" /></svg>
             </div>
             <h3 className="text-xl font-bold text-gray-900">
@@ -93,7 +93,7 @@ const UpdateTask: FC<Props> = ({ show, setShow, Data, fetchData, isEdit }) => {
           {/* Task Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Task Name <span className="text-orange-600">*</span>
+              Task Name <span className="text-indigo-600">*</span>
             </label>
 
             <input
@@ -103,7 +103,7 @@ const UpdateTask: FC<Props> = ({ show, setShow, Data, fetchData, isEdit }) => {
               onChange={handleChange}
               disabled={!isEdit}
               placeholder="Enter task name"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
               required
             />
           </div>
@@ -111,13 +111,13 @@ const UpdateTask: FC<Props> = ({ show, setShow, Data, fetchData, isEdit }) => {
           {/* Manager Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Master Step <span className="text-orange-600">*</span>
+              Master Step <span className="text-indigo-600">*</span>
             </label>
             <div className="flex gap-2">
               <div className="flex-1">
                 <input
                   type="text"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 disabled:cursor-not-allowed"
                   placeholder="Select Master Step..."
                   disabled={!isEdit}
                   value={step_name}
@@ -137,7 +137,7 @@ const UpdateTask: FC<Props> = ({ show, setShow, Data, fetchData, isEdit }) => {
           {/* Status Dropdown */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Status <span className="text-orange-600">*</span>
+              Status <span className="text-indigo-600">*</span>
             </label>
             <div className="relative group">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -150,7 +150,7 @@ const UpdateTask: FC<Props> = ({ show, setShow, Data, fetchData, isEdit }) => {
                 value={inputs?.status}
                 onChange={handleChange}
                 disabled={!isEdit}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer disabled:cursor-not-allowed"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white cursor-pointer disabled:cursor-not-allowed"
                 required
               >
                 <option value="">Select status</option>
@@ -183,7 +183,7 @@ const UpdateTask: FC<Props> = ({ show, setShow, Data, fetchData, isEdit }) => {
                 onChange={handleChange}
                 disabled={!isEdit}
                 placeholder="Enter task description, goals, or notes..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none resize-none transition-all duration-200 disabled:cursor-not-allowed"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none transition-all duration-200 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -192,7 +192,7 @@ const UpdateTask: FC<Props> = ({ show, setShow, Data, fetchData, isEdit }) => {
           <div className="flex items-center justify-end space-x-3 pt-6 border-t border-gray-200">
             <button
               type="button"
-              className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200"
+              className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transition-all duration-200"
               onClick={handleClose}
             >
               Cancel
@@ -201,7 +201,7 @@ const UpdateTask: FC<Props> = ({ show, setShow, Data, fetchData, isEdit }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-orange-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
+                className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 border border-transparent rounded-lg hover:shadow-lg focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transition-all duration-200 flex items-center gap-2"
               >
                 {loading ? 'Updatting' : 'Update'}
               </button>

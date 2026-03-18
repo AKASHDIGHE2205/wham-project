@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, ChevronUp, File, FileSpreadsheet, FileText, Image, Video } from "lucide-react";
+import { File, FileSpreadsheet, FileText, Image, Minus, Plus, Video } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import ShowTrainingDesk from "../../../components/ShowTrainingDesk";
 import { MEDIA_URL } from "../../../constant/Baseurl";
@@ -56,13 +56,13 @@ const TrainingViews: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 border border-orange-300 m-1 rounded-md">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-indigo-50 border border-indigo-300 m-1 rounded-md">
       {/* main container */}
       <div className="max-w-6xl mx-auto">
         {/* header - subtle, just to frame */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-orange-600">Training resources</h1>
-          <p className="text-orange-500">Guides, videos and templates</p>
+          <h1 className="text-3xl font-bold text-indigo-600">Training resources</h1>
+          <p className="text-indigo-500">Guides, videos and templates</p>
         </div>
 
         {/* card grids */}
@@ -81,7 +81,7 @@ const TrainingViews: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-2">
                           {(card.file_type === "pdf" && <FileText size={20} className="text-purple-700" strokeWidth={1.5} />) ||
-                            ((card.file_type === "excel" || card.file_type === "csv") && <FileSpreadsheet size={20} className="text-orange-700" strokeWidth={1.5} />) ||
+                            ((card.file_type === "excel" || card.file_type === "csv") && <FileSpreadsheet size={20} className="text-indigo-700" strokeWidth={1.5} />) ||
                             (card.file_type === "image" && <Image size={20} className="text-blue-700" strokeWidth={1.5} />) ||
                             (card.file_type === "video" && <Video size={20} className="text-green-700" strokeWidth={1.5} />) ||
                             <File size={20} className="text-gray-700" strokeWidth={1.5} />}
@@ -89,9 +89,9 @@ const TrainingViews: React.FC = () => {
                       </div>
                       <span
                         className={`${card.file_type === "excel"
-                          ? "bg-orange-500"
+                          ? "bg-indigo-500"
                           : card.file_type === "csv"
-                            ? "bg-orange-500"
+                            ? "bg-indigo-500"
                             : card.file_type === "pdf"
                               ? "bg-purple-600"
                               : card.file_type === "image"
@@ -161,9 +161,9 @@ const TrainingViews: React.FC = () => {
                     </div>
 
                     {isOpen ? (
-                      <ChevronDown className="w-5 h-5 text-gray-500" />
+                      <Minus className="w-5 h-5 text-indigo-600 font-bold"/>
                     ) : (
-                      <ChevronUp className="w-5 h-5 text-gray-500" />
+                      <Plus className="w-5 h-5 text-indigo-600 font-bold"/>
                     )}
                   </button>
 
@@ -175,7 +175,7 @@ const TrainingViews: React.FC = () => {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        transition={{ duration: 0.2, ease: "easeInOut" }}
                         className="overflow-hidden"
                       >
                         <div className="p-4 pt-0 pl-14 pr-4 pb-4 text-gray-700 text-sm border-t border-gray-100">

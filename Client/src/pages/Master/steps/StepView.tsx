@@ -83,18 +83,18 @@ const StepView = () => {
     }
   }
 
-  const handleView = async(step: Steps) =>{
+  const handleView = async (step: Steps) => {
     setSelectedStep(step);
     setShowViewModal(true);
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-orange-50 p-2 sm:p-6 border border-orange-300 rounded-md m-1">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-indigo-50 p-2 sm:p-6 border border-indigo-300 rounded-md m-1">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-orange-600">Steps Master</h1>
+            <h1 className="text-2xl font-bold text-indigo-600">Steps Master</h1>
           </div>
         </div>
 
@@ -109,11 +109,11 @@ const StepView = () => {
               <input
                 type="text"
                 placeholder="Search step..."
-                className="block w-full pl-9 sm:pl-10 pr-3 py-2 sm:py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all duration-200 text-sm sm:text-base"
+                className="block w-full pl-9 sm:pl-10 pr-3 py-2 sm:py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200 text-sm sm:text-base"
                 value={searchTerm}
                 onChange={handleSearchChange}
               />
-              <button className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-orange-600 cursor-pointer font-bold" onClick={() => setSearchTerm("")}>
+              <button className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-indigo-600 cursor-pointer font-bold" onClick={() => setSearchTerm("")}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
               </button>
             </div>
@@ -125,7 +125,7 @@ const StepView = () => {
                 <div className="relative">
                   <select
                     name="itemsPerPage"
-                    className="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-orange-500 focus:border-orange-500 outline-none appearance-none bg-white cursor-pointer text-sm sm:text-base"
+                    className="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white cursor-pointer text-sm sm:text-base"
                     value={itemsPerPage}
                     onChange={handleItemsPerPageChange}
                     required
@@ -162,7 +162,7 @@ const StepView = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[500px] divide-y divide-gray-200 p-4">
-              <thead className="bg-linear-to-r from-purple-50 to-orange-50">
+              <thead className="bg-linear-to-r from-purple-50 to-indigo-50">
                 <tr>
                   <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     ID
@@ -176,9 +176,9 @@ const StepView = () => {
                   <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Status
                   </th>
-                   <th className="px-2 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                      Action
-                    </th>
+                  <th className="px-2 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -190,22 +190,26 @@ const StepView = () => {
                   </tr>
                 ) : data?.length > 0 ? (
                   data?.map((step: Steps) => (
-                    <tr key={step?.id} className="hover:bg-orange-50 transition-colors duration-150">
+                    <tr key={step?.id} className="hover:bg-indigo-50 transition-colors duration-150">
                       <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-gray-900">{step?.id}</td>
                       <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-gray-900">{step?.step_name}</td>
                       <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-gray-900">{step?.step_desc}</td>
-                      <td 
-                        className={`inline-flex justify-center items-center px-2 py-1 rounded-full text-xs font-medium border ${step?.status === "A"
-                              ? "bg-green-100 text-green-800 border-green-200"
-                              : "bg-red-100 text-red-800 border-red-200"}`}>
-                                {step?.status === 'A' ? "Active" : "Inactive"}
-                                </td>
+                      <td className="px-2 py-2 text-left whitespace-nowrap">
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${step?.status === "A"
+                            ? "bg-green-100 text-green-800 border-green-200"
+                            : "bg-red-100 text-red-800 border-red-200"
+                            }`}
+                        >
+                          {step?.status === "A" ? "Active" : "In-active"}
+                        </span>
+                      </td>
                       <td className="px-3 py-2 text-left whitespace-nowrap">
                         <div className="flex justify-center items-center gap-1">
                           <button
                             type="button"
                             className="inline-flex items-center p-1.5 text-sm font-medium text-gray-900 bg-green-50 rounded-lg hover:bg-green-200 transition-all duration-200 cursor-pointer"
-                            onClick={()=>handleView(step)}
+                            onClick={() => handleView(step)}
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" color="green" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye-icon lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" /><circle cx="12" cy="12" r="3" /></svg>
                           </button>
@@ -228,7 +232,7 @@ const StepView = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="text-center py-4 text-orange-600">
+                    <td colSpan={5} className="text-center py-4 text-indigo-600">
                       No Records Found
                     </td>
                   </tr>
@@ -258,15 +262,15 @@ const StepView = () => {
             setShow={setShowEditModal}
             stepData={selectedStep}
             fetchData={fetchData}
-            isEdit = {true}
+            isEdit={true}
           />)}
-          {showViewModal && (
+        {showViewModal && (
           <UpdateStep
             show={showViewModal}
             setShow={setShowViewModal}
             stepData={selectedStep}
             fetchData={fetchData}
-            isEdit = {false}
+            isEdit={false}
           />)}
       </div>
     </div>
