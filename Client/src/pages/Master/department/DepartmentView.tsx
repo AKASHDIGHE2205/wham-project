@@ -79,7 +79,9 @@ const DepartmentView = () => {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-indigo-50 p-2 sm:p-6 border border-indigo-300 rounded-md m-1">
+    <div
+      className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-indigo-50 p-2 sm:p-6 border border-indigo-300 rounded-md m-1"
+    >
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
@@ -164,9 +166,9 @@ const DepartmentView = () => {
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">College</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Student Strength</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
-                    <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                      Action
-                    </th>
+                  <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">

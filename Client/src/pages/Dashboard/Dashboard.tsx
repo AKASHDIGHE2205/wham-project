@@ -49,7 +49,6 @@ export default function Dashboard() {
     }
   };
 
-
   const fetchTeams = async () => {
     setTeamsLoading(true);
     const response = await getActiveTeams();
@@ -58,7 +57,7 @@ export default function Dashboard() {
       setTeams(response?.Teams || []);
     }
   };
-  
+
   useEffect(() => {
     fetchWeekActivities();
   }, [currentWeekStart]);

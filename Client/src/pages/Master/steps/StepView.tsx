@@ -164,13 +164,13 @@ const StepView = () => {
             <table className="w-full min-w-[500px] divide-y divide-gray-200 p-4">
               <thead className="bg-linear-to-r from-purple-50 to-indigo-50">
                 <tr>
-                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     ID
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Name
                   </th>
-                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden">
                     Description
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
@@ -191,9 +191,9 @@ const StepView = () => {
                 ) : data?.length > 0 ? (
                   data?.map((step: Steps) => (
                     <tr key={step?.id} className="hover:bg-indigo-50 transition-colors duration-150">
-                      <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-gray-900">{step?.id}</td>
+                      <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-900">{step?.id}</td>
                       <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-gray-900">{step?.step_name}</td>
-                      <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-gray-900">{step?.step_desc}</td>
+                      <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-gray-900 hidden">{step?.step_desc}</td>
                       <td className="px-2 py-2 text-left whitespace-nowrap">
                         <span
                           className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${step?.status === "A"

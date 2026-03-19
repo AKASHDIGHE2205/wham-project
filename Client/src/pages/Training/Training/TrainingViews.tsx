@@ -56,7 +56,7 @@ const TrainingViews: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-indigo-50 border border-indigo-300 m-1 rounded-md">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-indigo-50 border border-indigo-300 m-1 rounded-md p-4">
       {/* main container */}
       <div className="max-w-6xl mx-auto">
         {/* header - subtle, just to frame */}
@@ -189,7 +189,7 @@ const TrainingViews: React.FC = () => {
             })}
           </div>
 
-          <p className="text-xs text-gray-500 mt-6">
+          <p className="text-xs text-gray-500 mt-6 hidden">
             * Resources are free to use under the terms specified. Updated monthly.
           </p>
         </div>

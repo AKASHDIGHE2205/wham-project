@@ -112,12 +112,12 @@ const UsersView = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
           {/* Total Users Card */}
           <div className="bg-blue-50 rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="h-1 w-full bg-blue-500"></div>
+            <div className="h-1 w-ull bg-blue-500"></div>
             <div className="p-2">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-medium text-gray-600 mb-1">Total Users</p>
-                  <p className="text-2xl font-bold text-gray-900">#{totalItems}</p>
+                  <p className="text-2xl font-bold text-gray-900">{totalItems}</p>
                 </div>
                 <div className="p-2 bg-blue-50 rounded-lg">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-users text-blue-600">
@@ -127,9 +127,6 @@ const UsersView = () => {
                     <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                   </svg>
                 </div>
-              </div>
-              <div className="mt-2 flex items-center text-xs text-gray-500">
-                <span>All registered users</span>
               </div>
             </div>
           </div>
@@ -141,7 +138,7 @@ const UsersView = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-medium text-gray-600 mb-1">Active Users</p>
-                  <p className="text-2xl font-bold text-green-600">#{activeCount}</p>
+                  <p className="text-2xl font-bold text-green-600">{activeCount}</p>
                 </div>
                 <div className="p-2 bg-green-50 rounded-lg">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-user-check text-green-600">
@@ -150,10 +147,6 @@ const UsersView = () => {
                     <polyline points="16 11 18 13 22 9" />
                   </svg>
                 </div>
-              </div>
-              <div className="mt-2 flex items-center text-xs text-green-600">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                <span>Currently active</span>
               </div>
             </div>
           </div>
@@ -165,7 +158,7 @@ const UsersView = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-medium text-gray-600 mb-1">Inactive Users</p>
-                  <p className="text-2xl font-bold text-red-600">#{inactiveCount}</p>
+                  <p className="text-2xl font-bold text-red-600">{inactiveCount}</p>
                 </div>
                 <div className="p-2 bg-red-50 rounded-lg">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-user-x text-red-600">
@@ -175,10 +168,6 @@ const UsersView = () => {
                     <line x1="22" y1="8" x2="17" y2="13" />
                   </svg>
                 </div>
-              </div>
-              <div className="mt-2 flex items-center text-xs text-red-600">
-                <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
-                <span>Suspended/inactive</span>
               </div>
             </div>
           </div>

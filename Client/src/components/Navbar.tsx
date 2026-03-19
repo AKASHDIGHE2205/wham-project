@@ -125,14 +125,13 @@ const Navbar = ({ onMobileMenuToggle, isMobileMenuOpen }: NavbarProps) => {
           <div className="flex lg:hidden items-center md:ml-3">
             <button
               onClick={onMobileMenuToggle}
-              className="p-2 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 transition-colors"
+              className="p-2 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
               aria-expanded={isMobileMenuOpen}
             >
-              <span className="sr-only">Open sidebar</span>
               {isMobileMenuOpen ? (
-                <X className="block w-6 h-6" aria-hidden="true" />
+                <X className="block w-6 h-6 text-[#3822ff]" aria-hidden="true"/>
               ) : (
-                <Grip className="block w-6 h-6" aria-hidden="true" />
+                <Grip className="block w-6 h-6 text-[#3822ff]" aria-hidden="true"/>
               )}
             </button>
           </div>

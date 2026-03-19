@@ -436,7 +436,7 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
       <div className="pt-6 border-t border-gray-100 flex justify-end">
         <button
           onClick={onNext}
-          className="px-8 py-2 bg-linear-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
+          className="px-8 py-2 bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
         >
           Next
         </button>

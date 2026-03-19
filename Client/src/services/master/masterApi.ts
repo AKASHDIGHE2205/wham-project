@@ -69,7 +69,6 @@ export const updateTeam = async (data: any) => {
       ...getHeaders(),
     });
     if (response.status === 200) {
-      toast.success(response.data.message || "Team updated successfully");
       return response.data;
     }
   } catch (error: string | any) {

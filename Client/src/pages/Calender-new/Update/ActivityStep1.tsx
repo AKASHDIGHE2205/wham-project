@@ -52,27 +52,27 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
 
   const removeCollege = (collegeId: number) => {
     updateFormData({
-      selectedColleges: formData.selectedColleges.filter((c: College) => c.clg_id !== collegeId)
+      selectedColleges: formData?.selectedColleges.filter((c: College) => c.clg_id !== collegeId)
     });
   };
 
   const removeDepartment = (deptId: number) => {
     updateFormData({
-      selectedDepartments: formData.selectedDepartments.filter((d: Department) => d.dept_id !== deptId)
+      selectedDepartments: formData?.selectedDepartments.filter((d: Department) => d.dept_id !== deptId)
     });
   };
 
-  const filteredSelectedColleges = formData.selectedColleges.filter((college: College) =>
+  const filteredSelectedColleges = formData?.selectedColleges.filter((college: College) =>
     college.clg_name.toLowerCase().includes(collegeSearchTerm.toLowerCase()),
   );
 
-  const filteredSelectedDepartments = formData.selectedDepartments.filter((department: Department) =>
+  const filteredSelectedDepartments = formData?.selectedDepartments.filter((department: Department) =>
     department.dept_name.toLowerCase().includes(departmentSearchTerm.toLowerCase()),
   );
 
   const removeSelectedLocation = (id: number) => {
     updateFormData({
-      selectedLocations: formData.selectedLocations.filter((location: SelectedLocation) => location.id !== id)
+      selectedLocations: formData?.selectedLocations.filter((location: SelectedLocation) => location?.id !== id)
     });
   };
 
@@ -82,26 +82,24 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
       ...location,
     };
     updateFormData({
-      selectedLocations: [...formData.selectedLocations, newLocation]
+      selectedLocations: [...formData?.selectedLocations, newLocation]
     });
     setShowMap(false);
   };
 
-  const filteredSelectedLocations = formData.selectedLocations.filter(
+  const filteredSelectedLocations = formData?.selectedLocations?.filter(
     (location: SelectedLocation) =>
-      location.address
-        .toLowerCase()
-        .includes(locationSearchTerm.toLowerCase()) ||
-      location.city.toLowerCase().includes(locationSearchTerm.toLowerCase()) ||
-      location.state.toLowerCase().includes(locationSearchTerm.toLowerCase()),
+      location?.address.toLowerCase().includes(locationSearchTerm.toLowerCase()) ||
+      location?.city.toLowerCase().includes(locationSearchTerm.toLowerCase()) ||
+      location?.state.toLowerCase().includes(locationSearchTerm.toLowerCase()),
   );
 
   const formatLocationDisplay = (location: SelectedLocation) => {
     const parts = [];
-    if (location.address) parts.push(location.address);
-    if (location.city) parts.push(location.city);
-    if (location.state) parts.push(location.state);
-    if (location.pin) parts.push(location.pin);
+    if (location?.address) parts.push(location?.address);
+    if (location?.city) parts.push(location?.city);
+    if (location?.state) parts.push(location?.state);
+    if (location?.pin) parts.push(location?.pin);
     return parts.join(", ");
   };
 
@@ -138,7 +136,7 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
             <input
               type="text"
               name="title"
-              value={formData.title}
+              value={formData?.title}
               onChange={handleChange}
               required
               disabled={isEdit}
@@ -155,7 +153,7 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
             <div className="relative">
               <select
                 name="occasion"
-                value={formData.occasion || ''}
+                value={formData?.occasion || ''}
                 onChange={handleChange}
                 required
                 disabled={isEdit}
@@ -182,10 +180,10 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
               <div className="relative">
                 <select
                   name="status"
-                  value={formData.status || ""}
+                  value={formData?.status || ""}
                   onChange={handleChange}
                   required
-                  className={`w-full px-3 py-2 border rounded-md appearance-none focus:outline-none focus:ring-1 focus:ring-purple-500 ${getStatusClasses(formData.status)}`}
+                  className={`w-full px-3 py-2 border rounded-md appearance-none focus:outline-none focus:ring-1 focus:ring-purple-500 ${getStatusClasses(formData?.status)}`}
                 >
                   <option value="" disabled>
                     Select Status
@@ -208,7 +206,7 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
             <div className="relative">
               <select
                 name="campaign"
-                value={formData.campaign || ''}
+                value={formData?.campaign || ''}
                 onChange={handleChange}
                 required
                 disabled={isEdit}
@@ -264,13 +262,13 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
               </div>
 
               {/* Selected Locations Display */}
-              {formData.selectedLocations.length > 0 && (
+              {formData?.selectedLocations.length > 0 && (
                 <div className="mb-3 max-h-40 overflow-y-auto border border-gray-200 rounded-md bg-yellow-100 p-2">
                   {filteredSelectedLocations.length > 0 ? (
                     <div className="space-y-2">
                       {filteredSelectedLocations.map((location: SelectedLocation) => (
                         <div
-                          key={location.id}
+                          key={location?.id}
                           className="flex items-start justify-between bg-white px-3 py-2 rounded-md border border-gray-200"
                         >
                           <div className="flex-1 pr-2">
@@ -278,12 +276,12 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
                               {formatLocationDisplay(location)}
                             </p>
                             <p className="text-xs text-gray-500 mt-1">
-                              Lat: {location.lat.toFixed(6)}, Lng:{" "}
-                              {location.lng.toFixed(6)}
+                              Lat: {location?.lat.toFixed(6)}, Lng:{" "}
+                              {location?.lng.toFixed(6)}
                             </p>
                           </div>
                           <button
-                            onClick={() => removeSelectedLocation(location.id)}
+                            onClick={() => removeSelectedLocation(location?.id)}
                             disabled={isEdit}
                             className="text-gray-400 hover:text-red-500 transition-colors shrink-0 disabled:cursor-not-allowed"
                           >
@@ -300,7 +298,7 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
                 </div>
               )}
 
-              {formData.selectedLocations.length === 0 && (
+              {formData?.selectedLocations.length === 0 && (
                 <p className="text-xs text-gray-600">
                   Click the{" "}
                   <MapPinPlusIcon size={14} className="inline text-purple-600" />{" "}
@@ -309,10 +307,10 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
               )}
 
               {/* Quick Stats */}
-              {formData.selectedLocations.length > 0 && (
+              {formData?.selectedLocations.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2 text-xs text-gray-600">
                   <span className="px-2 py-1 bg-gray-100 rounded-full">
-                    Total: {formData.selectedLocations.length} location(s)
+                    Total: {formData?.selectedLocations.length} location(s)
                   </span>
                 </div>
               )}
@@ -330,8 +328,8 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1">
                       College{" "}
-                      {formData.selectedColleges.length > 0 &&
-                        `(${formData.selectedColleges.length} selected)`}
+                      {formData?.selectedColleges.length > 0 &&
+                        `(${formData?.selectedColleges.length} selected)`}
                     </label>
 
                     {/* College Search and Selection */}
@@ -364,7 +362,7 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
                     </div>
 
                     {/* Selected Colleges Display */}
-                    {formData.selectedColleges.length > 0 && (
+                    {formData?.selectedColleges.length > 0 && (
                       <div className="mb-3 max-h-32 overflow-y-auto border border-gray-200 rounded-md bg-green-100 p-2">
                         {filteredSelectedColleges.length > 0 ? (
                           <div className="space-y-2">
@@ -394,7 +392,7 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
                       </div>
                     )}
 
-                    {formData.selectedColleges.length === 0 && (
+                    {formData?.selectedColleges.length === 0 && (
                       <p className="text-xs text-gray-600">
                         Click the{" "}
                         <List size={14} className="inline text-purple-600" /> button
@@ -409,8 +407,8 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1">
                       Department{" "}
-                      {formData.selectedDepartments.length > 0 &&
-                        `(${formData.selectedDepartments.length} selected)`}
+                      {formData?.selectedDepartments.length > 0 &&
+                        `(${formData?.selectedDepartments.length} selected)`}
                     </label>
 
                     {/* Department Search and Selection */}
@@ -442,7 +440,7 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
                     </div>
 
                     {/* Selected Departments Display */}
-                    {formData.selectedDepartments.length > 0 && (
+                    {formData?.selectedDepartments.length > 0 && (
                       <div className="mb-3 max-h-32 overflow-y-auto border border-gray-200 rounded-md bg-blue-100 p-2">
                         {filteredSelectedDepartments.length > 0 ? (
                           <div className="space-y-2">
@@ -472,7 +470,7 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
                       </div>
                     )}
 
-                    {formData.selectedDepartments.length === 0 && (
+                    {formData?.selectedDepartments.length === 0 && (
                       <p className="text-xs text-gray-600">
                         Click the{" "}
                         <List size={14} className="inline text-purple-600" /> button
@@ -490,7 +488,7 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
       <div className="pt-6 border-t border-gray-100 flex justify-end">
         <button
           onClick={onNext}
-          className="px-8 py-2 bg-linear-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-md transition-colors cursor-pointer"
+          className="px-8 py-2 bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md transition-colors cursor-pointer"
         >
           Next
         </button>
@@ -501,7 +499,7 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
           show={showCollege}
           setShow={setShowCollege}
           onSelectColleges={handleSelectColleges}
-          selectedColleges={formData.selectedColleges}
+          selectedColleges={formData?.selectedColleges}
         />
       )}
       {showDepartment && (
@@ -509,7 +507,7 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
           show={showDepartment}
           setShow={setShowDepartment}
           onSelectDepartments={handleSelectDepartments}
-          selectedDepartments={formData.selectedDepartments}
+          selectedDepartments={formData?.selectedDepartments}
         />
       )}
       {showMap && (

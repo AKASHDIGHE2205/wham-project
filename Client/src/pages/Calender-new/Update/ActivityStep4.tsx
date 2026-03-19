@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { getUserFromStorage } from '../../../helper/cryptoUser';
 import { updateActivity } from '../../../services/calender/calenderApi';
 import { getActiveTasks } from '../../../services/dashboard/DashboardApi';
-import type { SubActivityCard, Tasks } from '../../../types/activity.types';
+import type { Tasks } from '../../../types/activity.types';
 import type { SubActivity } from './Index';
 
 interface ActivityStep4Props {
@@ -33,45 +33,44 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
   }, []);
 
   const addNewSubActivity = () => {
-    const newCard: SubActivityCard = {
-      id: (formData.subActivities.length + 1).toString(),
-      taskId: 0,
+    // Find the highest existing ID to create a new unique ID
+    const maxId = formData?.subActivities.length > 0
+      ? Math.max(...formData.subActivities.map((sa: SubActivity) => sa.id || 0))
+      : 0;
+
+    const newSubActivity = {
+      id: maxId + 1, // Use incremental ID for new activities
+      sr_no: (formData?.subActivities.length + 1),
+      task_id: 0,
       title: '',
-      startTime: '',
-      endTime: '',
+      start_time: '',
+      end_time: '',
       notes: '',
       attachment: null
     };
-    updateFormData({ subActivities: [...formData.subActivities, newCard] });
+    updateFormData({ subActivities: [...formData?.subActivities, newSubActivity] });
   };
 
   const removeSubActivity = (id: number) => {
-    if (formData.subActivities.length > 1) {
-      const filtered = formData.subActivities.filter(
-        (activity: SubActivityCard) => activity.id !== id
+    if (formData?.subActivities.length > 1) {
+      const filtered = formData?.subActivities.filter(
+        (activity: SubActivity) => activity.id !== id
       );
 
-      const reindexed = filtered.map((activity: SubActivityCard, index: number) => ({
+      // Reindex sr_no
+      const reindexed = filtered.map((activity: SubActivity, index: number) => ({
         ...activity,
-        id: (index + 1).toString()
+        sr_no: index + 1
       }));
 
       updateFormData({ subActivities: reindexed });
     }
   };
 
-  const updateSubActivity = (id: number, field: keyof SubActivityCard, value: any) => {
-    const updatedActivities = formData.subActivities.map((activity: SubActivityCard) => {
+  const updateSubActivity = (id: number, field: keyof SubActivity, value: any) => {
+    const updatedActivities = formData?.subActivities.map((activity: SubActivity) => {
       if (activity.id === id) {
-        const updatedActivity = { ...activity, [field]: value };
-
-        // If taskId is updated, also set the taskName
-        if (field === 'taskId') {
-          const selectedTask = tasks.find(t => t.id === value);
-          updatedActivity.taskName = selectedTask?.task_name || '';
-        }
-
-        return updatedActivity;
+        return { ...activity, [field]: value };
       }
       return activity;
     });
@@ -81,14 +80,10 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
 
   const handleFileChange = (id: number, file: File | null) => {
     updateSubActivity(id, 'attachment', file);
-    if (file) {
-      updateSubActivity(id, 'attachmentName', file.name);
-    }
   };
 
   const validateForm = () => {
-
-    if (!formData.title?.trim()) {
+    if (!formData?.title?.trim()) {
       toast.error("Title is required");
       return false;
     }
@@ -103,74 +98,69 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
       return false;
     }
 
-    if (!formData.occasion) {
+    if (!formData?.occasion) {
       toast.error("Please select an occasion");
       return false;
     }
 
-    if (!formData.campaign) {
+    if (!formData?.campaign) {
       toast.error("Please select a campaign");
       return false;
     }
 
-    // if (!formData.selectedColleges.length) {
-    //   toast.error("Please select at least one college");
-    //   return false;
-    // }
-
-    // if (!formData.selectedDepartments.length) {
-    //   toast.error("Please select at least one department");
-    //   return false;
-    // }
-
-    if (!formData.selectedLocations.length) {
+    if (!formData?.selectedLocations.length) {
       toast.error("Please select at least one location");
       return false;
     }
 
-    if (!formData.startDate) {
+    if (!formData?.startDate) {
       toast.error("Start date is required");
       return false;
     }
 
-    if (!formData.endDate) {
+    if (!formData?.endDate) {
       toast.error("End date is required");
       return false;
     }
 
-    if (new Date(formData.startDate) > new Date(formData.endDate)) {
+    if (new Date(formData?.startDate) > new Date(formData?.endDate)) {
       toast.error("Start date cannot be after end date");
       return false;
     }
 
-    // if (!formData.selectedMembers.length) {
-    //   toast.error("Please select at least one member");
-    //   return false;
-    // }
-
-    if (!formData.vehicleType) {
+    if (!formData?.vehicleType) {
       toast.error("Vehicle type is required");
       return false;
     }
 
-    if (!formData.subActivities.length) {
+    if (!formData?.subActivities.length) {
       toast.error("Please add at least one sub activity");
       return false;
     }
 
-    for (const sa of formData.subActivities) {
+    for (const sa of formData?.subActivities) {
+      if (!sa.task_id) {
+        toast.error("Please select sub-activity type for all activities");
+        return false;
+      }
+
       if (!sa.title?.trim()) {
-        toast.error("Sub activity title is required");
+        toast.error("Sub activity title is required for all activities");
         return false;
       }
 
       if (!sa.start_time || !sa.end_time) {
-        toast.error("Sub activity start and end time required");
+        toast.error("Sub activity start and end time required for all activities");
         return false;
       }
 
-      if (sa.startTime > sa.endTime) {
+      if (sa.start_time > sa.end_time) {
         toast.error("Sub activity start time must be before end time");
+        return false;
+      }
+
+      if (!sa.notes?.trim()) {
+        toast.error("Notes are required for all sub activities");
         return false;
       }
     }
@@ -180,18 +170,19 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
+
     const submitData = {
-      activityId: activityId || 0,
+      activityId: activityId,
       activityDate: activityDate,
-      title: formData.title,
-      occasion: formData.occasion,
-      campaign: formData.campaign,
-      status: formData.status,
+      title: formData?.title,
+      occasion: formData?.occasion,
+      campaign: formData?.campaign,
+      status: formData?.status,
 
-      colleges: formData.selectedColleges,
-      departments: formData.selectedDepartments,
+      colleges: formData?.selectedColleges || [],
+      departments: formData?.selectedDepartments || [],
 
-      locations: formData.selectedLocations.map((loc: any) => ({
+      locations: formData?.selectedLocations.map((loc: any) => ({
         id: loc.id,
         lat: loc.lat,
         lng: loc.lng,
@@ -201,35 +192,37 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
         pin: loc.pin
       })),
 
-      startDate: formData.startDate,
-      endDate: formData.endDate,
+      startDate: formData?.startDate,
+      endDate: formData?.endDate,
 
-      members: formData.selectedMembers.map((member: any) => ({
+      members: formData?.selectedMembers.map((member: any) => ({
         id: member.id,
         first_name: member.first_name,
         middle_name: member.middle_name,
         last_name: member.last_name
       })),
 
-      teams: formData.selectedTeams.map((team: any) => ({
+      teams: formData?.selectedTeams.map((team: any) => ({
         id: team.id,
         name: team.name
       })),
 
-      vehicleType: formData.vehicleType,
-      notes: formData.notes,
+      vehicleType: formData?.vehicleType,
+      notes: formData?.notes,
 
-      subActivities: formData.subActivities.map((sa: SubActivity) => ({
+      subActivities: formData?.subActivities.map((sa: SubActivity) => ({
         id: sa.id,
-        taskId: sa.task_id,
+        task_id: sa.task_id,
         title: sa.title,
-        startTime: sa.start_time,
-        endTime: sa.end_time,
+        start_time: sa.start_time,
+        end_time: sa.end_time,
         notes: sa.notes
+        // Note: attachment is not included in the request body
       })),
 
       userId: user?.id ?? 0
     };
+
     try {
       setIsSubmitting(true);
       const response = await updateActivity(submitData);
@@ -238,6 +231,7 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
       }
     } catch (error) {
       console.log(error);
+      toast.error("Failed to update activity");
     } finally {
       setIsSubmitting(false);
     }
@@ -249,7 +243,7 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
         <button
           onClick={addNewSubActivity}
           disabled={isEdit}
-          className="flex items-center space-x-2 px-4 py-2  bg-linear-to-r from-indigo-600 to-purple-600  text-white rounded-md hover:bg-purple-700 transition-colors disabled:cursor-not-allowed"
+          className="flex items-center space-x-2 px-4 py-2 bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white rounded-md hover:bg-purple-700 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span className="font-semibold">Add Sub-Activity</span>
         </button>
@@ -258,21 +252,21 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
       {/* Mobile: Card View (visible on small screens) */}
       <div className="block md:hidden">
         <div className="space-y-4">
-          {formData.subActivities.map((activity: SubActivity) => (
+          {formData?.subActivities.map((activity: SubActivity, index: number) => (
             <div
               key={activity.id}
               className="border border-gray-200 rounded-xl p-4 bg-white shadow-sm relative"
             >
               {/* Card Header */}
               <div className="flex justify-between items-center mb-3 pb-2 border-b border-gray-100">
-                <span className="text-sm font-semibold text-purple-600">
-                  Activity #{activity.id}
+                <span className="text-sm font-semibold text-[#4f3fe0]">
+                  Activity {index + 1}
                 </span>
-                {formData.subActivities.length > 1 && (
+                {formData?.subActivities.length > 1 && (
                   <button
                     onClick={() => removeSubActivity(activity.id)}
                     disabled={isEdit}
-                    className="text-red-500 hover:text-red-700 transition-colors disabled:cursor-not-allowed"
+                    className="text-red-500 hover:text-red-700 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -289,10 +283,10 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
                   <div className="relative">
                     <select
                       value={activity.task_id || ''}
-                      onChange={(e) => updateSubActivity(activity.id, 'taskId', parseInt(e.target.value) || undefined)}
+                      onChange={(e) => updateSubActivity(activity.id, 'task_id', parseInt(e.target.value) || 0)}
                       required
                       disabled={isEdit}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-1 focus:ring-purple-500 bg-white text-sm disabled:cursor-not-allowed"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-1 focus:ring-purple-500 bg-white text-sm disabled:cursor-not-allowed disabled:bg-gray-100"
                     >
                       <option value="" disabled>Select</option>
                       {tasks?.map((item) => (
@@ -315,7 +309,7 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
                     required
                     disabled={isEdit}
                     placeholder="Enter title"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500 text-sm disabled:cursor-not-allowed"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500 text-sm disabled:cursor-not-allowed disabled:bg-gray-100"
                   />
                 </div>
 
@@ -328,19 +322,19 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
                     <input
                       type="time"
                       value={activity.start_time}
-                      onChange={(e) => updateSubActivity(activity.id, 'startTime', e.target.value)}
+                      onChange={(e) => updateSubActivity(activity.id, 'start_time', e.target.value)}
                       required
                       disabled={isEdit}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm disabled:cursor-not-allowed"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm disabled:cursor-not-allowed disabled:bg-gray-100"
                     />
                     <span className="text-gray-400">to</span>
                     <input
                       type="time"
                       value={activity.end_time}
-                      onChange={(e) => updateSubActivity(activity.id, 'endTime', e.target.value)}
+                      onChange={(e) => updateSubActivity(activity.id, 'end_time', e.target.value)}
                       required
                       disabled={isEdit}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm disabled:cursor-not-allowed"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm disabled:cursor-not-allowed disabled:bg-gray-100"
                     />
                   </div>
                 </div>
@@ -357,11 +351,11 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
                     onChange={(e) => updateSubActivity(activity.id, 'notes', e.target.value)}
                     required
                     disabled={isEdit}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500 text-sm resize-none disabled:cursor-not-allowed"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500 text-sm resize-none disabled:cursor-not-allowed disabled:bg-gray-100"
                   />
                 </div>
 
-                {/* Attachment */}
+                {/* Attachment - Hidden as per your requirement */}
                 <div hidden>
                   <label className="block text-xs font-medium text-gray-500 mb-1">
                     Attachment
@@ -400,18 +394,18 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
             </tr>
           </thead>
           <tbody>
-            {formData.subActivities.map((activity: SubActivity) => (
+            {formData?.subActivities.map((activity: SubActivity, index: number) => (
               <tr key={activity.id} className="border-b border-gray-200 hover:bg-gray-50">
-                <td className="px-4 py-3 text-sm text-gray-500">{activity.id}</td>
+                <td className="px-4 py-3 text-sm text-gray-500">{index + 1}</td>
 
                 {/* Sub-Activity Type */}
                 <td className="px-4 py-3">
                   <select
                     value={activity.task_id || ''}
-                    onChange={(e) => updateSubActivity(activity.id, 'taskId', parseInt(e.target.value) || undefined)}
+                    onChange={(e) => updateSubActivity(activity.id, 'task_id', parseInt(e.target.value) || 0)}
                     required
                     disabled={isEdit}
-                    className="w-40 px-2 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:cursor-not-allowed"
+                    className="w-40 px-2 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:cursor-not-allowed disabled:bg-gray-100"
                   >
                     <option value="" disabled>Select</option>
                     {tasks?.map((item) => (
@@ -429,7 +423,7 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
                     required
                     disabled={isEdit}
                     placeholder="Title"
-                    className="w-32 px-2 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:cursor-not-allowed"
+                    className="w-32 px-2 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:cursor-not-allowed disabled:bg-gray-100"
                   />
                 </td>
 
@@ -438,10 +432,10 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
                   <input
                     type="time"
                     value={activity.start_time}
-                    onChange={(e) => updateSubActivity(activity.id, 'startTime', e.target.value)}
+                    onChange={(e) => updateSubActivity(activity.id, 'start_time', e.target.value)}
                     required
                     disabled={isEdit}
-                    className="w-28 px-2 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:cursor-not-allowed"
+                    className="w-28 px-2 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:cursor-not-allowed disabled:bg-gray-100"
                   />
                 </td>
 
@@ -450,10 +444,10 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
                   <input
                     type="time"
                     value={activity.end_time}
-                    onChange={(e) => updateSubActivity(activity.id, 'endTime', e.target.value)}
+                    onChange={(e) => updateSubActivity(activity.id, 'end_time', e.target.value)}
                     required
                     disabled={isEdit}
-                    className="w-28 px-2 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:cursor-not-allowed"
+                    className="w-28 px-2 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:cursor-not-allowed disabled:bg-gray-100"
                   />
                 </td>
 
@@ -466,7 +460,7 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
                     required
                     disabled={isEdit}
                     placeholder="Notes"
-                    className="w-32 px-2 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:cursor-not-allowed"
+                    className="w-32 px-2 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:cursor-not-allowed disabled:bg-gray-100"
                   />
                 </td>
 
@@ -485,10 +479,10 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
 
                 {/* Action */}
                 <td className="px-4 py-3">
-                  {formData.subActivities.length > 1 && (
+                  {formData?.subActivities.length > 1 && (
                     <button
                       onClick={() => removeSubActivity(activity.id)}
-                      className="text-red-500 hover:text-red-700 transition-colors disabled:cursor-not-allowed"
+                      className="text-red-500 hover:text-red-700 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                       title="Remove"
                       disabled={isEdit}
                     >
@@ -509,17 +503,18 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
       <div className="pt-6 border-t border-gray-100 flex justify-between">
         <button
           onClick={onPrevious}
-          className="px-8 py-2  bg-linear-to-r from-indigo-600 to-purple-600  text-white rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
+          className="px-8 py-2 bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
         >
           Previous
         </button>
-        {!isEdit ? (<button
-          onClick={handleSubmit}
-          disabled={isSubmitting}
-          className="px-8 py-2  bg-linear-to-r from-indigo-600 to-purple-600  text-white rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
-        >
-          Submit
-        </button>
+        {!isEdit ? (
+          <button
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className="px-8 py-2 bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white rounded-md hover:bg-purple-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? 'Submitting...' : 'Submit'}
+          </button>
         ) : (
           <button
             onClick={onNext}

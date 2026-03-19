@@ -173,7 +173,7 @@ const TaskView = () => {
                     Name
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Step Name
+                    Parent Step
                   </th>
                   <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden">
                     Description
@@ -197,7 +197,7 @@ const TaskView = () => {
                 ) : data.length > 0 ? (
                   data.map((task: Task) => (
                     <tr key={task.id} className="hover:bg-indigo-50 transition-colors duration-150">
-                      <td className="px-3 py-3 text-left text-sm text-gray-900 whitespace-nowrap">{task.id}</td>
+                      <td className="px-3 py-3 text-center text-sm text-gray-900 whitespace-nowrap">{task.id}</td>
                       <td className="px-3 py-3 text-left text-sm text-gray-900">{task.task_name}</td>
                       <td className="px-3 py-3 text-left text-sm text-gray-900">{task.step_name}</td>
                       <td className="px-3 py-3 text-left text-sm text-gray-900 hidden">

@@ -50,11 +50,8 @@ const initialFormData = {
   }] as SubActivityCard[]
 };
 
-// Helper function to format date with time
 const formatDateWithTime = (dateStr: string, hours: number, minutes: number, seconds: number): string => {
-  // Parse the DD-MM-YYYY format
   const [day, month, year] = dateStr.split('-');
-  // Create date in YYYY-MM-DD format for the input
   return `${year}-${month}-${day}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
 

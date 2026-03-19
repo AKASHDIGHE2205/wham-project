@@ -205,7 +205,7 @@ const CollegeModal: FC<Props> = ({ show, setShow, onSelectColleges, selectedColl
           </button>
           <button
             onClick={handleSave}
-            className="px-6 py-2 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-lg hover:bg-orange-700 transition-all duration-200 cursor-pointer"
+            className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-[#4829f7] to-[#3715fa] border border-transparent rounded-lg transition-all duration-200 cursor-pointer"
           >
             Save Selection ({tempSelectedColleges.length})
           </button>

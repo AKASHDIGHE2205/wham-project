@@ -5,7 +5,6 @@ import { getUserFromStorage } from '../../helper/cryptoUser';
 
 export default function Home() {
   const user = getUserFromStorage();
-
   const currentTime = moment().format("HH:mm:ss");
 
   return (
@@ -14,7 +13,7 @@ export default function Home() {
       {/* Content Container */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-4 lg:px-8 flex flex-col gap-6">
         {/* Greeting Pill */}
-        <div className="flex justify-start mt-4">
+        <div className="flex justify-start mt-4" data-aos="fade-right">
           <div>
             <span className='text-2xl sm:text-4xl font-bold'> {(() => {
               const hour = parseInt(currentTime.split(":")[0]);
@@ -32,7 +31,7 @@ export default function Home() {
         {/* Hero Section */}
         <div className="flex flex-col lg:flex-row items-center justify-between gap-2">
           {/* Left: Text Content */}
-          <div className="flex-1 max-w-2xl">
+          <div className="flex-1 max-w-2xl" data-aos="fade-down">
             <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 leading-[1.1] mb-6">
               Your Mission<br />Command Center
             </h1>
@@ -49,7 +48,7 @@ export default function Home() {
           </div>
 
           {/* Right: Illustration Mockup */}
-          <div className="flex-1 relative w-full max-w-2xl aspect-4/3">{/* hidden md:block */}
+          <div className="flex-1 relative w-full max-w-2xl aspect-4/3" data-aos="fade-left">{/* hidden md:block */}
             {/* Main Screen Mockup */}
             <div className="absolute inset-12 bg-slate-800 rounded-3xl shadow-2xl overflow-hidden border-4 border-slate-700/50 transform perspective-1000 rotateY-[-5deg] rotateX-[5deg]">
               <div className="absolute inset-0 bg-linear-to-br from-blue-500/10 to-purple-500/10"></div>

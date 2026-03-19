@@ -17,10 +17,11 @@ const GoogleLocation: FC<Props> = ({ isShow, setIsShow, onLocationSelect }) => {
   const [marker, setMarker] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedAddress, setSelectedAddress] = useState("");
   const [mapCenter, setMapCenter] = useState({ lat: 18.5308, lng: 73.8478 });
+const LIBRARIES: ("places" | "marker")[] = ["places", "marker"];
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: `${GOOGLE_MAPS_API_KEY}`,
-    libraries: ["places"],
+    libraries:LIBRARIES,
   });
 
   // Get user current location

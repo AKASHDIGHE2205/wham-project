@@ -28,7 +28,7 @@ export const ActivityStep3: React.FC<ActivityStep3Props> = ({ formData, updateFo
             <div className="relative">
               <select
                 name="vehicleType"
-                value={formData.vehicleType}
+                value={formData?.vehicleType}
                 onChange={handleChange}
                 required
                 disabled={isEdit}
@@ -49,7 +49,7 @@ export const ActivityStep3: React.FC<ActivityStep3Props> = ({ formData, updateFo
             <textarea
               rows={2}
               name="notes"
-              value={formData.notes}
+              value={formData?.notes}
               onChange={handleChange}
               required
               disabled={isEdit}
@@ -73,9 +73,9 @@ export const ActivityStep3: React.FC<ActivityStep3Props> = ({ formData, updateFo
               <span className="text-sm font-semibold text-gray-700">
                 File attachment
               </span>
-              {formData.fileAttachment && (
+              {formData?.fileAttachment && (
                 <span className="text-xs text-green-600">
-                  {formData.fileAttachment.name}
+                  {formData?.fileAttachment.name}
                 </span>
               )}
               <span className="text-xs text-gray-500">
@@ -89,13 +89,13 @@ export const ActivityStep3: React.FC<ActivityStep3Props> = ({ formData, updateFo
       <div className="pt-6 border-t border-gray-100 flex justify-between">
         <button
           onClick={onPrevious}
-          className="px-8 py-2  bg-linear-to-r from-indigo-600 to-purple-600  text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
+          className="px-8 py-2  bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
         >
           Previous
         </button>
         <button
           onClick={onNext}
-          className="px-8 py-2  bg-linear-to-r from-indigo-600 to-purple-600  text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
+          className="px-8 py-2  bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
         >
           Next
         </button>

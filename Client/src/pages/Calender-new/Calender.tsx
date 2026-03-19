@@ -162,7 +162,7 @@ const Calendar = () => {
         {/* HEADER SECTION */}
         <div className="flex items-center justify-between sm:justify-start space-x-4 sm:space-x-6">
           <div className="flex items-center space-x-2 sm:space-x-3">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-linear-to-r from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-linear-to-r from-[#5441ff] to-[#4531ff] rounded-lg flex items-center justify-center shadow-sm">
               <svg
                 className="w-4 h-4 sm:w-6 sm:h-6 text-white"
                 fill="none"
@@ -194,7 +194,7 @@ const Calendar = () => {
           {/* Previous Button */}
           <button
             onClick={() => navigate("prev")}
-            className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 bg-white hover:bg-gray-50 border border-gray-300 rounded-md transition-colors duration-200 cursor-pointer"
+            className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 bg-white hover:bg-gray-50 border border-gray-200 rounded-md transition-colors duration-200 cursor-pointer"
           >
             <svg
               className="w-5 h-5 text-gray-600"
@@ -229,7 +229,7 @@ const Calendar = () => {
           {/* Next Button */}
           <button
             onClick={() => navigate("next")}
-            className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 bg-white hover:bg-gray-50 border border-gray-300 rounded-md transition-colors duration-200 cursor-pointer"
+            className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 bg-white hover:bg-gray-50 border border-gray-200 rounded-md transition-colors duration-200 cursor-pointer"
           >
             <svg
               className="w-5 h-5 text-gray-600"
@@ -253,7 +253,7 @@ const Calendar = () => {
             <select
               value={view}
               onChange={(e) => setView(e.target.value as CalendarView)}
-              className="appearance-none bg-white border border-gray-300 rounded-md px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 cursor-pointer pr-8 sm:pr-10"
+              className="appearance-none bg-white border border-gray-300 rounded-md px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-700 focus:outline-none focus:ring-0 focus:ring-[#4f3fe0] focus:border-[#4f3fe0] cursor-pointer pr-8 sm:pr-10"
             >
               {(["daily", "weekly", "monthly", "yearly"] as CalendarView[]).map(
                 (item) => (
@@ -272,7 +272,7 @@ const Calendar = () => {
 
           <Link
             to={'/add-activity'}
-            className="px-8 py-2 bg-linear-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-md transition-colors"
+            className="px-8 py-2 bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md transition-colors"
           >
             Add activity
           </Link>

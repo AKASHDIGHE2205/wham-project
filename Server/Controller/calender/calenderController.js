@@ -665,9 +665,7 @@ export const addActivity = async (req, res) => {
     const parsedSubActivities = subActivities ? JSON.parse(subActivities) : [];
 
     // STEP 2 — Generate Activity ID
-    const idResult = await query(
-      "SELECT IFNULL(MAX(id),0)+1 AS nextId FROM activities"
-    );
+    const idResult = await query("SELECT IFNULL(MAX(id),0)+1 AS nextId FROM activities");
 
     const activityId = idResult[0].nextId;
 
@@ -700,79 +698,42 @@ export const addActivity = async (req, res) => {
     for (const field of mainFileFields) {
       if (fileMap[field]) {
         const file = fileMap[field];
-
         const filePath = path.join(activityFolder, file.originalname);
-
         fs.writeFileSync(filePath, file.buffer);
 
-        await query(
-          `INSERT INTO activity_files
-   (activity_id,activity_date,file_name,file_path,file_type,uploaded_at)
-   VALUES (?,?,?,?,?,NOW())`,
-          [
-            activityId,
-            activityDate,
-            file.originalname,
-            filePath,
-            file.mimetype
-          ]
-        );
+        await query(`INSERT INTO activity_files (activity_id,activity_date,file_name,file_path,file_type,uploaded_at)
+                     VALUES (?,?,?,?,?,NOW())`,[activityId,activityDate,file.originalname,filePath,file.mimetype]);
       }
     }
 
     // STEP 5 — Insert Colleges
     for (const clg of parsedColleges) {
-      await query(
-        `INSERT INTO activity_colleges (activity_id,date,clg_id)
-     VALUES (?,?,?)`,
+      await query(`INSERT INTO activity_colleges (activity_id,date,clg_id) VALUES (?,?,?)`,
         [activityId, activityDate, clg.clg_id]
       );
     }
 
     // STEP 6 — Insert Departments
     for (const dept of parsedDepartments) {
-      await query(
-        `INSERT INTO activity_departments (activity_id,activity_date,dept_id)
-     VALUES (?,?,?)`,
-        [activityId, activityDate, dept.dept_id]
-      );
+      await query(`INSERT INTO activity_departments (activity_id,activity_date,dept_id) VALUES (?,?,?)`,
+      [activityId, activityDate, dept.dept_id]);
     }
 
     // STEP 7 — Insert Locations
     for (const loc of parsedLocations) {
-      await query(
-        `INSERT INTO activity_locations
-     (activity_id,activity_date,lat,lng,address,city,state,pin)
-     VALUES (?,?,?,?,?,?,?,?)`,
-        [
-          activityId,
-          activityDate,
-          loc.lat,
-          loc.lng,
-          loc.address,
-          loc.city,
-          loc.state,
-          loc.pin
-        ]
-      );
+      await query(`INSERT INTO activity_locations(activity_id,activity_date,lat,lng,address,city,state,pin) VALUES (?,?,?,?,?,?,?,?)`,
+      [activityId, activityDate, loc.lat, loc.lng, loc.address, loc.city, loc.state, loc.pin]);
     }
 
     // STEP 8 — Insert Members
     for (const member of parsedMembers) {
-      await query(
-        `INSERT INTO activity_members (activity_id,activity_date,member_id)
-     VALUES (?,?,?)`,
-        [activityId, activityDate, member.id]
-      );
+      await query(`INSERT INTO activity_members (activity_id,activity_date,member_id) VALUES (?,?,?)`,
+        [activityId, activityDate, member.id]);
     }
 
     // STEP 9 — Insert Teams
     for (const team of parsedTeams) {
-      await query(
-        `INSERT INTO activity_teams (activity_id,activity_date,team_id)
-     VALUES (?,?,?)`,
-        [activityId, activityDate, team.id]
-      );
+      await query(`INSERT INTO activity_teams (activity_id,activity_date,team_id) VALUES (?,?,?)`, [activityId, activityDate, team.id]);
     }
 
     // STEP 10 & 11 — Insert SubActivities + Attachments
@@ -782,32 +743,17 @@ export const addActivity = async (req, res) => {
       const srNo = i + 1;
 
       const subResult = await query(
-        `INSERT INTO sub_activities
-   (activity_id,activity_date,sr_no,task_id,title,start_time,end_time,notes,attachment)
-   VALUES (?,?,?,?,?,?,?,?,?)`,
-        [
-          activityId,
-          activityDate,
-          srNo,
-          sub.taskId,
-          sub.title,
-          sub.startTime,
-          sub.endTime,
-          sub.notes,
-          null
-        ]
+        `INSERT INTO sub_activities (activity_id,activity_date,sr_no,task_id,title,start_time,end_time,notes,attachment)
+         VALUES (?,?,?,?,?,?,?,?,?)`,
+        [activityId, activityDate, srNo, sub.taskId, sub.title, sub.startTime, sub.endTime, sub.notes, null]
       );
-
       const subActivityId = subResult.insertId;
-
 
       const attachmentField = `subActivity_${i}_attachment`;
 
       if (fileMap[attachmentField]) {
         const file = fileMap[attachmentField];
-
         const safeTitle = sub.title.replace(/\s+/g, "-").toLowerCase();
-
         const subFolder = path.join(activityFolder, `subactivity-${subActivityId}-${safeTitle}`);
 
         if (!fs.existsSync(subFolder)) {
@@ -815,37 +761,24 @@ export const addActivity = async (req, res) => {
         }
 
         const filePath = path.join(subFolder, file.originalname);
-
         fs.writeFileSync(filePath, file.buffer);
 
-        await query(
-          `UPDATE sub_activities
-   SET attachment=?
-   WHERE id=?`,
-          [filePath, subActivityId]
-        );
+        await query(`UPDATE sub_activities SET attachment=? WHERE id=?`, [filePath, subActivityId]);
       }
     }
 
     // STEP 12 — Response
-    res.status(201).json({
-      message: "Activity created successfully",
-      activityId
-    });
+    res.status(201).json({ message: "Activity created successfully", activityId });
   } catch (error) {
     console.error("Add Activity Error:", error);
-
-    res.status(500).json({
-      message: "Failed to create activity",
-      error: error.message
-    });
+    res.status(500).json({ message: "Failed to create activity", error: error.message });
   }
 };
 
 export const getActivities = async (req, res) => {
   try {
     const { userId, role, startDate, endDate } = req.body;
-    
+
     let dateFilter = '';
     if (startDate && endDate) {
       dateFilter = `AND (
@@ -1080,7 +1013,7 @@ export const updateActivity = async (req, res) => {
     } = req.body;
 
     if (!activityId || !activityDate) {
-      return res.status(400).json({message: "Please fill all required fields!"});
+      return res.status(400).json({ message: "Please fill all required fields!" });
     }
 
     /* ==============================
@@ -1189,25 +1122,25 @@ export const updateActivity = async (req, res) => {
 
     /* ==============================
        STEP 8 — Insert SubActivities
+       FIXED: Using correct field names from frontend
     ============================== */
 
     for (let i = 0; i < subActivities.length; i++) {
 
       const sub = subActivities[i];
       const srNo = i + 1;
-
       await query(
         `INSERT INTO sub_activities
-         (activity_id,activity_date,sr_no,task_id,title,start_time,end_time,notes)
+         (activity_id, activity_date, sr_no, task_id, title, start_time, end_time, notes)
          VALUES (?,?,?,?,?,?,?,?)`,
         [
           activityId,
           activityDate,
           srNo,
-          sub.taskId,
+          sub.task_id,      // Changed from sub.taskId to sub.task_id
           sub.title,
-          sub.startTime,
-          sub.endTime,
+          sub.start_time,   // Changed from sub.startTime to sub.start_time
+          sub.end_time,     // Changed from sub.endTime to sub.end_time
           sub.notes
         ]
       );

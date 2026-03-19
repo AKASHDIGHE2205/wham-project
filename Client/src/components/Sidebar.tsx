@@ -114,13 +114,11 @@ const Sidebar = ({ onCloseMobile }: SidebarProps) => {
   const getVisibleItems = (): NavItem[] => {
     return navItems.filter(item => hasAccess(item.roles));
   };
-
-  // Close dropdowns on route change
+  
   useEffect(() => {
     setActiveDropdown(null);
   }, [location.pathname]);
 
-  // Handle link click to close mobile sidebar
   const handleLinkClick = () => {
     if (onCloseMobile) {
       onCloseMobile();
@@ -135,13 +133,10 @@ const Sidebar = ({ onCloseMobile }: SidebarProps) => {
           to={item.path}
           onClick={handleLinkClick}
           className={({ isActive }) =>
-            `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${isActive
-              ? 'bg-indigo-50 text-indigo-700'
-              : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
-            }`
-          }
+            `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4531ff] ${isActive
+            ? 'bg-indigo-50 text-[#1100ff]' : 'text-slate-900 hover:bg-slate-50 hover:text-slate-900'}`}
         >
-          <item.icon className={`w-5 h-5 ${location.pathname === item.path ? 'text-indigo-600' : 'text-slate-400'}`} />
+          <item.icon className={`w-5 h-5 ${location.pathname === item.path ? 'text-[#1900ff]' : 'text-slate-400'}`} />
           <span>{item.label}</span>
         </NavLink>
       );
@@ -159,13 +154,11 @@ const Sidebar = ({ onCloseMobile }: SidebarProps) => {
           <button
             onClick={() => setActiveDropdown(isOpen ? null : item.key)}
             aria-expanded={isOpen}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${isOpen || isActiveChild
-              ? 'bg-slate-50 text-slate-900'
-              : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
-              }`}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4531ff] ${isOpen || isActiveChild
+              ? 'bg-slate-50 text-slate-900' : 'text-slate-900 hover:bg-slate-50 hover:text-slate-900'}`}
           >
             <div className="flex items-center gap-3">
-              <item.icon className={`w-5 h-5 ${isActiveChild ? 'text-indigo-600' : 'text-slate-400'}`} />
+              <item.icon className={`w-5 h-5 ${isActiveChild ? 'text-[#1900ff]' : 'text-slate-400'}`} />
               <span>{item.label}</span>
             </div>
             <ChevronDown
@@ -189,13 +182,10 @@ const Sidebar = ({ onCloseMobile }: SidebarProps) => {
                       to={subItem.path}
                       onClick={handleLinkClick}
                       className={({ isActive }) =>
-                        `flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${isActive
-                          ? 'bg-indigo-50 text-indigo-700 font-medium'
-                          : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                        }`
-                      }
+                        `flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4531ff] ${isActive ?'bg-indigo-50 text-[#1600e0] font-medium' : 'text-slate-800 hover:bg-slate-50 hover:text-slate-900'}`}
                     >
-                      <subItem.icon className={`w-4 h-4 ${location.pathname.startsWith(subItem.path) ? 'text-indigo-600' : 'text-slate-400'}`} />
+                      <subItem.icon 
+                      className={`w-4 h-4 ${location.pathname.startsWith(subItem.path) ? 'text-[#1900ff]' : 'text-slate-900'}`}/>
                       {subItem.label}
                     </NavLink>
                   ))}
@@ -226,15 +216,11 @@ const Sidebar = ({ onCloseMobile }: SidebarProps) => {
             />
           ) : (
             <div className="w-10 h-10 rounded-full bg-linear-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white text-sm font-semibold shadow-sm">
-              {user?.firstName?.[0] || ''}
-              {user?.lastName?.[0] || ''}
-              {(!user?.firstName && !user?.lastName) && (
-                <User className="w-5 h-5" />
-              )}
+              {user?.firstName?.[0] || ''} {user?.lastName?.[0] || ''}
+              {(!user?.firstName && !user?.lastName) && (<User className="w-5 h-5" />)}
             </div>
           )}
 
-          {/* Name + Email */}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-slate-900 truncate">
               {user?.firstName} {user?.lastName}
@@ -245,12 +231,13 @@ const Sidebar = ({ onCloseMobile }: SidebarProps) => {
           </div>
 
           {/* Role Badge */}
-          <div className="shrink-0 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800 uppercase">
+          <div
+            className="shrink-0 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-[#1700e9] uppercase"
+          >
             {user?.role === 'User' ? 'Student' : user?.role}
           </div>
         </div>
 
-        {/* Actions */}
         <div className="mt-3">
           <Link
             to="/auth/log-out"
@@ -261,20 +248,18 @@ const Sidebar = ({ onCloseMobile }: SidebarProps) => {
             Sign out
           </Link>
         </div>
-
       </div>
     );
   };
 
   return (
     <div className="bg-white shadow-lg h-full w-70 transition-all duration-300 flex flex-col border-r border-gray-200 relative">
-      {/* Mobile Close Button */}
       <div className="lg:hidden absolute top-4 right-4">
         <button
           onClick={onCloseMobile}
-          className="p-2 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="p-2 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-900"
         >
-          <X className="w-5 h-5" />
+          <X className="w-5 h-5 text-[#3822ff]" />
         </button>
       </div>
 
@@ -282,7 +267,7 @@ const Sidebar = ({ onCloseMobile }: SidebarProps) => {
       <div className="flex items-center justify-between p-4 border-b border-gray-100">
         <Link
           to={"/"}
-          className="flex items-center space-x-2 group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg"
+          className="flex items-center space-x-2 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4531ff] rounded-lg"
           onClick={handleLinkClick}
         >
           <div className="w-8 h-8 bg-linear-to-br from-[#5b49ff] to-[#3f2afc] rounded-lg flex items-center justify-center shadow-lg group-hover:shadow transition-all">
@@ -331,7 +316,6 @@ const Sidebar = ({ onCloseMobile }: SidebarProps) => {
           </div>
         )}
       </div>
-
       {/* User Profile Section */}
       {user && (user?.role === "Master" || user?.role === "Admin" || user?.role === "Manager" || user?.role === "User") && (
         <div className="px-3 pb-4">

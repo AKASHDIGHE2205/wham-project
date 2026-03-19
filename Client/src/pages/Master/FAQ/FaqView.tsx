@@ -173,7 +173,7 @@ const FaqView = () => {
             <table className="w-full min-w-[700px] divide-y divide-gray-200 p-4">
               <thead className="bg-linear-to-r from-purple-50 to-indigo-50">
                 <tr>
-                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     ID
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
@@ -197,7 +197,7 @@ const FaqView = () => {
                 ) : data?.length > 0 ? (
                   data?.map((faq: Faq) => (
                     <tr key={faq?.faq_id} className="hover:bg-indigo-50 transition-colors duration-150">
-                      <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-gray-900">{faq?.faq_id}</td>
+                      <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-gray-900">{faq?.faq_id}</td>
                       <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-gray-900 max-w-[300px] truncate">
                         {faq?.faq_question}
                       </td>

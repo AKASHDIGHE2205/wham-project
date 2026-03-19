@@ -1,4 +1,4 @@
-import { ChevronDown, Plus, Trash2 } from 'lucide-react';
+import { ChevronDown, Trash2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { getUserFromStorage } from '../../helper/cryptoUser';
@@ -251,9 +251,8 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
       <div className="flex justify-between items-center">
         <button
           onClick={addNewSubActivity}
-          className="flex items-center space-x-2 px-4 py-2 bg-linear-to-r from-indigo-600 to-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+          className="flex items-center space-x-2 px-4 py-1 bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white rounded-md hover:bg-purple-700 transition-colors"
         >
-          <Plus className="w-4 h-4" />
           <span className="font-semibold">Add Sub-Activity</span>
         </button>
       </div>
@@ -498,14 +497,14 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
       <div className="pt-6 border-t border-gray-100 flex justify-between">
         <button
           onClick={onPrevious}
-          className="px-8 py-2 bg-linear-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
+          className="px-8 py-2 bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
         >
           Previous
         </button>
         <button
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className="px-8 py-2 bg-linear-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
+          className="px-8 py-2 bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
         >
           Submit
         </button>

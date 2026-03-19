@@ -24,17 +24,17 @@ export const ActivityStep2: React.FC<ActivityStep2Props> = ({ formData, updateFo
 
   const removeMember = (memberId: number) => {
     updateFormData({
-      selectedMembers: formData.selectedMembers.filter((m: SelectedMember) => m.id !== memberId)
+      selectedMembers: formData?.selectedMembers.filter((m: SelectedMember) => m.id !== memberId)
     });
   };
 
   const removeTeam = (teamId: number) => {
     updateFormData({
-      selectedTeams: formData.selectedTeams.filter((t: SelectedTeam) => t.id !== teamId)
+      selectedTeams: formData?.selectedTeams.filter((t: SelectedTeam) => t.id !== teamId)
     });
   };
 
-  const totalSelections = formData.selectedMembers.length + formData.selectedTeams.length;
+  const totalSelections = formData?.selectedMembers.length + formData?.selectedTeams.length;
 
   const getCurrentDateTime = (): string => {
     const now = new Date();
@@ -68,7 +68,7 @@ export const ActivityStep2: React.FC<ActivityStep2Props> = ({ formData, updateFo
                   type="datetime-local"
                   name="startDate"
                   min={minDateTime}
-                  value={formData.startDate}
+                  value={formData?.startDate}
                   onChange={handleChange}
                   required
                   disabled={isEdit}
@@ -86,7 +86,7 @@ export const ActivityStep2: React.FC<ActivityStep2Props> = ({ formData, updateFo
                   type="datetime-local"
                   name="endDate"
                   min={minDateTime}
-                  value={formData.endDate}
+                  value={formData?.endDate}
                   onChange={handleChange}
                   required
                   disabled={isEdit}
@@ -128,13 +128,13 @@ export const ActivityStep2: React.FC<ActivityStep2Props> = ({ formData, updateFo
           {totalSelections > 0 && (
             <div className="space-y-3">
               {/* Selected Teams */}
-              {formData.selectedTeams.length > 0 && (
+              {formData?.selectedTeams.length > 0 && (
                 <div>
                   <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                    Teams ({formData.selectedTeams.length})
+                    Teams ({formData?.selectedTeams.length})
                   </h4>
                   <div className="flex flex-wrap gap-2">
-                    {formData.selectedTeams.map((team: SelectedTeam) => (
+                    {formData?.selectedTeams.map((team: SelectedTeam) => (
                       <div
                         key={`team-${team.id}`}
                         className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-100 text-blue-800 rounded-full text-sm border border-blue-200 group hover:bg-blue-200 transition-colors"
@@ -157,13 +157,13 @@ export const ActivityStep2: React.FC<ActivityStep2Props> = ({ formData, updateFo
               )}
 
               {/* Selected Members */}
-              {formData.selectedMembers.length > 0 && (
+              {formData?.selectedMembers.length > 0 && (
                 <div>
                   <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                    Individual Members ({formData.selectedMembers.length})
+                    Individual Members ({formData?.selectedMembers.length})
                   </h4>
                   <div className="flex flex-wrap gap-2">
-                    {formData.selectedMembers.map((member: Member) => (
+                    {formData?.selectedMembers.map((member: Member) => (
                       <div
                         key={`member-${member.member_id}`}
                         className="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-100 text-orange-800 rounded-full text-sm border border-orange-200 group hover:bg-orange-200 transition-colors"
@@ -222,13 +222,13 @@ export const ActivityStep2: React.FC<ActivityStep2Props> = ({ formData, updateFo
       <div className="pt-6 border-t border-gray-100 flex justify-between">
         <button
           onClick={onPrevious}
-          className="px-8 py-2  bg-linear-to-r from-indigo-600 to-purple-600  text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
+          className="px-8 py-2  bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
         >
           Previous
         </button>
         <button
           onClick={onNext}
-          className="px-8 py-2  bg-linear-to-r from-indigo-600 to-purple-600  text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
+          className="px-8 py-2  bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
         >
           Next
         </button>
@@ -239,8 +239,8 @@ export const ActivityStep2: React.FC<ActivityStep2Props> = ({ formData, updateFo
         <MemberModal
           show={showMembers}
           setShow={setShowMembers}
-          selectedMembers={formData.selectedMembers}
-          selectedTeams={formData.selectedTeams}
+          selectedMembers={formData?.selectedMembers}
+          selectedTeams={formData?.selectedTeams}
           onConfirm={handleSelectionConfirm}
         />
       )}

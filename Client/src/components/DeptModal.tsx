@@ -14,11 +14,11 @@ interface Department {
   dept_name: string;
 }
 
-const DeptModal: FC<Props> = ({ 
-  show, 
-  setShow, 
+const DeptModal: FC<Props> = ({
+  show,
+  setShow,
   onSelectDepartments,
-  selectedDepartments = [] 
+  selectedDepartments = []
 }) => {
   const [data, setData] = useState<Department[]>([]);
   const [loading, setLoading] = useState(false);
@@ -28,7 +28,7 @@ const DeptModal: FC<Props> = ({
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const response = await getActiveDepartment();     
+      const response = await getActiveDepartment();
       if (response) {
         setData(response?.Result || []);
         setLoading(false);
@@ -44,7 +44,7 @@ const DeptModal: FC<Props> = ({
     }
   }, [show, selectedDepartments]);
 
-  const filteredDepartments = data?.filter((items) => 
+  const filteredDepartments = data?.filter((items) =>
     items?.dept_name.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -165,11 +165,10 @@ const DeptModal: FC<Props> = ({
                     {filteredDepartments?.map((department) => {
                       const isSelected = isDepartmentSelected(department?.dept_id);
                       return (
-                        <tr 
-                          key={department?.dept_id} 
-                          className={`hover:bg-gray-50 transition-colors duration-150 ${
-                            isSelected ? 'bg-orange-50' : ''
-                          }`}
+                        <tr
+                          key={department?.dept_id}
+                          className={`hover:bg-gray-50 transition-colors duration-150 ${isSelected ? 'bg-orange-50' : ''
+                            }`}
                         >
                           <td className="px-4 py-2 whitespace-nowrap text-center">
                             <span className="text-sm text-gray-900">
@@ -184,11 +183,10 @@ const DeptModal: FC<Props> = ({
                           <td className="px-4 py-2 whitespace-nowrap text-left">
                             <button
                               onClick={() => handleSelect(department)}
-                              className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer ${
-                                isSelected 
+                              className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer ${isSelected
                                   ? 'text-red-600 bg-red-50 border border-red-200 hover:bg-red-100'
                                   : 'text-orange-600 bg-orange-50 border border-orange-200 hover:bg-orange-100'
-                              }`}
+                                }`}
                             >
                               {isSelected ? 'Remove' : 'Select'}
                             </button>
@@ -220,7 +218,7 @@ const DeptModal: FC<Props> = ({
           </button>
           <button
             onClick={handleSave}
-            className="px-6 py-2 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-lg hover:bg-orange-700 transition-all duration-200 cursor-pointer"
+            className="px-6 py-2 text-sm font-medium text-white bg-linear-to-r from-[#4829f7] to-[#3715fa] border border-transparent rounded-lg hover:bg-orange-700 transition-all duration-200 cursor-pointer"
           >
             Save Selection ({tempSelectedDepartments.length})
           </button>
