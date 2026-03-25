@@ -27,7 +27,7 @@ const UserModal: FC<Props> = ({ show, setShow }) => {
       setLoading(true);
       const response = await getUsers();
       setLoading(false);
-      setUserData(response.users || [])
+      setUserData(response?.users || [])
     }
     fetchData();
   }, [])

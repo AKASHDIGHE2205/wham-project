@@ -65,7 +65,7 @@ const CollegeModal: FC<Props> = ({ show, setShow, onSelectColleges, selectedColl
   };
 
   const isCollegeSelected = (collegeId: number) => {
-    return tempSelectedColleges.some(c => c.clg_id === collegeId);
+    return tempSelectedColleges?.some(c => c.clg_id === collegeId);
   };
 
   if (!show) return null;

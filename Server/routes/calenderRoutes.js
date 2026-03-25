@@ -17,9 +17,10 @@ router.get("/get-members", verifyToken, getActiveMembers);
 //-------------------------------------------------------------------
 router.get("/getActiveOccasions", verifyToken, getActiveOccasions);
 router.get("/getActiveCompaigns", verifyToken, getActiveCompaign);
-router.post("/add-activity", verifyToken, upload.any(),addActivity);
+router.post("/add-activity", verifyToken, upload.any(), addActivity);
 router.post("/getActivities", verifyToken, getActivities);
 router.post("/getActivitiesDetails", verifyToken, getActivityDetails);
 router.post("/updateActivity", verifyToken, updateActivity);
+
 
 export default router;

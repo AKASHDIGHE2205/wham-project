@@ -1,7 +1,7 @@
-import db from '../../db.js'
 import fs from 'fs-extra';
-import sharp from 'sharp';
 import path from 'path';
+import sharp from 'sharp';
+import db from '../../db.js';
 
 export const getUpcomingEvents = (req, res) => {
   const { userId, role } = req.body;//isOrganizer
@@ -908,4 +908,20 @@ export const getMemberDetailsForDashboard = (req, res) => {
     console.error("Exception:", error);
     return res.status(500).json({ message: "Something went wrong" });
   }
+};
+
+export const getNotifyActivity = async (req, res) => {
+  const sql = `
+    SELECT id, date, title, occasion_id, campaign_id, start_date, end_date, vehicle_type, notes, status 
+    FROM activities
+    WHERE status = 'P'
+    AND end_date >= CURDATE()
+  `;
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      return res.status(500).json({ message: 'Error fetching activities' });
+    }
+    return res.status(200).json(results);
+  });
 };

@@ -1,7 +1,7 @@
 import express from "express";
-import { addAttendence, addSteps, getActiveEvents, getActiveSteps, getActiveTasks, getEventForAttend, getMemberDetailsForDashboard, getUpcomingEvents, updateSteps } from "../Controller/dashboard/DashboardController.js";
 import multer from "multer";
-import {verifyToken} from '../middleware/verifyToken.js'
+import { addAttendence, addSteps, getActiveEvents, getActiveSteps, getActiveTasks, getEventForAttend, getMemberDetailsForDashboard, getNotifyActivity, getUpcomingEvents, updateSteps } from "../Controller/dashboard/DashboardController.js";
+import { verifyToken } from '../middleware/verifyToken.js';
 
 const router = express.Router();
 const storage = multer.memoryStorage();
@@ -17,5 +17,6 @@ router.post('/addAttendence',verifyToken, upload.single("media"), addAttendence)
 router.post('/addSteps',verifyToken, addSteps);
 router.put('/updateSteps',verifyToken, updateSteps);
 router.get('/getMemberDetailsForDashboard/:id',verifyToken, getMemberDetailsForDashboard);
+router.get("/getNotifyActivity", getNotifyActivity);
 
 export default router;

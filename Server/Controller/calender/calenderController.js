@@ -702,7 +702,7 @@ export const addActivity = async (req, res) => {
         fs.writeFileSync(filePath, file.buffer);
 
         await query(`INSERT INTO activity_files (activity_id,activity_date,file_name,file_path,file_type,uploaded_at)
-                     VALUES (?,?,?,?,?,NOW())`,[activityId,activityDate,file.originalname,filePath,file.mimetype]);
+                     VALUES (?,?,?,?,?,NOW())`, [activityId, activityDate, file.originalname, filePath, file.mimetype]);
       }
     }
 
@@ -716,13 +716,13 @@ export const addActivity = async (req, res) => {
     // STEP 6 — Insert Departments
     for (const dept of parsedDepartments) {
       await query(`INSERT INTO activity_departments (activity_id,activity_date,dept_id) VALUES (?,?,?)`,
-      [activityId, activityDate, dept.dept_id]);
+        [activityId, activityDate, dept.dept_id]);
     }
 
     // STEP 7 — Insert Locations
     for (const loc of parsedLocations) {
       await query(`INSERT INTO activity_locations(activity_id,activity_date,lat,lng,address,city,state,pin) VALUES (?,?,?,?,?,?,?,?)`,
-      [activityId, activityDate, loc.lat, loc.lng, loc.address, loc.city, loc.state, loc.pin]);
+        [activityId, activityDate, loc.lat, loc.lng, loc.address, loc.city, loc.state, loc.pin]);
     }
 
     // STEP 8 — Insert Members
@@ -991,41 +991,25 @@ export const getActivityDetails = async (req, res) => {
 
 export const updateActivity = async (req, res) => {
   try {
-
-    const {
-      activityId,
-      activityDate,
-      title,
-      occasion,
-      campaign,
-      status,
-      colleges = [],
-      departments = [],
-      locations = [],
-      members = [],
-      teams = [],
-      subActivities = [],
-      vehicleType,
-      notes,
-      startDate,
-      endDate,
-      userId
-    } = req.body;
+    const { activityId, activityDate, title, occasion, campaign, status, colleges = [], departments = [], locations = [], members = [], teams = [],
+      subActivities = [], vehicleType, notes, startDate, endDate, userId } = req.body;
 
     if (!activityId || !activityDate) {
       return res.status(400).json({ message: "Please fill all required fields!" });
     }
+    
+    if (status === 'A') {
+     var approvedBy = userId || 0;
+    }
 
-    /* ==============================
-       STEP 1 — Update Activity
-    ============================== */
-
+    /* ==============================STEP 1 — Update Activity============================== */
     await query(
       `UPDATE activities
        SET title=?,
            occasion_id=?,
            campaign_id=?,
            status = ?,
+           approved_by = ?,
            start_date=?,
            end_date=?,
            vehicle_type=?,
@@ -1033,13 +1017,10 @@ export const updateActivity = async (req, res) => {
            u_at=NOW(),
            u_by=?
        WHERE id=? AND date=?`,
-      [title, occasion, campaign, status, startDate, endDate, vehicleType, notes, userId, activityId, activityDate]
+      [title, occasion, campaign, status, approvedBy, startDate, endDate, vehicleType, notes, userId, activityId, activityDate]
     );
 
-    /* ==============================
-       STEP 2 — Delete Old Child Data
-    ============================== */
-
+    /* ==============================STEP 2 — Delete Old Child Data============================== */
     await query(`DELETE FROM activity_colleges WHERE activity_id=? AND date=?`, [activityId, activityDate]);
     await query(`DELETE FROM activity_departments WHERE activity_id=? AND activity_date=?`, [activityId, activityDate]);
     await query(`DELETE FROM activity_locations WHERE activity_id=? AND activity_date=?`, [activityId, activityDate]);
@@ -1047,10 +1028,7 @@ export const updateActivity = async (req, res) => {
     await query(`DELETE FROM activity_teams WHERE activity_id=? AND activity_date=?`, [activityId, activityDate]);
     await query(`DELETE FROM sub_activities WHERE activity_id=? AND activity_date=?`, [activityId, activityDate]);
 
-    /* ==============================
-       STEP 3 — Insert Colleges
-    ============================== */
-
+    /* ==============================STEP 3 — Insert Colleges============================== */
     for (const clg of colleges) {
       await query(
         `INSERT INTO activity_colleges (activity_id,date,clg_id)
@@ -1059,10 +1037,7 @@ export const updateActivity = async (req, res) => {
       );
     }
 
-    /* ==============================
-       STEP 4 — Insert Departments
-    ============================== */
-
+    /* ==============================STEP 4 — Insert Departments============================== */
     for (const dept of departments) {
       await query(
         `INSERT INTO activity_departments
@@ -1072,32 +1047,17 @@ export const updateActivity = async (req, res) => {
       );
     }
 
-    /* ==============================
-       STEP 5 — Insert Locations
-    ============================== */
-
+    /* ==============================STEP 5 — Insert Locations============================== */
     for (const loc of locations) {
       await query(
         `INSERT INTO activity_locations
          (activity_id,activity_date,lat,lng,address,city,state,pin)
          VALUES (?,?,?,?,?,?,?,?)`,
-        [
-          activityId,
-          activityDate,
-          loc.lat,
-          loc.lng,
-          loc.address,
-          loc.city,
-          loc.state,
-          loc.pin
-        ]
+        [activityId, activityDate, loc.lat, loc.lng, loc.address, loc.city, loc.state, loc.pin]
       );
     }
 
-    /* ==============================
-       STEP 6 — Insert Members
-    ============================== */
-
+    /* ==============================STEP 6 — Insert Members============================== */
     for (const member of members) {
       await query(
         `INSERT INTO activity_members
@@ -1107,10 +1067,7 @@ export const updateActivity = async (req, res) => {
       );
     }
 
-    /* ==============================
-       STEP 7 — Insert Teams
-    ============================== */
-
+    /* ==============================STEP 7 — Insert Teams============================== */
     for (const team of teams) {
       await query(
         `INSERT INTO activity_teams
@@ -1120,45 +1077,23 @@ export const updateActivity = async (req, res) => {
       );
     }
 
-    /* ==============================
-       STEP 8 — Insert SubActivities
-       FIXED: Using correct field names from frontend
-    ============================== */
-
+    /* ==============================STEP 8 — Insert SubActivities============================== */
     for (let i = 0; i < subActivities.length; i++) {
-
       const sub = subActivities[i];
       const srNo = i + 1;
       await query(
         `INSERT INTO sub_activities
          (activity_id, activity_date, sr_no, task_id, title, start_time, end_time, notes)
          VALUES (?,?,?,?,?,?,?,?)`,
-        [
-          activityId,
-          activityDate,
-          srNo,
-          sub.task_id,      // Changed from sub.taskId to sub.task_id
-          sub.title,
-          sub.start_time,   // Changed from sub.startTime to sub.start_time
-          sub.end_time,     // Changed from sub.endTime to sub.end_time
-          sub.notes
-        ]
+        [activityId, activityDate, srNo, sub.task_id, sub.title, sub.start_time, sub.end_time, sub.notes]
       );
     }
 
-    /* ==============================
-       STEP 9 — Response
-    ============================== */
-
-    res.json({
-      message: "Activity updated successfully",
-      activityId
-    });
+    /* ============================== STEP 9 — Response ============================== */
+    res.json({ message: "Activity updated successfully", activityId });
 
   } catch (error) {
-
     console.error("Update Activity Error:", error);
-
     res.status(500).json({
       message: "Failed to update activity",
       error: error.message

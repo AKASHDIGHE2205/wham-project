@@ -1,7 +1,8 @@
-import { Search } from "lucide-react";
+import { Search, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast/headless";
 import DataLoading from "../../../components/DataLoading";
+import { MEDIA_URL } from "../../../constant/Baseurl";
 import { getUserFromStorage } from "../../../helper/cryptoUser";
 import CustomPagination from "../../../helper/CustomPagination";
 import { activeUser, getAllUsers } from "../../../services/master/masterApi";
@@ -13,6 +14,7 @@ export interface Users {
   phone: string;
   email: string;
   role: string;
+  photo: string;
   is_verified: string
   isorganizer: string
 }
@@ -237,9 +239,9 @@ const UsersView = () => {
                   <th className="px-2 py-3 text-center text-xs font-semibold text-gray-900 uppercase tracking-wider">
                     Sr. No.
                   </th>
-                  {/* <th className="px-2 py-3 text-center text-xs font-semibold text-gray-900 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-center text-xs font-semibold text-gray-900 uppercase tracking-wider">
                     User ID
-                  </th> */}
+                  </th>
                   <th className="px-2 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
                     Name
                   </th>
@@ -271,7 +273,19 @@ const UsersView = () => {
                   data?.map((item, index) => (
                     <tr key={item?.user_id} className="hover:bg-indigo-50 transition-colors duration-150">
                       <td className="px-2 py-0.5 text-center whitespace-nowrap text-sm text-black">{index + 1}</td>
-                      {/* <td className="px-2 py-0.5 text-center whitespace-nowrap text-sm text-black">{item?.user_id}</td> */}
+                      <td className="px-2 py-0.5 text-center whitespace-nowrap text-sm text-black">
+                        {item?.photo ? (
+                          <img
+                            src={`${MEDIA_URL}${item?.photo}`}
+                            alt="User"
+                            className="w-12 h-12 object-cover mx-auto rounded-lg"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 mx-auto flex items-center justify-center rounded-lg bg-[#e1dcff]">
+                            <User className="w-6 h-6 text-[#4829f7]" />
+                          </div>
+                        )}
+                      </td>
                       <td className="px-2 py-0.5 text-left whitespace-nowrap text-sm text-black">
                         <div className="flex flex-col gap-1 items-start">
                           <span>{item?.full_name}</span>

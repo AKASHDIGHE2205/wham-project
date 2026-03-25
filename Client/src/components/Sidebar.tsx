@@ -1,4 +1,4 @@
-import { BookUserIcon, CalendarDays, ChartNoAxesCombined, ChevronDown, GraduationCap, Layers3, ListChecks, LogOutIcon, MessageCircleQuestionIcon, School, Settings, University, User, UserCheck, Users, UsersRound, Workflow, X } from "lucide-react";
+import { BookUserIcon, CalendarDays, ChartNoAxesCombined, ChevronDown, GraduationCap, ImagesIcon, Layers3, ListChecks, LogOutIcon, MessageCircleQuestionIcon, School, Settings, University, User, UserCheck, Users, UsersRound, Workflow, X } from "lucide-react";
 import { AnimatePresence, motion } from 'motion/react';
 import React, { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
@@ -94,6 +94,13 @@ const navItems: NavItem[] = [
       { label: 'My Trainings', path: '/my-trainings', icon: BookUserIcon, roles: ['Master', 'Admin', 'Manager', 'User'] },
     ]
   },
+  {
+    type: 'link',
+    label: 'Library',
+    path: '/library',
+    icon: ImagesIcon,
+    roles: ['Master', 'Admin', 'Manager', 'User']
+  },
 ];
 
 interface SidebarProps {
@@ -114,7 +121,7 @@ const Sidebar = ({ onCloseMobile }: SidebarProps) => {
   const getVisibleItems = (): NavItem[] => {
     return navItems.filter(item => hasAccess(item.roles));
   };
-  
+
   useEffect(() => {
     setActiveDropdown(null);
   }, [location.pathname]);
@@ -134,7 +141,7 @@ const Sidebar = ({ onCloseMobile }: SidebarProps) => {
           onClick={handleLinkClick}
           className={({ isActive }) =>
             `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4531ff] ${isActive
-            ? 'bg-indigo-50 text-[#1100ff]' : 'text-slate-900 hover:bg-slate-50 hover:text-slate-900'}`}
+              ? 'bg-indigo-50 text-[#1100ff]' : 'text-slate-900 hover:bg-slate-50 hover:text-slate-900'}`}
         >
           <item.icon className={`w-5 h-5 ${location.pathname === item.path ? 'text-[#1900ff]' : 'text-slate-400'}`} />
           <span>{item.label}</span>
@@ -182,10 +189,10 @@ const Sidebar = ({ onCloseMobile }: SidebarProps) => {
                       to={subItem.path}
                       onClick={handleLinkClick}
                       className={({ isActive }) =>
-                        `flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4531ff] ${isActive ?'bg-indigo-50 text-[#1600e0] font-medium' : 'text-slate-800 hover:bg-slate-50 hover:text-slate-900'}`}
+                        `flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4531ff] ${isActive ? 'bg-indigo-50 text-[#1600e0] font-medium' : 'text-slate-800 hover:bg-slate-50 hover:text-slate-900'}`}
                     >
-                      <subItem.icon 
-                      className={`w-4 h-4 ${location.pathname.startsWith(subItem.path) ? 'text-[#1900ff]' : 'text-slate-900'}`}/>
+                      <subItem.icon
+                        className={`w-4 h-4 ${location.pathname.startsWith(subItem.path) ? 'text-[#1900ff]' : 'text-slate-900'}`} />
                       {subItem.label}
                     </NavLink>
                   ))}

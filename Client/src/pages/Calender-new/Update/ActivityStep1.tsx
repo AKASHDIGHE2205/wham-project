@@ -1,9 +1,9 @@
-import { ChevronDown, List, MapPin, MapPinPlusIcon, X } from "lucide-react";
+import { ChevronDown, CircleArrowLeft, CircleArrowRight, List, MapPin, MapPinPlusIcon, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import CollegeModal from "../../../components/CollegeModal";
 import DeptModal from "../../../components/DeptModal";
 import GoogleLocation from "../../../components/GoogleLocation";
-import { getUserFromStorage } from "../../../helper/cryptoUser";
 import { getActiveCompaign, getActiveOccasions, } from "../../../services/calender/calenderApi";
 import type { College, Compaign, Department, Occasions, SelectedLocation } from "../../../types/activity.types";
 
@@ -23,7 +23,7 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
   const [departmentSearchTerm, setDepartmentSearchTerm] = useState("");
   const [showMap, setShowMap] = useState(false);
   const [locationSearchTerm, setLocationSearchTerm] = useState("");
-  const user = getUserFromStorage();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchOccasions = async () => {
@@ -108,21 +108,6 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
     updateFormData({ [name]: name === 'occasion' || name === 'campaign' ? Number(value) : value });
   };
 
-  const getStatusClasses = (status: string) => {
-    switch (status) {
-      case "P":
-        return "bg-yellow-50 border-yellow-400 text-yellow-700";
-      case "A":
-        return "bg-green-50 border-green-400 text-green-700";
-      case "R":
-        return "bg-red-50 border-red-400 text-red-700";
-      case "C":
-        return "bg-blue-50 border-blue-400 text-blue-700";
-      default:
-        return "bg-gray-50 border-gray-300 text-gray-700";
-    }
-  };
-
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -170,34 +155,6 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
             </div>
           </div>
 
-          {/*Status */}
-          {(user?.role === 'Master' || user?.role === 'Manager') && (
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
-                Status <span className="text-red-500">*</span>
-              </label>
-
-              <div className="relative">
-                <select
-                  name="status"
-                  value={formData?.status || ""}
-                  onChange={handleChange}
-                  required
-                  className={`w-full px-3 py-2 border rounded-md appearance-none focus:outline-none focus:ring-1 focus:ring-purple-500 ${getStatusClasses(formData?.status)}`}
-                >
-                  <option value="" disabled>
-                    Select Status
-                  </option>
-                  <option value="P">Pending</option>
-                  <option value="A">Approved</option>
-                  <option value="R">Rejected</option>
-                  <option value="C">Completed</option>
-                </select>
-
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-              </div>
-            </div>
-          )}
           {/*Compaign */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
@@ -485,12 +442,18 @@ export const ActivityStep1: React.FC<ActivityStep1Props> = ({ formData, updateFo
         </div>
       </div>
 
-      <div className="pt-6 border-t border-gray-100 flex justify-end">
+      <div className="pt-6 border-t border-gray-100 flex justify-between">
+        <button
+          onClick={()=>navigate(-1)}
+          className="px-4 py-2 bg-linear-to-r from-gray-200 to-gray-300 font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
+        >
+          <span className="flex justify-center items-center gap-1"> <CircleArrowLeft size={18}/> Back</span>
+        </button>
         <button
           onClick={onNext}
           className="px-8 py-2 bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md transition-colors cursor-pointer"
         >
-          Next
+          <span className="flex justify-center items-center gap-1"> Next<CircleArrowRight size={18}/></span>
         </button>
       </div>
 

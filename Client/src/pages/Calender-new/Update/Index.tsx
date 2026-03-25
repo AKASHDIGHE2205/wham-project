@@ -152,30 +152,30 @@ import { ActivityStep5 } from './ActivityStep5';
             selectedColleges: colleges,
             selectedDepartments: departments,
 
-            selectedLocations: locations.map((loc, index) => ({
+            selectedLocations: locations?.map((loc, index) => ({
               id: index,
-              lat: Number(loc.lat),
-              lng: Number(loc.lng),
-              address: loc.address,
-              city: loc.city,
-              state: loc.state,
-              pin: loc.pin
+              lat: Number(loc?.lat),
+              lng: Number(loc?.lng),
+              address: loc?.address,
+              city: loc?.city,
+              state: loc?.state,
+              pin: loc?.pin
             })),
 
             startDate: activity?.start_date,
             endDate: activity?.end_date,
 
-            selectedMembers: members.map((m) => ({
-              id: m.member_id,
-              full_name: m.full_name,
-              first_name: m.first_name,
-              middle_name: m.middle_name,
-              last_name: m.last_name,
+            selectedMembers: members?.map((m) => ({
+              id: m?.member_id,
+              full_name: m?.full_name,
+              first_name: m?.first_name,
+              middle_name: m?.middle_name,
+              last_name: m?.last_name,
             })),
 
-            selectedTeams: teams.map((t) => ({
-              id: t.team_id,
-              name: t.name
+            selectedTeams: teams?.map((t) => ({
+              id: t?.team_id,
+              name: t?.name
             })),
 
             vehicleType: activity?.vehicle_type,
@@ -184,15 +184,15 @@ import { ActivityStep5 } from './ActivityStep5';
             imageAttachment: files?.file_path || '',
             fileAttachment: "",
 
-            subActivities: subActivities.map((sub) => ({
-              id: sub.id,
-              sr_no: sub.sr_no,
-              task_id: sub.task_id,
-              title: sub.title,
-              start_time: sub.start_time,
-              end_time: sub.end_time,
-              notes: sub.notes,
-              attachment: sub.attachment
+            subActivities: subActivities?.map((sub) => ({
+              id: sub?.id,
+              sr_no: sub?.sr_no,
+              task_id: sub?.task_id,
+              title: sub?.title,
+              start_time: sub?.start_time,
+              end_time: sub?.end_time,
+              notes: sub?.notes,
+              attachment: sub?.attachment
             }))
           });
           setLoading(false);
@@ -251,15 +251,15 @@ import { ActivityStep5 } from './ActivityStep5';
           {/* Stepper Navigation */}
           {currentStep <= 4 && (
             <nav className="mb-8 bg-gray-100 rounded-lg overflow-hidden flex shadow-sm overflow-x-auto sm:overflow-x-visible">
-              {steps.map((step, index) => {
-                const isActive = currentStep === step.id;
-                const isCompleted = currentStep > step.id;
+              {steps?.map((step, index) => {
+                const isActive = currentStep === step?.id;
+                const isCompleted = currentStep > step?.id;
 
                 return (
                   <div
-                    key={step.id}
-                    className={`flex-1 flex items-center justify-center py-3 px-4 relative transition-all duration-300 ${isActive ? 'bg-blue-600 text-white' : 'text-gray-600'
-                      }`}
+                    key={step?.id}
+                    className={`flex-1 flex items-center justify-center py-3 px-4 relative transition-all cursor-pointer duration-300 ${isActive ? 'bg-blue-600 text-white' : 'text-gray-600'}`}
+                    onClick={()=>setCurrentStep(step?.id || 1)}
                   >
                     <div className="flex items-center space-x-2 z-10">
                       {isCompleted ? (
@@ -268,12 +268,12 @@ import { ActivityStep5 } from './ActivityStep5';
                         </div>
                       ) : null}
                       <span className={`text-sm font-semibold whitespace-nowrap ${isActive ? 'text-white' : 'text-gray-500'}`}>
-                        {step.name}
+                        {step?.name}
                       </span>
                     </div>
 
                     {/* Arrow effect for active step */}
-                    {isActive && index < steps.length - 1 && (
+                    {isActive && index < steps?.length - 1 && (
                       <div className="absolute right-[-15px] top-0 bottom-0 w-0 h-0 border-t-24px border-t-transparent border-b-24pxborder-b-transparent border-l-15px border-l-blue-600 z-20"></div>
                     )}
                     {isActive && index > 0 && (

@@ -1,4 +1,4 @@
-import { Camera, ChevronDown, FileText } from "lucide-react";
+import { Camera, ChevronDown, CircleArrowLeft, CircleArrowRight, FileText } from "lucide-react";
 import React, { useRef } from "react";
 
 interface ActivityStep3Props {
@@ -39,7 +39,7 @@ export const ActivityStep3: React.FC<ActivityStep3Props> = ({ formData, updateFo
             <div className="relative">
               <select
                 name="vehicleType"
-                value={formData.vehicleType}
+                value={formData?.vehicleType}
                 onChange={handleChange}
                 required
                 className="w-full px-3 py-2 border border-purple-600 rounded-md appearance-none focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white">
@@ -59,7 +59,7 @@ export const ActivityStep3: React.FC<ActivityStep3Props> = ({ formData, updateFo
             <textarea
               rows={2}
               name="notes"
-              value={formData.notes}
+              value={formData?.notes}
               onChange={handleChange}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -82,9 +82,9 @@ export const ActivityStep3: React.FC<ActivityStep3Props> = ({ formData, updateFo
               <span className="text-sm font-semibold text-gray-700">
                 Image attachment
               </span>
-              {formData.imageAttachment && (
+              {formData?.imageAttachment && (
                 <span className="text-xs text-green-600">
-                  {formData.imageAttachment.name}
+                  {formData?.imageAttachment?.name}
                 </span>
               )}
               <span className="text-xs text-gray-500">
@@ -104,9 +104,9 @@ export const ActivityStep3: React.FC<ActivityStep3Props> = ({ formData, updateFo
               <span className="text-sm font-semibold text-gray-700">
                 File attachment
               </span>
-              {formData.fileAttachment && (
+              {formData?.fileAttachment && (
                 <span className="text-xs text-green-600">
-                  {formData.fileAttachment.name}
+                  {formData?.fileAttachment?.name}
                 </span>
               )}
               <span className="text-xs text-gray-500">
@@ -120,15 +120,15 @@ export const ActivityStep3: React.FC<ActivityStep3Props> = ({ formData, updateFo
       <div className="pt-6 border-t border-gray-100 flex justify-between">
         <button
           onClick={onPrevious}
-          className="px-8 py-2 bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
+          className="px-8 py-2 bg-linear-to-r from-gray-200 to-gray-300 font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
         >
-          Previous
+          <span className="flex justify-center items-center gap-1"> <CircleArrowLeft size={18} /> Back</span>
         </button>
         <button
           onClick={onNext}
           className="px-8 py-2 bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
         >
-          Next
+          <span className="flex justify-center items-center gap-1"> Next<CircleArrowRight size={18} /></span>
         </button>
       </div>
     </div>

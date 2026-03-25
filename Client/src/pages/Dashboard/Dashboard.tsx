@@ -399,7 +399,7 @@ export default function Dashboard() {
             </section>
 
             {/* Action Items */}
-            <section className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+            <section className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6" hidden>
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-md font-bold text-slate-800 flex items-center gap-2">
                   <Bell className="w-5 h-5 text-indigo-600" /> Notification

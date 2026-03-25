@@ -986,6 +986,7 @@ export const getAllUsers = (req, res) => {
           IFNULL(last_name,'')
         ) AS full_name,
         role,
+        photo,
         email,
         phone,
         is_verified,

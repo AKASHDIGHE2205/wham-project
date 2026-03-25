@@ -29,13 +29,7 @@ interface Props {
   onConfirm: (members: any[], teams: any[]) => void;
 }
 
-const MemberModal: FC<Props> = ({ 
-  show, 
-  setShow, 
-  selectedMembers = [], 
-  selectedTeams = [], 
-  onConfirm 
-}) => {
+const MemberModal: FC<Props> = ({ show, setShow, selectedMembers = [], selectedTeams = [], onConfirm }) => {
   const [members, setMembers] = useState<Member[]>([]);
   const [search, setSearch] = useState("");
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
@@ -51,7 +45,7 @@ const MemberModal: FC<Props> = ({
       setLoadingMembers(true);
       try {
         const response = await getAllMembers();
-        setMembers(response.Members || []);
+        setMembers(response?.Members || []);
       } catch {
         toast.error("Failed to load members");
       } finally {
@@ -63,7 +57,7 @@ const MemberModal: FC<Props> = ({
       setLoadingTeams(true);
       try {
         const response = await getActiveTeams();
-        setTeams(response.Teams || []);
+        setTeams(response?.Teams || []);
       } catch (error) {
         console.error('Error fetching teams:', error);
         toast.error('Failed to load teams');
@@ -80,18 +74,18 @@ const MemberModal: FC<Props> = ({
   useEffect(() => {
     if (show) {
       const memberItems: SelectedItem[] = selectedMembers?.map(member => ({
-        id: member.id,
+        id: member?.id,
         type: 'member',
-        name: `${member.first_name} ${member.middle_name ? member.middle_name + ' ' : ''}${member.last_name || ''}`.trim(),
-        first_name: member.first_name,
-        middle_name: member.middle_name,
-        last_name: member.last_name
+        name: `${member?.first_name} ${member?.middle_name ? member?.middle_name + ' ' : ''}${member?.last_name || ''}`.trim(),
+        first_name: member?.first_name,
+        middle_name: member?.middle_name,
+        last_name: member?.last_name
       }));
 
       const teamItems: SelectedItem[] = selectedTeams?.map(team => ({
-        id: team.id,
+        id: team?.id,
         type: 'team',
-        name: team.name
+        name: team?.name
       }));
 
       setSelectedItems([...memberItems, ...teamItems]);
@@ -122,21 +116,17 @@ const MemberModal: FC<Props> = ({
 
   const handleConfirm = () => {
     // Separate members and teams from selected items
-    const selectedMembersData = selectedItems
-      ?.filter(item => item?.type === 'member')
-      ?.map(item => ({
-        id: item?.id,
-        first_name: item?.first_name || '',
-        middle_name: item?.middle_name || '',
-        last_name: item?.last_name || ''
-      }));
+    const selectedMembersData = selectedItems?.filter(item => item?.type === 'member')?.map(item => ({
+      id: item?.id,
+      first_name: item?.first_name || '',
+      middle_name: item?.middle_name || '',
+      last_name: item?.last_name || ''
+    }));
 
-    const selectedTeamsData = selectedItems
-      ?.filter(item => item?.type === 'team')
-      ?.map(item => ({
-        id: item?.id,
-        name: item?.name
-      }));
+    const selectedTeamsData = selectedItems?.filter(item => item?.type === 'team')?.map(item => ({
+      id: item?.id,
+      name: item?.name
+    }));
 
     // Call the onConfirm callback with the selected data
     onConfirm(selectedMembersData, selectedTeamsData);
@@ -148,18 +138,16 @@ const MemberModal: FC<Props> = ({
     handleClose();
   };
 
-  const filteredMembers = members.filter((m) => 
-    `${m.mem_id} ${m.first_name} ${m.middle_name} ${m.last_name}`
-      .toLowerCase()
-      .includes(search.toLowerCase())
+  const filteredMembers = members.filter((m) =>
+    `${m.mem_id} ${m.first_name} ${m.middle_name} ${m.last_name}`.toLowerCase().includes(search.toLowerCase())
   );
 
-  const filteredTeams = teams.filter((team:any) => 
-    `${team.id} ${team.name}`.toLowerCase().includes(search.toLowerCase())
+  const filteredTeams = teams?.filter((team: any) =>
+    `${team?.id} ${team?.name}`.toLowerCase().includes(search.toLowerCase())
   );
 
   const getFullName = (member: Member) => {
-    return `${member.first_name} ${member.middle_name ? member.middle_name + ' ' : ''}${member.last_name || ''}`.trim();
+    return `${member?.first_name} ${member?.middle_name ? member?.middle_name + ' ' : ''}${member?.last_name || ''}`.trim();
   };
 
   return (
@@ -217,11 +205,10 @@ const MemberModal: FC<Props> = ({
               {selectedItems?.map((item, index: number) => (
                 <div
                   key={index}
-                  className={`border rounded-full px-3 py-2 shadow-sm flex items-center gap-2 group hover:shadow-md transition-all duration-200 ${
-                    item?.type === 'team'
-                      ? 'bg-blue-100 border-blue-200 text-blue-800'
-                      : 'bg-orange-100 border-orange-200 text-orange-800'
-                  }`}
+                  className={`border rounded-full px-3 py-2 shadow-sm flex items-center gap-2 group hover:shadow-md transition-all duration-200 ${item?.type === 'team'
+                    ? 'bg-blue-100 border-blue-200 text-blue-800'
+                    : 'bg-orange-100 border-orange-200 text-orange-800'
+                    }`}
                 >
                   <span className="text-sm font-medium">
                     {item?.type === 'team' ? '👥' : '👤'} {item?.name}
@@ -231,11 +218,10 @@ const MemberModal: FC<Props> = ({
                       e.stopPropagation();
                       toggleSelection(item);
                     }}
-                    className={`p-0.5 rounded-full transition-colors ${
-                      item?.type === 'team'
-                        ? 'text-blue-600 hover:text-blue-800 hover:bg-blue-200'
-                        : 'text-orange-600 hover:text-orange-800 hover:bg-orange-200'
-                    }`}
+                    className={`p-0.5 rounded-full transition-colors ${item?.type === 'team'
+                      ? 'text-blue-600 hover:text-blue-800 hover:bg-blue-200'
+                      : 'text-orange-600 hover:text-orange-800 hover:bg-orange-200'
+                      }`}
                   >
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -254,21 +240,19 @@ const MemberModal: FC<Props> = ({
             <div className="flex space-x-1">
               <button
                 onClick={() => setActiveTab('teams')}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer ${
-                  activeTab === 'teams'
-                    ? 'bg-blue-500 text-white shadow-sm'
-                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-                }`}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer ${activeTab === 'teams'
+                  ? 'bg-blue-500 text-white shadow-sm'
+                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                  }`}
               >
                 Teams ({filteredTeams?.length})
               </button>
               <button
                 onClick={() => setActiveTab('members')}
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer ${
-                  activeTab === 'members'
-                    ? 'bg-orange-500 text-white shadow-sm'
-                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-                }`}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer ${activeTab === 'members'
+                  ? 'bg-orange-500 text-white shadow-sm'
+                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                  }`}
               >
                 Members ({filteredMembers?.length})
               </button>
@@ -330,14 +314,11 @@ const MemberModal: FC<Props> = ({
                         </tr>
                       ) : (
                         <>
-                          {filteredTeams?.map((item:any) => (
+                          {filteredTeams?.map((item: any) => (
                             <tr
                               key={`team-${item?.id}`}
-                              className={`hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${
-                                isSelected(item?.id, 'team')
-                                  ? "bg-blue-50 border-l-4 border-l-blue-500" 
-                                  : ""
-                              }`}
+                              className={`hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${isSelected(item?.id, 'team')
+                                ? "bg-blue-50 border-l-4 border-l-blue-500" : ""}`}
                               onClick={() =>
                                 toggleSelection({
                                   id: item?.id,
@@ -426,11 +407,8 @@ const MemberModal: FC<Props> = ({
                           {filteredMembers?.map((item) => (
                             <tr
                               key={`member-${item?.mem_id}`}
-                              className={`hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${
-                                isSelected(item?.mem_id, 'member')
-                                  ? "bg-orange-50 border-l-4 border-l-orange-500" 
-                                  : ""
-                              }`}
+                              className={`hover:bg-gray-50 cursor-pointer transition-colors duration-150 ${isSelected(item?.mem_id, 'member')
+                                ? "bg-orange-50 border-l-4 border-l-orange-500" : ""}`}
                               onClick={() =>
                                 toggleSelection({
                                   id: item?.mem_id,

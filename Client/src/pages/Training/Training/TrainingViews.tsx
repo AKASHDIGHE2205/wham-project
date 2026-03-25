@@ -113,15 +113,15 @@ const TrainingViews: React.FC = () => {
                         href={`${MEDIA_URL}${card?.file_path}`}
                         download
                         className=" bg-purple-50 px-2 py-0.5 rounded-xl hover:bg-purple-200 text-purple-700 font-medium text-sm inline-flex items-center hover:text-purple-900 transition cursor-pointer gap-1">
-                        Download now
-                        {/* <svg xmlns="http://www.w3.org/2000/svg" width="20" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-cloud-download-icon lucide-cloud-download"><path d="M12 13v8l-4-4" /><path d="m12 21 4-4" /><path d="M4.393 15.269A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.436 8.284" /></svg> */}
+                        Download
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-cloud-download-icon lucide-cloud-download"><path d="M12 13v8l-4-4" /><path d="m12 21 4-4" /><path d="M4.393 15.269A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.436 8.284" /></svg>
                       </a>
                       <button
                         type="button"
                         onClick={() => handleView(card)}
                         className=" bg-green-50 px-2 py-0.5 rounded-xl hover:bg-green-200 text-green-700 font-medium text-sm inline-flex items-center hover:text-green-900 transition cursor-pointer gap-1">
                         View
-                        {/* <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye-icon lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg> */}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye-icon lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
                       </button>
                     </div>
                   </div>
@@ -151,10 +151,6 @@ const TrainingViews: React.FC = () => {
                     onClick={() => toggleFaq(index)}
                   >
                     <div className="flex items-start gap-3">
-                      {isOpen && (
-                        <span className="inline-block w-1.5 h-6 bg-purple-500 rounded-full mt-0.5"></span>
-                      )}
-
                       <span className="text-gray-800">
                         {item.faq_question}
                       </span>

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
-import { BASE_URL } from "../../constant/Baseurl";
 import toast from "react-hot-toast";
+import { BASE_URL } from "../../constant/Baseurl";
 import { getTokenFromStorage } from "../../helper/cryptoUser";
 
 const getHeaders = () => {
@@ -17,7 +17,7 @@ export const getUpcomingEvents = async (data: any) => {
   try {
     const response = await axios.post(
       `${BASE_URL}/dashboard/getUpcomingEvents`,
-      data,{...getHeaders()}
+      data, { ...getHeaders() }
     );
     return response.data;
   } catch (error: any) {
@@ -32,7 +32,7 @@ export const getActiveEvents = async (data: any) => {
   try {
     const response = await axios.post(
       `${BASE_URL}/dashboard/getActiveEvents`,
-      data,{...getHeaders()}
+      data, { ...getHeaders() }
     );
     return response.data;
   } catch (error: any) {
@@ -45,7 +45,7 @@ export const getActiveEvents = async (data: any) => {
 
 export const getActiveSteps = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/dashboard/getActiveSteps`,{...getHeaders()});
+    const response = await axios.get(`${BASE_URL}/dashboard/getActiveSteps`, { ...getHeaders() });
     return response.data;
   } catch (error: any) {
     toast.error(
@@ -57,7 +57,7 @@ export const getActiveSteps = async () => {
 
 export const getActiveTasks = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/dashboard/getActiveTasks`,{...getHeaders()});
+    const response = await axios.get(`${BASE_URL}/dashboard/getActiveTasks`, { ...getHeaders() });
     return response.data;
   } catch (error: any) {
     toast.error(
@@ -85,7 +85,7 @@ export const addAttendence = async (data: any) => {
   try {
     const response: any = await axios.post(
       `${BASE_URL}/dashboard/addAttendence`,
-      data,{...getHeaders(),}
+      data, { ...getHeaders(), }
     );
     if (response.status === 200) {
       toast.success(response?.message || "Attendance added successfully!");
@@ -101,7 +101,7 @@ export const addSteps = async (data: any) => {
   try {
     const response: any = await axios.post(
       `${BASE_URL}/dashboard/addSteps`,
-      data,{...getHeaders()}
+      data, { ...getHeaders() }
     );
     if (response.status === 200) {
       toast.success(response?.message || "Steps added successfully!");
@@ -117,7 +117,7 @@ export const getEventForAttend = async (data: any) => {
   try {
     const response = await axios.post(
       `${BASE_URL}/dashboard/getEventForAttend`,
-      data,{...getHeaders(),}
+      data, { ...getHeaders(), }
     );
     return response.data;
   } catch (error: unknown) {
@@ -138,7 +138,7 @@ export const updateSteps = async (data: any) => {
   try {
     const response: any = await axios.put(
       `${BASE_URL}/dashboard/updateSteps`,
-      data,{...getHeaders(),}
+      data, { ...getHeaders(), }
     );
     if (response.status === 200) {
       toast.success(response?.message || "Steps updated successfully!");
@@ -153,7 +153,7 @@ export const updateSteps = async (data: any) => {
 export const getMemberDetailsForDashboard = async (id: number | string) => {
   try {
     const response = await axios.get(
-      `${BASE_URL}/dashboard/getMemberDetailsForDashboard/${id}`,{...getHeaders(),}
+      `${BASE_URL}/dashboard/getMemberDetailsForDashboard/${id}`, { ...getHeaders(), }
     );
     if (response.status === 200) {
       return response.data;
@@ -161,5 +161,22 @@ export const getMemberDetailsForDashboard = async (id: number | string) => {
   } catch (error: any) {
     toast.error(error.response?.data?.message || "Failed to fetch member");
     console.error(error);
+  }
+};
+
+// ---------------------------------------------------------
+export const getNotifyActivity = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/dashboard/getNotifyActivity`, { ...getHeaders(), });
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      toast.error(error.response?.data?.message || "Failed to fetch Activities");
+      console.error(error);
+    } else {
+      toast.error("An unexpected error occurred");
+      console.error(error);
+    }
+    return null;
   }
 };

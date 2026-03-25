@@ -11,7 +11,7 @@ export default function Home() {
     <div className="min-h-screen relative overflow-hidden text-slate-800 bg-linear-to-r from-purple-50 to-indigo-50">
 
       {/* Content Container */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-4 lg:px-8 flex flex-col gap-6">
+      <div className="relative max-w-7xl mx-auto px-6 py-4 lg:px-8 flex flex-col gap-6">
         {/* Greeting Pill */}
         <div className="flex justify-start mt-4" data-aos="fade-right">
           <div>
@@ -41,8 +41,8 @@ export default function Home() {
             {(user?.role === 'User' || user?.role === 'Master' || user?.role === 'Admin' || user?.role === 'Manager') && (
               <Link
                 to={'/dashboard'}
-                className="bg-linear-to-r from-[#5b48ff] to-[#3f2aff] text-white px-8 py-4 rounded-full font-medium text-lg shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 transition-all hover:scale-105">
-                Go to Dashboard
+                className="bg-linear-to-r from-[#5b48ff] to-[#3f2aff] text-white px-6 py-3 rounded-full font-medium text-lg shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 transition-all hover:scale-105">
+                  Go to Dashboard
               </Link>
             )}
           </div>

@@ -1,4 +1,4 @@
-import { Calendar, User, UserPlus, Users, X } from "lucide-react";
+import { Calendar, CircleArrowLeft, CircleArrowRight, User, UserPlus, Users, X } from "lucide-react";
 import React, { useState } from "react";
 import MemberModal from "../../../components/MemberModal";
 import type { SelectedMember, SelectedTeam } from "../../../types/activity.types";
@@ -9,13 +9,13 @@ interface ActivityStep2Props {
   updateFormData: (data: any) => void;
   onNext: () => void;
   onPrevious: () => void;
-  isEdit : boolean
+  isEdit: boolean
 }
 
 export const ActivityStep2: React.FC<ActivityStep2Props> = ({ formData, updateFormData, onNext, onPrevious, isEdit }) => {
-    const [showMembers, setShowMembers] = useState(false);
+  const [showMembers, setShowMembers] = useState(false);
 
-    const handleSelectionConfirm = (members: SelectedMember[], teams: SelectedTeam[]) => {
+  const handleSelectionConfirm = (members: SelectedMember[], teams: SelectedTeam[]) => {
     updateFormData({
       selectedMembers: members,
       selectedTeams: teams
@@ -222,15 +222,15 @@ export const ActivityStep2: React.FC<ActivityStep2Props> = ({ formData, updateFo
       <div className="pt-6 border-t border-gray-100 flex justify-between">
         <button
           onClick={onPrevious}
-          className="px-8 py-2  bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
-        >
-          Previous
+          className="px-8 py-2 bg-linear-to-r from-gray-200 to-gray-300 font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
+        > 
+          <span className="flex justify-center items-center gap-1"> <CircleArrowLeft size={18} /> Back</span>
         </button>
         <button
           onClick={onNext}
           className="px-8 py-2  bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
         >
-          Next
+          <span className="flex justify-center items-center gap-1"> Next<CircleArrowRight size={18}/></span>
         </button>
       </div>
 

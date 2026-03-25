@@ -1,4 +1,4 @@
-import { ChevronDown, Trash2 } from 'lucide-react';
+import { CheckLine, ChevronDown, CircleArrowLeft, Trash2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { getUserFromStorage } from '../../helper/cryptoUser';
@@ -30,7 +30,7 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
 
   const addNewSubActivity = () => {
     const newCard: SubActivityCard = {
-      id: (formData.subActivities.length + 1).toString(),
+      id: (formData?.subActivities.length + 1).toString(),
       taskId: undefined,
       title: '',
       startTime: '',
@@ -38,16 +38,16 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
       notes: '',
       attachment: null
     };
-    updateFormData({ subActivities: [...formData.subActivities, newCard] });
+    updateFormData({ subActivities: [...formData?.subActivities, newCard] });
   };
 
   const removeSubActivity = (id: number) => {
-    if (formData.subActivities.length > 1) {
-      const filtered = formData.subActivities.filter(
+    if (formData?.subActivities.length > 1) {
+      const filtered = formData?.subActivities.filter(
         (activity: SubActivityCard) => activity.id !== id
       );
 
-      const reindexed = filtered.map((activity: SubActivityCard, index: number) => ({
+      const reindexed = filtered?.map((activity: SubActivityCard, index: number) => ({
         ...activity,
         id: (index + 1).toString()
       }));
@@ -57,7 +57,7 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
   };
 
   const updateSubActivity = (id: number, field: keyof SubActivityCard, value: any) => {
-    const updatedActivities = formData.subActivities.map((activity: SubActivityCard) => {
+    const updatedActivities = formData?.subActivities?.map((activity: SubActivityCard) => {
       if (activity.id === id) {
         const updatedActivity = { ...activity, [field]: value };
 
@@ -83,63 +83,63 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
   };
 
   const validateForm = () => {
-    if (!formData.title?.trim()) {
+    if (!formData?.title?.trim()) {
       toast.error("Title is required");
       return false;
     }
 
-    if (!formData.occasion) {
+    if (!formData?.occasion) {
       toast.error("Please select an occasion");
       return false;
     }
 
-    if (!formData.campaign) {
+    if (!formData?.campaign) {
       toast.error("Please select a campaign");
       return false;
     }
 
-    // if (!formData.selectedColleges.length) {
+    // if (!formData?.selectedColleges.length) {
     //   toast.error("Please select at least one college");
     //   return false;
     // }
 
-    // if (!formData.selectedDepartments.length) {
+    // if (!formData?.selectedDepartments.length) {
     //   toast.error("Please select at least one department");
     //   return false;
     // }
 
-    if (!formData.selectedLocations.length) {
+    if (!formData?.selectedLocations.length) {
       toast.error("Please select at least one location");
       return false;
     }
 
-    if (!formData.startDate) {
+    if (!formData?.startDate) {
       toast.error("Start date is required");
       return false;
     }
 
-    if (!formData.endDate) {
+    if (!formData?.endDate) {
       toast.error("End date is required");
       return false;
     }
 
-    if (new Date(formData.startDate) > new Date(formData.endDate)) {
+    if (new Date(formData?.startDate) > new Date(formData?.endDate)) {
       toast.error("Start date cannot be after end date");
       return false;
     }
 
 
-    if (!formData.vehicleType) {
+    if (!formData?.vehicleType) {
       toast.error("Vehicle type is required");
       return false;
     }
 
-    if (!formData.subActivities.length) {
+    if (!formData?.subActivities.length) {
       toast.error("Please add at least one sub activity");
       return false;
     }
 
-    for (const sa of formData.subActivities) {
+    for (const sa of formData?.subActivities) {
       if (!sa.title?.trim()) {
         toast.error("Sub activity title is required");
         return false;
@@ -166,54 +166,54 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
     const submitData = new FormData();
 
     // Step 1 - Simple fields (backend expects strings)
-    submitData.append('title', formData.title);
-    submitData.append('occasion', formData.occasion.toString());
-    submitData.append('campaign', formData.campaign.toString());
+    submitData.append('title', formData?.title);
+    submitData.append('occasion', formData?.occasion.toString());
+    submitData.append('campaign', formData?.campaign.toString());
 
     // Step 1 - Arrays (backend expects JSON strings)
-    submitData.append('colleges', JSON.stringify(formData.selectedColleges));
-    submitData.append('departments', JSON.stringify(formData.selectedDepartments));
-    submitData.append('locations', JSON.stringify(formData.selectedLocations.map((loc: any) => ({
-      id: loc.id,
-      lat: loc.lat,
-      lng: loc.lng,
-      address: loc.address,
-      city: loc.city,
-      state: loc.state,
-      pin: loc.pin
+    submitData.append('colleges', JSON.stringify(formData?.selectedColleges));
+    submitData.append('departments', JSON.stringify(formData?.selectedDepartments));
+    submitData.append('locations', JSON.stringify(formData?.selectedLocations?.map((loc: any) => ({
+      id: loc?.id,
+      lat: loc?.lat,
+      lng: loc?.lng,
+      address: loc?.address,
+      city: loc?.city,
+      state: loc?.state,
+      pin: loc?.pin
     }))));
 
     // Step 2 - Dates
-    submitData.append('startDate', formData.startDate);
-    submitData.append('endDate', formData.endDate);
+    submitData.append('startDate', formData?.startDate);
+    submitData.append('endDate', formData?.endDate);
 
     // Step 2 - Participants (backend expects JSON strings)
-    submitData.append('members', JSON.stringify(formData.selectedMembers.map((member: any) => ({
+    submitData.append('members', JSON.stringify(formData?.selectedMembers?.map((member: any) => ({
       id: member.id,
       first_name: member.first_name,
       middle_name: member.middle_name,
       last_name: member.last_name
     }))));
 
-    submitData.append('teams', JSON.stringify(formData.selectedTeams.map((team: any) => ({
+    submitData.append('teams', JSON.stringify(formData?.selectedTeams?.map((team: any) => ({
       id: team.id,
       name: team.name
     }))));
 
     // Step 3 - Logistics
-    submitData.append('vehicleType', formData.vehicleType);
-    submitData.append('notes', formData.notes);
+    submitData.append('vehicleType', formData?.vehicleType);
+    submitData.append('notes', formData?.notes);
 
     // Step 3 - Files (if any)
-    if (formData.imageAttachment) {
-      submitData.append('image', formData.imageAttachment);
+    if (formData?.imageAttachment) {
+      submitData.append('image', formData?.imageAttachment);
     }
-    if (formData.fileAttachment) {
-      submitData.append('file', formData.fileAttachment);
+    if (formData?.fileAttachment) {
+      submitData.append('file', formData?.fileAttachment);
     }
 
     // Step 4 - SubActivities (backend expects JSON string with specific format)
-    const subActivitiesForApi = formData.subActivities.map((sa: SubActivityCard) => ({
+    const subActivitiesForApi = formData?.subActivities?.map((sa: SubActivityCard) => ({
       id: sa.id,
       taskId: sa.taskId,
       taskName: sa.taskName,
@@ -226,7 +226,7 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
     submitData.append('subActivities', JSON.stringify(subActivitiesForApi));
 
     // Append sub-activity files separately (if needed by backend)
-    formData.subActivities.forEach((sa: SubActivityCard, index: number) => {
+    formData?.subActivities.forEach((sa: SubActivityCard, index: number) => {
       if (sa.attachment) {
         submitData.append(`subActivity_${index}_attachment`, sa.attachment);
       }
@@ -260,7 +260,7 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
       {/* Mobile: Card View (visible on small screens) */}
       <div className="block md:hidden">
         <div className="space-y-4">
-          {formData.subActivities.map((activity: SubActivityCard) => (
+          {formData?.subActivities?.map((activity: SubActivityCard) => (
             <div
               key={activity.id}
               className="border border-gray-200 rounded-xl p-4 bg-white shadow-sm relative"
@@ -270,7 +270,7 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
                 <span className="text-sm font-semibold text-purple-600">
                   Activity #{activity.id}
                 </span>
-                {formData.subActivities.length > 1 && (
+                {formData?.subActivities.length > 1 && (
                   <button
                     onClick={() => removeSubActivity(activity.id)}
                     className="text-red-500 hover:text-red-700 transition-colors"
@@ -395,7 +395,7 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
             </tr>
           </thead>
           <tbody>
-            {formData.subActivities.map((activity: SubActivityCard) => (
+            {formData?.subActivities?.map((activity: SubActivityCard) => (
               <tr key={activity.id} className="border-b border-gray-200 hover:bg-gray-50">
                 <td className="px-4 py-3 text-sm text-gray-500">{activity.id}</td>
 
@@ -474,7 +474,7 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
 
                 {/* Action */}
                 <td className="px-4 py-3">
-                  {formData.subActivities.length > 1 && (
+                  {formData?.subActivities.length > 1 && (
                     <button
                       onClick={() => removeSubActivity(activity.id)}
                       className="text-red-500 hover:text-red-700 transition-colors"
@@ -497,16 +497,16 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
       <div className="pt-6 border-t border-gray-100 flex justify-between">
         <button
           onClick={onPrevious}
-          className="px-8 py-2 bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
+          className="px-8 py-2 bg-linear-to-r from-gray-200 to-gray-300 font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
         >
-          Previous
+          <span className="flex justify-center items-center gap-1"> <CircleArrowLeft size={18}/> Back</span>
         </button>
         <button
           onClick={handleSubmit}
           disabled={isSubmitting}
           className="px-8 py-2 bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
         >
-          Submit
+          <span className="flex justify-center items-center gap-1">Submit <CheckLine size={18}/></span>
         </button>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { ChevronDown, FileText } from "lucide-react";
+import { ChevronDown, CircleArrowLeft, CircleArrowRight, FileText } from "lucide-react";
 import React from "react";
 import { MEDIA_URL } from "../../../constant/Baseurl";
 
@@ -89,15 +89,15 @@ export const ActivityStep3: React.FC<ActivityStep3Props> = ({ formData, updateFo
       <div className="pt-6 border-t border-gray-100 flex justify-between">
         <button
           onClick={onPrevious}
-          className="px-8 py-2  bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
+          className="px-8 py-2 bg-linear-to-r from-gray-200 to-gray-300 font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
         >
-          Previous
+          <span className="flex justify-center items-center gap-1"> <CircleArrowLeft size={18}/> Back</span>
         </button>
         <button
           onClick={onNext}
           className="px-8 py-2  bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
         >
-          Next
+          <span className="flex justify-center items-center gap-1"> Next<CircleArrowRight size={18}/></span>
         </button>
       </div>
     </div>

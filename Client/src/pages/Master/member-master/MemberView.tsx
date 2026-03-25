@@ -52,7 +52,7 @@ const MemberView = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchData();
-    }, 500); // Debounce time of 500ms
+    }, 500);
     return () => clearTimeout(timer);
   }, [search, currentPage, itemsPerPage]);
 

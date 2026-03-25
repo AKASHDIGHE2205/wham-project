@@ -24,12 +24,12 @@ const StepModal: FC<Props> = ({ show, setShow }) => {
     const fetchData = async () => {
       setLoading(true);
       const response = await getActiveSteps();
-      setData(response.steps || [])
+      setData(response?.steps || [])
       setLoading(false);
     }
     fetchData();
   }, [])
-  const filteredData = data.filter((item: Steps) =>
+  const filteredData = data?.filter((item: Steps) =>
     item?.id?.toString()?.toLowerCase()?.includes(search?.toString()?.toLowerCase()) ||
     item?.step_name?.toLowerCase().includes(search?.toLowerCase())
   )
@@ -42,7 +42,7 @@ const StepModal: FC<Props> = ({ show, setShow }) => {
   }
 
   const handleSelect = (item: any) => {
-    dispatch(handleSelectStep({ id: item.id, name: item.step_name }))
+    dispatch(handleSelectStep({ id: item?.id, name: item?.step_name }))
     setShow(false)
   }
 
@@ -107,11 +107,11 @@ const StepModal: FC<Props> = ({ show, setShow }) => {
                     </div>
                   </td>
                 </tr>
-              ) : filteredData.length > 0 ? (
-                filteredData.map((step: Steps) => (
-                  <tr key={step.id} className="hover:bg-gray-50 transition-colors duration-150">
-                    <td className="px-3 py-1 text-center text-sm text-gray-900">{step.id}</td>
-                    <td className="px-3 py-1 text-left text-sm text-gray-900">{step.step_name}</td>
+              ) : filteredData?.length > 0 ? (
+                filteredData?.map((step: Steps) => (
+                  <tr key={step?.id} className="hover:bg-gray-50 transition-colors duration-150">
+                    <td className="px-3 py-1 text-center text-sm text-gray-900">{step?.id}</td>
+                    <td className="px-3 py-1 text-left text-sm text-gray-900">{step?.step_name}</td>
                     <td className="px-3 py-1 text-left">
                       <button
                         type="button"

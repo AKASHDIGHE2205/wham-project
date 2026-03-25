@@ -10,101 +10,6 @@ dotenv.config();
 
 const SECRET_KEY = process.env.SECRET_KEY || "Malpani@2025";
 
-export const registerUser_old = async (req, res) => {
-  const { firstName, middleName, lastName, password, email, phone } = req.body;
-
-  if (!firstName || !lastName || !password || !email || !phone) {
-    return res.status(400).json({ message: "Please fill in all required fields.", });
-  }
-
-  const checkUserSQL = `SELECT id FROM users WHERE email = ? OR phone = ?`;
-
-  db.query(checkUserSQL, [email, phone], async (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: "Internal server error" });
-    }
-
-    if (results.length > 0) {
-      return res.status(409).json({ message: "User already exists with this email or phone.", });
-    }
-
-    try {
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      // 1️⃣ Get connection from pool
-      db.getConnection((connErr, connection) => {
-        if (connErr) {
-          console.error(connErr);
-          return res.status(500).json({ message: "Database connection failed" });
-        }
-
-        // 2️⃣ Start transaction
-        connection.beginTransaction((txErr) => {
-          if (txErr) {
-            connection.release();
-            return res.status(500).json({ message: "Transaction start failed" });
-          }
-
-          // 3️⃣ Insert user
-          const insertUserSQL = `
-            INSERT INTO users
-            (first_name, middle_name, last_name, password, email, phone, role, is_verified, isorganizer)
-            VALUES (?, ?, ?, ?, ?, ?, 'User', 'I', 'N')
-          `;
-
-          connection.query(insertUserSQL, [firstName, middleName, lastName, hashedPassword, email, phone], (userErr, userResult) => {
-            if (userErr) {
-              return connection.rollback(() => {
-                connection.release();
-                console.error(userErr);
-                res.status(500).json({ message: "User creation failed" });
-              });
-            }
-
-            const userId = userResult.insertId;
-
-            // 4️⃣ Insert member
-            const insertMemberSQL = `
-                    INSERT INTO mst_members
-                      (mem_id, first_name, middle_name, last_name, mobile, email, designation, isorganizer, user_id, status)
-                      SELECT IFNULL(MAX(mem_id), 0) + 1,?, ?, ?, ?, ?, 'Users', 'N', ?, 'A'
-                      FROM mst_members
-                  `;
-
-            connection.query(insertMemberSQL, [firstName, middleName, lastName, phone, email, userId], (memberErr) => {
-              if (memberErr) {
-                return connection.rollback(() => {
-                  connection.release();
-                  console.error(memberErr);
-                  res.status(500).json({ message: "Member creation failed" });
-                });
-              }
-
-              // 5️⃣ Commit
-              connection.commit((commitErr) => {
-                if (commitErr) {
-                  return connection.rollback(() => {
-                    connection.release();
-                    res.status(500).json({ message: "Commit failed" });
-                  });
-                }
-
-                // 6️⃣ Release connection
-                connection.release();
-
-                return res.status(201).json({ message: "User registered successfully ✅", userId, });
-              });
-            });
-          });
-        });
-      });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: "Registration failed" });
-    }
-  });
-};
 export const registerUser = async (req, res) => {
   try {
 
@@ -221,7 +126,7 @@ export const registerUser = async (req, res) => {
                     return res.status(201).json({
                       message: "User registered successfully ✅",
                       userId,
-                      profilePhoto: savedFilePath // null if not uploaded
+                      profilePhoto: savedFilePath
                     });
 
                   });
@@ -239,8 +144,6 @@ export const registerUser = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
-
-// LOGIN USER
 export const loginUser = (req, res) => {
   try {
     const { email, password } = req.body;
@@ -301,80 +204,6 @@ export const loginUser = (req, res) => {
     return res.status(500).json({ message: "Unexpected server error!", });
   }
 };
-
-//GET TEAM MEMBERS updated on 12/01/2026
-export const getTeamMembers_old = (req, res) => {
-  const { userId } = req.body;
-
-  // STEP 1: Get member IDs for this user
-  const sql1 = `SELECT mem_id FROM mst_members WHERE user_id = ?`;
-
-  db.query(sql1, [userId], (err, memberResults) => {
-    if (err) {
-      console.error("Database error:", err);
-      return res.status(500).json({ message: "Internal server error" });
-    }
-
-    if (memberResults.length === 0) {
-      return res.status(404).json({ message: "No member found for this user" });
-    }
-
-    const memberIds = memberResults.map(m => m.mem_id);
-
-    // STEP 2: Find teams this user belongs to
-    const sql2 = `
-                    SELECT DISTINCT t.id AS team_id, t.name AS team_name, t.description, t.manager_id
-                    FROM mst_team t
-                    JOIN team_members tm ON tm.team_id = t.id
-                    WHERE tm.member_id IN (?)
-                  `;
-
-    db.query(sql2, [memberIds], (err, teamResults) => {
-      if (err) {
-        console.error("Database error:", err);
-        return res.status(500).json({ message: "Internal server error" });
-      }
-
-      if (teamResults.length === 0) {
-        return res.status(200).json({ message: "User is not assigned to any team", teams: [] });
-      }
-
-      const teamIds = teamResults.map(t => t.team_id);
-
-      // STEP 3: Get ALL members of those teams EXCEPT the logged-in user
-      const sql3 = `
-                      SELECT 
-                        tm.team_id,
-                        m.mem_id,
-                        CONCAT(m.first_name, ' ', m.middle_name, ' ', m.last_name) AS full_name,
-                        m.user_id
-                      FROM team_members tm
-                      JOIN mst_members m ON m.mem_id = tm.member_id
-                      WHERE tm.team_id IN (?)
-                        AND m.user_id <> ?         -- 🚫 exclude logged-in user
-                    `;
-
-      db.query(sql3, [teamIds, userId], (err, membersResults) => {
-        if (err) {
-          console.error("Database error:", err);
-          return res.status(500).json({ message: "Internal server error" });
-        }
-
-        // Structure response: team info + members
-        const response = teamResults.map(team => ({
-          team_id: team.team_id,
-          team_name: team.team_name,
-          description: team.description,
-          manager_id: team.manager_id,
-          members: membersResults.filter(m => m.team_id === team.team_id)
-        }));
-
-        return res.status(200).json({ teams: response });
-      });
-    });
-  });
-};
-
 export const getTeamMembers = (req, res) => {
   const { userId } = req.body;
 
@@ -457,7 +286,6 @@ export const getTeamMembers = (req, res) => {
     });
   });
 };
-
 export const sendOtp = async (req, res) => {
   try {
     const { mobile } = req.body;
@@ -529,7 +357,6 @@ export const sendOtp = async (req, res) => {
     });
   }
 };
-
 export const validateOtp = async (req, res) => {
   try {
     const { mobile, otp } = req.body;
@@ -578,7 +405,6 @@ export const validateOtp = async (req, res) => {
     return res.status(500).json({ success: false, message: "Something went wrong while validating OTP", });
   }
 };
-
 export const updatePassword = async (req, res) => {
   try {
     const { mobile, password } = req.body;
@@ -614,7 +440,6 @@ export const updatePassword = async (req, res) => {
     return res.status(500).json({ success: false, message: "Something went wrong while resetting password", });
   }
 };
-
 export const refreshToken = async (req, res) => {
   try {
     const { refreshToken } = req.body;
@@ -738,7 +563,9 @@ export const getUserProfile = (req, res) => {
         const memberSql2 = `
           SELECT
             m.mem_id,
-            CONCAT(m.first_name, ' ', m.middle_name, ' ', m.last_name) AS mem_name,
+            m.first_name, 
+            m.middle_name, 
+            m.last_name,
             m.user_id,
             tm.team_id
           FROM team_members tm
@@ -755,7 +582,9 @@ export const getUserProfile = (req, res) => {
             if (!memberMap[member.mem_id]) {
               memberMap[member.mem_id] = {
                 mem_id: member.mem_id,
-                mem_name: member.mem_name,
+                first_name: member.first_name,
+                middle_name: member.middle_name,
+                last_name: member.last_name,
                 user_id: member.user_id,
                 teams: []
               };

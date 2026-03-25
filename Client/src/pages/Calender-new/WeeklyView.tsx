@@ -80,7 +80,6 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({ currentDate, Data, Loading, onc
     return target < today;
   };
 
-  // Function to get activities for a specific day
   const getActivitiesForDay = (day: Date): Activities[] => {
     return Data.filter(activity => {
       const startDate = parseDateTime(activity.start_date);
@@ -123,7 +122,7 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({ currentDate, Data, Loading, onc
       <div className="overflow-x-auto">
         {/* Header with days */}
         <div className="grid grid-cols-7 min-w-[750px] bg-gray-50 border-b border-gray-200">
-          {days.map((day) => {
+          {days?.map((day) => {
             const isPastDay = isPastDate(day);
             return (
               <div
@@ -151,7 +150,7 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({ currentDate, Data, Loading, onc
 
         {/* Days Grid with Activities */}
         <div className="grid grid-cols-7 min-w-[750px] bg-white">
-          {days.map((day, idx) => {
+          {days?.map((day, idx) => {
             const isPastDay = isPastDate(day);
             const dayActivities = getActivitiesForDay(day);
 
@@ -164,7 +163,7 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({ currentDate, Data, Loading, onc
               >
                 {/* Activities Container */}
                 <div className="space-y-2">
-                  {dayActivities.length === 0 ? (
+                  {dayActivities?.length === 0 ? (
                     <div className="text-xs text-gray-400 text-center mt-4">
                       {!isPastDay && (
                         <span className="cursor-pointer hover:text-white" onClick={() => handleDayClick(day)}>
@@ -173,10 +172,10 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({ currentDate, Data, Loading, onc
                       )}
                     </div>
                   ) : (
-                    dayActivities.map((activity, index) => {
-                      const styles = getActivityStyles(activity.status);
-                      const startDate = parseDateTime(activity.start_date);
-                      const endDate = parseDateTime(activity.end_date);
+                    dayActivities?.map((activity, index) => {
+                      const styles = getActivityStyles(activity?.status);
+                      const startDate = parseDateTime(activity?.start_date);
+                      const endDate = parseDateTime(activity?.end_date);
 
                       return (
                         <div
@@ -185,7 +184,7 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({ currentDate, Data, Loading, onc
                           title={`Click to Edit`}
                           onClick={(e) => handleActivityClick(activity, e)}
                         >
-                          <div className={`truncate font-medium ${styles.text} mb-1`}>#{activity.title}</div>
+                          <div className={`truncate font-medium ${styles.text} mb-1`}>#{activity?.title}</div>
                           <div className="text-[10px] flex flex-col gap-1 text-gray-600">
                             <div className="flex justify-start items-center gap-1">
                               <CalendarHeart size={10} />

@@ -1,4 +1,4 @@
-import { ChevronDown, Trash2 } from 'lucide-react';
+import { CheckLine, ChevronDown, CircleArrowLeft, Trash2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { getUserFromStorage } from '../../../helper/cryptoUser';
@@ -80,6 +80,26 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
 
   const handleFileChange = (id: number, file: File | null) => {
     updateSubActivity(id, 'attachment', file);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    updateFormData({ [name]: name === 'occasion' || name === 'campaign' ? Number(value) : value });
+  };
+
+  const getStatusClasses = (status: string) => {
+    switch (status) {
+      case "P":
+        return "bg-yellow-50 border-yellow-400 text-yellow-700";
+      case "A":
+        return "bg-green-50 border-green-400 text-green-700";
+      case "R":
+        return "bg-red-50 border-red-400 text-red-700";
+      case "C":
+        return "bg-blue-50 border-blue-400 text-blue-700";
+      default:
+        return "bg-gray-50 border-gray-300 text-gray-700";
+    }
   };
 
   const validateForm = () => {
@@ -496,6 +516,35 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
         </table>
       </div>
 
+      {/*Status */}
+      {(user?.role === 'Master' || user?.role === 'Manager' || user?.role === 'Manager') && (
+        <div className='w-full sm:w-1/2'>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">
+            Status <span className="text-red-500">*</span>
+          </label>
+
+          <div className="relative">
+            <select
+              name="status"
+              value={formData?.status || ""}
+              onChange={handleChange}
+              required
+              className={`w-full px-3 py-2 border rounded-md appearance-none focus:outline-none focus:ring-1 focus:ring-purple-500 ${getStatusClasses(formData?.status)}`}
+            >
+              <option value="" disabled>
+                Select Status
+              </option>
+              <option value="P">Pending</option>
+              <option value="A">Approved</option>
+              <option value="R">Rejected</option>
+              <option value="C">Completed</option>
+            </select>
+
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          </div>
+        </div>
+      )}
+
       <span className="text-xs text-red-600 block">
         *Sub-activities editable only before manager approval.*
       </span>
@@ -503,9 +552,9 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
       <div className="pt-6 border-t border-gray-100 flex justify-between">
         <button
           onClick={onPrevious}
-          className="px-8 py-2 bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
+          className="px-8 py-2 bg-linear-to-r from-gray-200 to-gray-300 font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
         >
-          Previous
+          <span className="flex justify-center items-center gap-1"> <CircleArrowLeft size={18} /> Back</span>
         </button>
         {!isEdit ? (
           <button
@@ -513,7 +562,7 @@ export const ActivityStep4: React.FC<ActivityStep4Props> = ({ formData, updateFo
             disabled={isSubmitting}
             className="px-8 py-2 bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white rounded-md hover:bg-purple-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'Submitting...' : 'Submit'}
+            <span className="flex justify-center items-center gap-1">{isSubmitting ? 'Submitting...' : 'Submit'} <CheckLine size={18} /></span>
           </button>
         ) : (
           <button

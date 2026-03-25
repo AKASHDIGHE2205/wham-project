@@ -115,7 +115,6 @@ const EditMember = () => {
       const response = await getMemberDetails(id);
       if (response) {
         setData(response?.member || null);
-        // Map API teams to our internal format
         const apiTeams: ApiTeam[] = response?.member?.teams?.map((team: any) => ({
           team_id: team.team_id,
           name: team.name
@@ -130,7 +129,6 @@ const EditMember = () => {
     setSelectedTeams(prev => prev.filter(team => team.team_id !== teamId));
   }
 
-  // Convert our internal format to TeamModal format
   const getTeamsForModal = (): TeamModalTeam[] => {
     return selectedTeams.map(team => ({
       id: team.team_id,
@@ -138,8 +136,7 @@ const EditMember = () => {
     }));
   }
 
-  // Handle teams coming from TeamModal (convert back to our internal format)
-  const handleTeamSelection = (teams: TeamModalTeam[]) => {
+    const handleTeamSelection = (teams: TeamModalTeam[]) => {
     const apiTeams: ApiTeam[] = teams.map(team => ({
       team_id: team.id,
       name: team.name
@@ -180,7 +177,7 @@ const EditMember = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    if (!inputs.first_name || !inputs.last_name || !inputs.birth_date || !inputs.join_date || !inputs.mobile || !inputs.email || !clg_id || !dept_id || !inputs.education_year) {
+    if (!inputs.first_name || !inputs.last_name || !inputs.birth_date || !inputs.join_date || !inputs.mobile || !inputs.email ) {
       setLoading(false);
       return toast.error("Please fill all required fields!")
     }

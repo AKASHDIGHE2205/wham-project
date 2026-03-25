@@ -129,7 +129,7 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ currentDate, Data, Loading, o
 
           {/* Days Grid */}
           <div className="grid grid-cols-7 bg-white">
-            {days.map((day, idx) => {
+            {days?.map((day, idx) => {
               const isCurrentMonth = isSameMonth(day, currentDate);
               const isPast = day < new Date(new Date().setHours(0, 0, 0, 0));
               const dayActivities = getActivitiesForDay(day);
@@ -158,19 +158,19 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ currentDate, Data, Loading, o
                     </div>
 
                     {/* More indicator if many activities */}
-                    {dayActivities.length > 3 && (
+                    {dayActivities?.length > 3 && (
                       <span className="text-xs bg-gray-100 text-gray-600 px-1.5 rounded">
-                        +{dayActivities.length - 3}
+                        +{dayActivities?.length - 3}
                       </span>
                     )}
                   </div>
 
                   {/* Activities Container */}
                   <div className="mt-1 space-y-1 max-h-20 sm:max-h-[100px] overflow-y-auto">
-                    {dayActivities.slice(0, 3).map((activity, index) => {
-                      const styles = getActivityStyles(activity.status);
-                      const startDate = parseDateTime(activity.start_date);
-                      const endDate = parseDateTime(activity.end_date);
+                    {dayActivities?.slice(0, 3)?.map((activity, index) => {
+                      const styles = getActivityStyles(activity?.status);
+                      const startDate = parseDateTime(activity?.start_date);
+                      const endDate = parseDateTime(activity?.end_date);
                       return (
                         <div
                           key={index}

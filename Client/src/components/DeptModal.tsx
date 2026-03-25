@@ -14,12 +14,7 @@ interface Department {
   dept_name: string;
 }
 
-const DeptModal: FC<Props> = ({
-  show,
-  setShow,
-  onSelectDepartments,
-  selectedDepartments = []
-}) => {
+const DeptModal: FC<Props> = ({ show, setShow, onSelectDepartments, selectedDepartments = [] }) => {
   const [data, setData] = useState<Department[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -55,9 +50,9 @@ const DeptModal: FC<Props> = ({
 
   const handleSelect = (department: Department) => {
     setTempSelectedDepartments(prev => {
-      const isSelected = prev.some(d => d.dept_id === department.dept_id);
+      const isSelected = prev.some(d => d?.dept_id === department?.dept_id);
       if (isSelected) {
-        return prev.filter(d => d.dept_id !== department.dept_id);
+        return prev.filter(d => d?.dept_id !== department?.dept_id);
       } else {
         return [...prev, department];
       }
@@ -70,7 +65,7 @@ const DeptModal: FC<Props> = ({
   };
 
   const isDepartmentSelected = (deptId: number) => {
-    return tempSelectedDepartments.some(d => d.dept_id === deptId);
+    return tempSelectedDepartments?.some(d => d?.dept_id === deptId);
   };
 
   if (!show) return null;
@@ -99,9 +94,9 @@ const DeptModal: FC<Props> = ({
               <p className="text-sm text-gray-600 mt-1">
                 Choose one or more departments from the list below.
               </p>
-              {tempSelectedDepartments.length > 0 && (
+              {tempSelectedDepartments?.length > 0 && (
                 <p className="text-xs text-orange-600 mt-1">
-                  {tempSelectedDepartments.length} department(s) selected
+                  {tempSelectedDepartments?.length} department(s) selected
                 </p>
               )}
             </div>
@@ -184,8 +179,8 @@ const DeptModal: FC<Props> = ({
                             <button
                               onClick={() => handleSelect(department)}
                               className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer ${isSelected
-                                  ? 'text-red-600 bg-red-50 border border-red-200 hover:bg-red-100'
-                                  : 'text-orange-600 bg-orange-50 border border-orange-200 hover:bg-orange-100'
+                                ? 'text-red-600 bg-red-50 border border-red-200 hover:bg-red-100'
+                                : 'text-orange-600 bg-orange-50 border border-orange-200 hover:bg-orange-100'
                                 }`}
                             >
                               {isSelected ? 'Remove' : 'Select'}

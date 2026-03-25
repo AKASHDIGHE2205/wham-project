@@ -76,8 +76,8 @@ const DailyView: React.FC<DailyViewProps> = ({ currentDate, Data, Loading }) => 
   // Get activities for the current day
   const getActivitiesForDay = (): Activities[] => {
     return Data.filter(activity => {
-      const startDate = parseDateTime(activity.start_date);
-      const endDate = parseDateTime(activity.end_date);
+      const startDate = parseDateTime(activity?.start_date);
+      const endDate = parseDateTime(activity?.end_date);
       
       const dayStart = new Date(currentDate);
       dayStart.setHours(0, 0, 0, 0);
@@ -98,8 +98,8 @@ const DailyView: React.FC<DailyViewProps> = ({ currentDate, Data, Loading }) => 
     const dayActivities = getActivitiesForDay();
     
     return dayActivities.filter(activity => {
-      const startDate = parseDateTime(activity.start_date);
-      const endDate = parseDateTime(activity.end_date);
+      const startDate = parseDateTime(activity?.start_date);
+      const endDate = parseDateTime(activity?.end_date);
       
       const hourStart = new Date(currentDate);
       hourStart.setHours(hour, 0, 0, 0);
@@ -148,7 +148,7 @@ const DailyView: React.FC<DailyViewProps> = ({ currentDate, Data, Loading }) => 
 
       {/* Time slots */}
       <div className="relative max-w-5xl mx-auto hidden">
-        {hours.map((hour) => {
+        {hours?.map((hour) => {
           const hourActivities = getActivitiesForHour(hour);
           const isPastHourSlot = isPastHour(hour);
           
@@ -168,12 +168,12 @@ const DailyView: React.FC<DailyViewProps> = ({ currentDate, Data, Loading }) => 
 
               {/* Activities container */}
               <div className="flex-1 p-2 relative min-h-20">
-                {hourActivities.length > 0 ? (
+                {hourActivities?.length > 0 ? (
                   <div className="space-y-2">
-                    {hourActivities.map((activity, index) => {
-                      const styles = getActivityStyles(activity.status);
-                      const startDate = parseDateTime(activity.start_date);
-                      const endDate = parseDateTime(activity.end_date);
+                    {hourActivities?.map((activity, index) => {
+                      const styles = getActivityStyles(activity?.status);
+                      const startDate = parseDateTime(activity?.start_date);
+                      const endDate = parseDateTime(activity?.end_date);
                       
                       return (
                         <div
@@ -182,7 +182,7 @@ const DailyView: React.FC<DailyViewProps> = ({ currentDate, Data, Loading }) => 
                           title={`Click to Edit`}
                           onClick={(e) => handleActivityClick(activity, e)}
                         >
-                          <div className={`truncate font-medium ${styles.text} mb-1`}>#{activity.title}</div>
+                          <div className={`truncate font-medium ${styles.text} mb-1`}>#{activity?.title}</div>
                           <div className="text-[10px] flex items-center gap-2 text-gray-600">
                             <div className="flex items-center gap-1">
                               <Clock size={10}/> 
@@ -214,10 +214,10 @@ const DailyView: React.FC<DailyViewProps> = ({ currentDate, Data, Loading }) => 
         <div className="border-t border-gray-200 p-4 bg-gray-50">
           <h3 className="text-sm font-medium text-gray-700 mb-2">All activities for {format(currentDate, "MMMM d, yyyy")}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-            {getActivitiesForDay().map((activity, index) => {
-              const styles = getActivityStyles(activity.status);
-              const startDate = parseDateTime(activity.start_date);
-              const endDate = parseDateTime(activity.end_date);
+            {getActivitiesForDay()?.map((activity, index) => {
+              const styles = getActivityStyles(activity?.status);
+              const startDate = parseDateTime(activity?.start_date);
+              const endDate = parseDateTime(activity?.end_date);
               
               return (
                 <div
@@ -225,7 +225,7 @@ const DailyView: React.FC<DailyViewProps> = ({ currentDate, Data, Loading }) => 
                   className={`text-xs p-2 rounded border ${styles.bg} ${styles.border} cursor-pointer ${styles.hover} transition-colors`}
                   onClick={(e) => handleActivityClick(activity, e)}
                 >
-                  <div className={`font-medium ${styles.text} mb-1`}>#{activity.title}</div>
+                  <div className={`font-medium ${styles.text} mb-1`}>#{activity?.title}</div>
                   <div className="text-[10px] flex items-center gap-2 text-gray-600">
                     <div className="flex items-center gap-1">
                       <Calendar size={10}/> 

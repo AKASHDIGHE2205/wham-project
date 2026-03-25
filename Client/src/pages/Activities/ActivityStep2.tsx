@@ -1,4 +1,4 @@
-import { Calendar, User, UserPlus, Users, X } from "lucide-react";
+import { Calendar, CircleArrowLeft, CircleArrowRight, User, UserPlus, Users, X } from "lucide-react";
 import React, { useState } from "react";
 import MemberModal from "../../components/MemberModal";
 import type { SelectedMember, SelectedTeam } from "../../types/activity.types";
@@ -21,22 +21,18 @@ export const ActivityStep2: React.FC<ActivityStep2Props> = ({ formData, updateFo
   };
 
   const removeMember = (memberId: number) => {
-    updateFormData({
-      selectedMembers: formData.selectedMembers.filter((m: SelectedMember) => m.id !== memberId)
-    });
+    updateFormData({selectedMembers: formData?.selectedMembers.filter((m: SelectedMember) => m.id !== memberId)});
   };
 
   const removeTeam = (teamId: number) => {
-    updateFormData({
-      selectedTeams: formData.selectedTeams.filter((t: SelectedTeam) => t.id !== teamId)
-    });
+    updateFormData({selectedTeams: formData?.selectedTeams.filter((t: SelectedTeam) => t.id !== teamId)});
   };
 
   const getMemberFullName = (member: SelectedMember): string => {
-    return `${member.first_name} ${member.middle_name ? member.middle_name + " " : ""}${member.last_name || ""}`.trim();
+    return `${member?.first_name} ${member?.middle_name ? member?.middle_name + " " : ""}${member?.last_name || ""}`.trim();
   };
 
-  const totalSelections = formData.selectedMembers.length + formData.selectedTeams.length;
+  const totalSelections = formData?.selectedMembers?.length + formData?.selectedTeams?.length;
 
   const getCurrentDateTime = (): string => {
     const now = new Date();
@@ -70,7 +66,7 @@ export const ActivityStep2: React.FC<ActivityStep2Props> = ({ formData, updateFo
                   type="datetime-local"
                   name="startDate"
                   min={minDateTime}
-                  value={formData.startDate}
+                  value={formData?.startDate}
                   onChange={handleChange}
                   required
                   className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
@@ -87,7 +83,7 @@ export const ActivityStep2: React.FC<ActivityStep2Props> = ({ formData, updateFo
                   type="datetime-local"
                   name="endDate"
                   min={minDateTime}
-                  value={formData.endDate}
+                  value={formData?.endDate}
                   onChange={handleChange}
                   required
                   className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
@@ -127,13 +123,13 @@ export const ActivityStep2: React.FC<ActivityStep2Props> = ({ formData, updateFo
           {totalSelections > 0 && (
             <div className="space-y-3">
               {/* Selected Teams */}
-              {formData.selectedTeams.length > 0 && (
+              {formData?.selectedTeams?.length > 0 && (
                 <div>
                   <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                    Teams ({formData.selectedTeams.length})
+                    Teams ({formData?.selectedTeams?.length})
                   </h4>
                   <div className="flex flex-wrap gap-2">
-                    {formData.selectedTeams.map((team: SelectedTeam) => (
+                    {formData?.selectedTeams?.map((team: SelectedTeam) => (
                       <div
                         key={`team-${team.id}`}
                         className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-100 text-blue-800 rounded-full text-sm border border-blue-200 group hover:bg-blue-200 transition-colors"
@@ -155,22 +151,22 @@ export const ActivityStep2: React.FC<ActivityStep2Props> = ({ formData, updateFo
               )}
 
               {/* Selected Members */}
-              {formData.selectedMembers.length > 0 && (
+              {formData?.selectedMembers?.length > 0 && (
                 <div>
                   <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                    Individual Members ({formData.selectedMembers.length})
+                    Individual Members ({formData?.selectedMembers?.length})
                   </h4>
                   <div className="flex flex-wrap gap-2">
-                    {formData.selectedMembers.map((member: SelectedMember) => (
+                    {formData?.selectedMembers?.map((member: SelectedMember) => (
                       <div
-                        key={`member-${member.id}`}
+                        key={`member-${member?.id}`}
                         className="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-100 text-orange-800 rounded-full text-sm border border-orange-200 group hover:bg-orange-200 transition-colors"
                       >
                         <span className="font-medium flex justify-center items-center gap-1">
                           <User size={14} /> {getMemberFullName(member)}
                         </span>
                         <button
-                          onClick={() => removeMember(member.id)}
+                          onClick={() => removeMember(member?.id)}
                           className="ml-1 p-0.5 rounded-full hover:bg-orange-300 transition-colors"
                           title="Remove member"
                         >
@@ -219,15 +215,15 @@ export const ActivityStep2: React.FC<ActivityStep2Props> = ({ formData, updateFo
       <div className="pt-6 border-t border-gray-100 flex justify-between">
         <button
           onClick={onPrevious}
-          className="px-8 py-2 bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
+          className="px-8 py-2 bg-linear-to-r from-gray-200 to-gray-300 font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
         >
-          Previous
+          <span className="flex justify-center items-center gap-1"> <CircleArrowLeft size={18}/> Back</span>
         </button>
         <button
           onClick={onNext}
           className="px-8 py-2 bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md hover:bg-purple-700 transition-colors cursor-pointer"
         >
-          Next
+          <span className="flex justify-center items-center gap-1"> Next<CircleArrowRight size={18}/></span>
         </button>
       </div>
 
@@ -236,8 +232,8 @@ export const ActivityStep2: React.FC<ActivityStep2Props> = ({ formData, updateFo
         <MemberModal
           show={showMembers}
           setShow={setShowMembers}
-          selectedMembers={formData.selectedMembers}
-          selectedTeams={formData.selectedTeams}
+          selectedMembers={formData?.selectedMembers}
+          selectedTeams={formData?.selectedTeams}
           onConfirm={handleSelectionConfirm}
         />
       )}

@@ -6,6 +6,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Loadings from "./components/Loadings";
 import { authFinished, setUser, verifyAndLoadUser } from "./feature/authSlice";
 import DefaultLayout from "./layout/DefaultLayout";
+import Library from "./pages/library/Library";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
 
@@ -99,14 +100,21 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<DefaultLayout />}>
               <Route index element={<Home />} />
+              
               <Route path="/dashboard" element={<Dashboard />} />
+
               <Route path="/calender" element={<Calender />} />
+              
               <Route path="/trainings/manage" element={<TrainingView />} />
               <Route path="/trainings/create" element={<TrainingAdd />} />
               <Route path="/training/edit-training/:id" element={<TrainingEdit />} />
               <Route path="/my-trainings" element={<TrainingViews />} />
+
               <Route path="add-activity" element={<CreateActivityPage />} />
               <Route path="update-activity/:id/:date" element={<UpdateActivityPage />} />
+              
+              <Route path="/library" element={<Library/>}/>
+
               <Route element={<ProtectedRoute allowedRoles={["Master", "Admin", "Manager"]} />}>
                 {masterRoutes.map((route, index) => (<Route key={index} path={route.path} element={route.element} />))}
               </Route>

@@ -26,7 +26,7 @@ const UniversityModal: FC<Props> = ({ show, setShow }) => {
       setLoading(true);
       const response = await getActiveUniversities();
       setLoading(false);
-      setUserData(response.Result || [])
+      setUserData(response?.Result || [])
     }
     fetchData();
   }, [])

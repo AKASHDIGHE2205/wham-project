@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ArrowRight, CheckCircle, Clock, Eye, EyeOff, Lock, Phone } from 'lucide-react';
+import { motion } from 'motion/react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
@@ -7,11 +8,11 @@ import { sendOtp, UpdateOtp, ValidateOtp } from '../../services/auth/authApi';
 
 const ForgotPassword: React.FC = () => {
   const [step, setStep] = useState(1);
-  const [mobile, setMobile] = useState([]);
+  const [mobile, setMobile] = useState('');
   const [password, setPassword] = useState('');
   const [cPassword, setCPassword] = useState('');
-  const [showPass, setShowPass] = useState(false)
-  const [otp, setOtp] = useState(0)
+  const [showPass, setShowPass] = useState(false);
+  const [otp, setOtp] = useState('');
   const [timeLeft, setTimeLeft] = useState(120);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [loading, setLoading] = useState({
@@ -20,6 +21,7 @@ const ForgotPassword: React.FC = () => {
     resetPassword: false,
     resendOtp: false
   });
+  const year = new Date().getFullYear();
   const navigate = useNavigate();
   const maskedMobile = mobile ? mobile.toString().slice(0, -3).replace(/./g, "X") + mobile.toString().slice(-3) : "";
 
@@ -57,15 +59,16 @@ const ForgotPassword: React.FC = () => {
     setLoading(prev => ({ ...prev, sendOtp: true }));
 
     try {
-      const body = { mobile }
+      const body = { mobile };
       const response = await sendOtp(body);
       if (response?.status === 200) {
         setStep(2);
-        setTimeLeft(120);;
+        setTimeLeft(120);
         setIsTimerRunning(true);
       }
     } catch (error) {
       console.log(error);
+      toast.error('Failed to send OTP. Please try again.');
     } finally {
       setLoading(prev => ({ ...prev, sendOtp: false }));
     }
@@ -88,8 +91,8 @@ const ForgotPassword: React.FC = () => {
     try {
       const body = {
         mobile,
-        otp
-      }
+        otp: parseInt(otp)
+      };
       const response = await ValidateOtp(body);
       if (response?.status === 200) {
         setIsTimerRunning(false);
@@ -97,6 +100,7 @@ const ForgotPassword: React.FC = () => {
       }
     } catch (error) {
       console.log(error);
+      toast.error('Invalid OTP. Please try again.');
     } finally {
       setLoading(prev => ({ ...prev, verifyOtp: false }));
     }
@@ -104,7 +108,7 @@ const ForgotPassword: React.FC = () => {
 
   const handleResetPassword = async () => {
     if (!password || !cPassword || !mobile) {
-      toast.error('Please fill all required fields.')
+      toast.error('Please fill all required fields.');
       return;
     }
     if (password !== cPassword) {
@@ -115,7 +119,7 @@ const ForgotPassword: React.FC = () => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
 
     if (!passwordRegex.test(password)) {
-      toast.error('Invalid format.');
+      toast.error('Password must be at least 8 characters, include uppercase, lowercase, number, and special character.');
       return;
     }
 
@@ -125,18 +129,19 @@ const ForgotPassword: React.FC = () => {
       const body = {
         mobile,
         password
-      }
+      };
 
       const response = await UpdateOtp(body);
       if (response?.status === 200) {
         setCPassword('');
-        setMobile([]);
-        setOtp(0);
+        setMobile('');
+        setOtp('');
         setPassword('');
-        setTimeLeft(120);;
+        setTimeLeft(120);
         setIsTimerRunning(false);
-        setStep(1)
-        navigate('/auth/login')
+        setStep(1);
+        toast.success('Password reset successfully!');
+        navigate('/auth/login');
       }
     } catch (error) {
       console.log(error);
@@ -158,12 +163,13 @@ const ForgotPassword: React.FC = () => {
     try {
       const body = {
         mobile
-      }
+      };
       const response = await sendOtp(body);
       if (response?.status === 200) {
         setTimeLeft(120);
         setIsTimerRunning(true);
-        setOtp(0);
+        setOtp('');
+        toast.success('OTP resent successfully!');
       }
     } catch (error) {
       console.log(error);
@@ -174,39 +180,61 @@ const ForgotPassword: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-r from-purple-50 to-indigo-50 flex items-center justify-center">
-      {/* Centered Floating Card */}
-      <div className="w-full max-w-lg px-6 py-8" data-aos="fade-up">
-        <div className="bg-white rounded-xl shadow-lg p-8">
-          {/* Header with Logo */}
-          <div className="text-center mb-8">
-            <div className="flex flex-col items-center justify-center">
-              <div className="flex items-center gap-2 group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg mb-3">
-                <div className="w-16 h-16 bg-[#3232ff] rounded-lg flex items-center justify-center shadow-sm group-hover:shadow transition-all">
-                  <span className="text-white font-bold text-xl">W</span>
-                </div>
-              </div>
-              <span className="text-xl font-bold bg-linear-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-                WHam Energy
-              </span>
-            </div>
+    <div className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-[#ffffff]">
+      {/* Background Gradients */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-600/20 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-600/20 blur-[120px] rounded-full" />
+        <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] bg-pink-600/10 blur-[100px] rounded-full" />
+        
+        {/* Animated Waves */}
+        <motion.div 
+          animate={{ 
+            x: [0, 50, 0],
+            y: [0, -30, 0],
+            rotate: [0, 5, 0]
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          className="absolute top-1/4 -left-20 w-[120%] h-32 bg-linear-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 blur-3xl transform -rotate-12"
+        />
+        <motion.div 
+          animate={{ 
+            x: [0, -50, 0],
+            y: [0, 30, 0],
+            rotate: [0, -5, 0]
+          }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          className="absolute bottom-1/4 -right-20 w-[120%] h-40 bg-linear-to-r from-pink-500/10 via-blue-500/10 to-purple-500/10 blur-3xl transform rotate-12"
+        />
+      </div>
 
-            <h2 className="text-sm font-semibold text-gray-500 mb-2 mt-1">
-              {step === 1 && "Reset Your Password"}
-              {step === 2 && "Verify OTP"}
-              {step === 3 && "Create New Password"}
-            </h2>
+      {/* Forgot Password Card */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="z-10 w-full max-w-[480px] px-6"
+      >
+        <div className="bg-white/90 backdrop-blur-xl rounded-[40px] shadow-2xl p-10 flex flex-col items-center border border-white/20">
+          {/* Logo */}
+          <div className="flex items-center gap-2">
+            <div className="w-14 h-14 bg-linear-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-2xl">W</span>
+            </div>
           </div>
 
+          <h1 className="text-3xl font-bold text-slate-900">WHam Energy</h1>
+          <p className="text-slate-500 font-medium mb-8">Reset Your Password</p>
+
           {/* Step Progress Indicator */}
-          <div className="flex justify-center mb-8">
+          <div className="flex justify-center mb-8 w-full">
             <div className="flex items-center">
               {[1, 2, 3].map((stepNumber) => (
                 <React.Fragment key={stepNumber}>
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
                     ${step >= stepNumber
-                      ? 'bg-[#3232ff] text-white shadow-md shadow-indigo-500/30'
-                      : 'bg-gray-100 text-gray-400 border border-gray-200'
+                      ? 'bg-linear-to-br from-blue-500 to-purple-600 text-white shadow-md shadow-blue-500/30'
+                      : 'bg-white border border-slate-200 text-slate-400'
                     }`}>
                     {step > stepNumber ? (
                       <CheckCircle className="w-4 h-4" />
@@ -215,7 +243,7 @@ const ForgotPassword: React.FC = () => {
                     )}
                   </div>
                   {stepNumber < 3 && (
-                    <div className={`w-12 h-1 mx-1 rounded-full ${step > stepNumber ? 'bg-[#3232ff]' : 'bg-gray-200'
+                    <div className={`w-12 h-1 mx-1 rounded-full ${step > stepNumber ? 'bg-blue-500' : 'bg-slate-200'
                       }`} />
                   )}
                 </React.Fragment>
@@ -224,38 +252,36 @@ const ForgotPassword: React.FC = () => {
           </div>
 
           {/* Form */}
-          <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+          <form className="w-full space-y-6" onSubmit={(e) => e.preventDefault()}>
             {/* Step 1: Mobile Input */}
             {step === 1 && (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Mobile Number
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Phone className="h-5 w-5 text-gray-400" />
+                  <label className="text-sm font-semibold text-slate-700 ml-1">Mobile Number</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                      <Phone className="w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                     </div>
-                    <input
+                    <input 
                       type="tel"
                       onChange={(e: any) => setMobile(e.target.value)}
                       maxLength={10}
                       minLength={10}
                       required
-                      className="w-full pl-10 pr-4 py-2 h-12 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-gray-50"
+                      className="w-full text-sm bg-white border border-slate-200 rounded-xl py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
                       placeholder="Enter 10-digit mobile number"
                     />
                   </div>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-slate-500 ml-1">
                     We'll send a verification code to this number
                   </p>
                 </div>
 
-                <button
+                <button 
                   type="button"
                   onClick={handleSendOtp}
                   disabled={loading.sendOtp}
-                  className="w-full bg-[#3232ff] hover:bg-[#2424fa] text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 shadow-lg shadow-indigo-500/25 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 rounded-2xl shadow-lg shadow-blue-500/25 transform active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {loading.sendOtp ? (
                     <>
@@ -276,31 +302,29 @@ const ForgotPassword: React.FC = () => {
             {step === 2 && (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Enter OTP
-                  </label>
+                  <label className="text-sm font-semibold text-slate-700 ml-1">Enter OTP</label>
                   <input
                     type="text"
                     onChange={(e: any) => setOtp(e.target.value)}
                     maxLength={6}
-                    className="w-full px-4 py-2 h-12 text-center text-2xl tracking-[0.5em] font-mono border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-gray-50"
+                    className="w-full text-center text-2xl tracking-[0.5em] font-mono bg-white border border-slate-200 rounded-xl py-2 px-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
                     placeholder="••••••"
                   />
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-slate-500 ml-1">
                     OTP sent to {maskedMobile}
                   </p>
                 </div>
 
                 {/* Timer and Resend */}
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between p-2 bg-slate-50 rounded-xl border border-slate-200">
                   <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm text-gray-600">
+                    <Clock className="w-4 h-4 text-slate-500" />
+                    <span className="text-sm text-slate-600 font-medium">
                       Code expires in
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`font-mono font-bold ${timeLeft < 60 ? 'text-red-600' : 'text-[#3232ff]'}`}>
+                    <span className={`font-mono font-bold ${timeLeft < 60 ? 'text-red-600' : 'text-blue-600'}`}>
                       {formatTime(timeLeft)}
                     </span>
                     {!isTimerRunning && (
@@ -308,7 +332,7 @@ const ForgotPassword: React.FC = () => {
                         type="button"
                         onClick={handleResendOtp}
                         disabled={loading.resendOtp}
-                        className="text-sm text-[#3232ff] hover:text-[#2424fa] font-medium disabled:opacity-50"
+                        className="text-sm text-blue-600 hover:text-blue-700 font-semibold disabled:opacity-50 transition-colors"
                       >
                         {loading.resendOtp ? 'Sending...' : 'Resend'}
                       </button>
@@ -316,11 +340,11 @@ const ForgotPassword: React.FC = () => {
                   </div>
                 </div>
 
-                <button
+                <button 
                   type="button"
                   onClick={handleVerifyOtp}
                   disabled={loading.verifyOtp}
-                  className="w-full bg-[#3232ff] hover:bg-[#2424fa] text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 shadow-lg shadow-indigo-500/25 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 rounded-2xl shadow-lg shadow-blue-500/25 transform active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {loading.verifyOtp ? (
                     <>
@@ -341,59 +365,55 @@ const ForgotPassword: React.FC = () => {
             {step === 3 && (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    New Password
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-gray-400" />
+                  <label className="text-sm font-semibold text-slate-700 ml-1">New Password</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                      <Lock className="w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                     </div>
-                    <input
+                    <input 
                       type={showPass ? "text" : "password"}
                       onChange={(e: any) => setPassword(e.target.value)}
                       required
-                      className="w-full pl-10 pr-12 py-2 h-12 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-gray-50"
+                      className="w-full text-sm bg-white border border-slate-200 rounded-xl py-3 pl-12 pr-12 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
                       placeholder="Enter new password"
                     />
-                    <button
+                    <button 
                       type="button"
                       onClick={() => setShowPass(!showPass)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-600 transition-colors"
+                      className="absolute inset-y-0 right-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
                     >
-                      {showPass ? <EyeOff size={20} /> : <Eye size={20} />}
+                      {showPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Confirm New Password
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-gray-400" />
+                  <label className="text-sm font-semibold text-slate-700 ml-1">Confirm New Password</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                      <Lock className="w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                     </div>
-                    <input
+                    <input 
                       type="password"
                       onChange={(e: any) => setCPassword(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 h-12 border border-gray-300 rounded-lg focus:ring-0 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-gray-50"
+                      className="w-full text-sm bg-white border border-slate-200 rounded-xl py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
                       placeholder="Confirm new password"
                     />
                   </div>
                 </div>
 
                 {/* Password Hint */}
-                <div className="p-3 bg-blue-50 rounded-lg">
+                <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
                   <p className="text-xs text-blue-700">
                     <span className="font-semibold">Password must:</span> Be at least 8 characters, include uppercase, lowercase, number, and special character.
                   </p>
                 </div>
 
-                <button
+                <button 
                   type="button"
                   onClick={handleResetPassword}
                   disabled={loading.resetPassword}
-                  className="w-full bg-[#3232ff] hover:bg-[#2424fa] text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 shadow-lg shadow-indigo-500/25 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 rounded-2xl shadow-lg shadow-blue-500/25 transform active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {loading.resetPassword ? (
                     <>
@@ -412,21 +432,21 @@ const ForgotPassword: React.FC = () => {
 
             {/* Back to Login Link */}
             <div className="text-center">
-              <Link
-                to="/auth/login"
-                className="text-sm text-indigo-600 hover:text-indigo-700 hover:underline"
+              <Link 
+                to="/auth/login" 
+                className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
               >
                 ← Back to Sign In
               </Link>
             </div>
           </form>
-
-          {/* Footer */}
-          <div className="mt-8 pt-6 border-t border-gray-200 text-center text-xs text-gray-400">
-            © 2024 WHam Energy. All rights reserved.
-          </div>
         </div>
-      </div>
+      </motion.div>
+
+      {/* Footer */}
+      <footer className="absolute bottom-8 text-slate-400 text-xs tracking-wider z-10">
+        © {year} WHam Energy. All rights reserved.
+      </footer>
     </div>
   );
 };
