@@ -1,6 +1,6 @@
 import { Search, User } from "lucide-react";
 import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast/headless";
+import { toast } from "react-hot-toast";
 import DataLoading from "../../../components/DataLoading";
 import { MEDIA_URL } from "../../../constant/Baseurl";
 import { getUserFromStorage } from "../../../helper/cryptoUser";
@@ -106,23 +106,22 @@ const UsersView = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-indigo-600">Users List.</h1>
+            <h1 className="text-lg sm:text-xl font-bold text-indigo-600">Users List</h1>
           </div>
         </div>
 
-        {/* Stats Cards Section - Option 2: Colored Header */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+        {/* Stats Cards Section */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           {/* Total Users Card */}
-          <div className="bg-blue-50 rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="h-1 w-ull bg-blue-500"></div>
-            <div className="p-2">
+          <div className="bg-linear-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200 shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+            <div className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-medium text-gray-600 mb-1">Total Users</p>
-                  <p className="text-2xl font-bold text-gray-900">{totalItems}</p>
+                  <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-2">Total Users</p>
+                  <p className="text-3xl font-bold text-blue-900">{totalItems}</p>
                 </div>
-                <div className="p-2 bg-blue-50 rounded-lg">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-users text-blue-600">
+                <div className="p-3 bg-blue-200 rounded-lg">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-users text-blue-700">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
                     <circle cx="9" cy="7" r="4" />
                     <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
@@ -134,16 +133,15 @@ const UsersView = () => {
           </div>
 
           {/* Active Users Card */}
-          <div className="bg-green-50 rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="h-1 w-full bg-green-500"></div>
-            <div className="p-2">
+          <div className="bg-linear-to-br from-green-50 to-green-100 rounded-lg border border-green-200 shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+            <div className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-medium text-gray-600 mb-1">Active Users</p>
-                  <p className="text-2xl font-bold text-green-600">{activeCount}</p>
+                  <p className="text-xs font-semibold text-green-600 uppercase tracking-wide mb-2">Active Users</p>
+                  <p className="text-3xl font-bold text-green-900">{activeCount}</p>
                 </div>
-                <div className="p-2 bg-green-50 rounded-lg">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-user-check text-green-600">
+                <div className="p-3 bg-green-200 rounded-lg">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-user-check text-green-700">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
                     <circle cx="9" cy="7" r="4" />
                     <polyline points="16 11 18 13 22 9" />
@@ -154,16 +152,15 @@ const UsersView = () => {
           </div>
 
           {/* Inactive Users Card */}
-          <div className="bg-red-50 rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="h-1 w-full bg-red-500"></div>
-            <div className="p-2">
+          <div className="bg-linear-to-br from-red-50 to-red-100 rounded-lg border border-red-200 shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+            <div className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-medium text-gray-600 mb-1">Inactive Users</p>
-                  <p className="text-2xl font-bold text-red-600">{inactiveCount}</p>
+                  <p className="text-xs font-semibold text-red-600 uppercase tracking-wide mb-2">Inactive Users</p>
+                  <p className="text-3xl font-bold text-red-900">{inactiveCount}</p>
                 </div>
-                <div className="p-2 bg-red-50 rounded-lg">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-user-x text-red-600">
+                <div className="p-3 bg-red-200 rounded-lg">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-user-x text-red-700">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
                     <circle cx="9" cy="7" r="4" />
                     <line x1="17" y1="8" x2="22" y2="13" />
@@ -176,7 +173,7 @@ const UsersView = () => {
         </div>
 
         {/* Search and Filter Section */}
-        <div className="bg-white rounded-xl shadow-xs border border-gray-200 p-4 sm:p-6 mb-4">
+        <div className="bg-white rounded-xl shadow-xs border border-gray-200 p-4 mb-4">
           <div className="flex flex-col gap-4 justify-between">
             {/* Search Input - 30% width on large screens */}
             <div className="w-full lg:w-[30%] relative">
@@ -230,8 +227,8 @@ const UsersView = () => {
           </div>
         </div>
 
-        {/* Users Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        {/* Desktop Table View - hidden on mobile */}
+        <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[500px]">
               <thead className="bg-linear-to-r from-purple-50 to-indigo-50">
@@ -240,16 +237,16 @@ const UsersView = () => {
                     Sr. No.
                   </th>
                   <th className="px-2 py-3 text-center text-xs font-semibold text-gray-900 uppercase tracking-wider">
-                    User ID
+                    Profile
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
                     Name
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
-                    Email
+                    Contact No.
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
-                    Contact No.
+                    Email
                   </th>
                   <th className="px-2 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
                     Status
@@ -265,15 +262,15 @@ const UsersView = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading ? (
                   <tr>
-                    <td colSpan={7} className="text-center py-4">
+                    <td colSpan={8} className="text-center py-4">
                       <DataLoading />
                     </td>
                   </tr>
                 ) : data?.length > 0 ? (
                   data?.map((item, index) => (
                     <tr key={item?.user_id} className="hover:bg-indigo-50 transition-colors duration-150">
-                      <td className="px-2 py-0.5 text-center whitespace-nowrap text-sm text-black">{index + 1}</td>
-                      <td className="px-2 py-0.5 text-center whitespace-nowrap text-sm text-black">
+                      <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-black">{index + 1}</td>
+                      <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-black">
                         {item?.photo ? (
                           <img
                             src={`${MEDIA_URL}${item?.photo}`}
@@ -286,40 +283,42 @@ const UsersView = () => {
                           </div>
                         )}
                       </td>
-                      <td className="px-2 py-0.5 text-left whitespace-nowrap text-sm text-black">
+                      <td className="px-2 py-2 text-left text-sm text-black">
                         <div className="flex flex-col gap-1 items-start">
-                          <span>{item?.full_name}</span>
-                          <div className="self-start">
-                            <span className="text-xs py-0.5 px-2 bg-gray-100 rounded-xl font-semibold">
-                              <span>User Id : {item?.user_id}</span>
-                            </span>
-                          </div>
+                          <span className="font-medium">{item?.full_name}</span>
+                          <span className="text-xs py-0.5 px-2 bg-gray-100 rounded-full">
+                            ID: {item?.user_id}
+                          </span>
                         </div>
                       </td>
-                      <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-black">
-                        <a href={`tel:${item?.phone}`} className="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer">
+                      <td className="px-2 py-2 text-left text-sm text-black">
+                        <a href={`tel:${item?.phone}`} className="text-blue-600 hover:text-blue-800 hover:underline">
                           {item?.phone}
                         </a>
                       </td>
-                      <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-black">
-                        <a href={`mailto:${item?.email}`} className="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer">
+                      <td className="px-2 py-2 text-left text-sm text-black">
+                        <a href={`mailto:${item?.email}`} className="text-blue-600 hover:text-blue-800 hover:underline break-all">
                           {item?.email}
                         </a>
                       </td>
-                      <td className="px-2 py-0.5">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item?.is_verified === 'A' ? 'bg-green-100 text-green-800' : item?.is_verified === 'I' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'
-                          }`}>
+                      <td className="px-2 py-2">
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${
+                          item?.is_verified === 'A' 
+                            ? "bg-green-100 text-green-800 border-green-200" 
+                            : "bg-red-100 text-red-800 border-red-200"
+                        }`}>
                           {item?.is_verified === "A" ? "Active" : "In-active"}
                         </span>
                       </td>
-
-                      <td className="px-2 py-0.5">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item?.isorganizer === 'Y' ? 'bg-green-100 text-green-800' : item?.isorganizer === 'N' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'
-                          }`}>
+                      <td className="px-2 py-2">
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${
+                          item?.isorganizer === 'Y' 
+                            ? "bg-green-100 text-green-800 border-green-200" 
+                            : "bg-red-100 text-red-800 border-red-200"
+                        }`}>
                           {item?.isorganizer === "Y" ? "Yes" : "No"}
                         </span>
                       </td>
-
                       <td className="px-3 py-2 text-left whitespace-nowrap">
                         <div className="flex justify-center items-center gap-1">
                           <button
@@ -349,7 +348,7 @@ const UsersView = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={7} className="text-center py-4 text-indigo-600">
+                    <td colSpan={8} className="text-center py-4 text-indigo-600">
                       No Records Found
                     </td>
                   </tr>
@@ -359,6 +358,121 @@ const UsersView = () => {
           </div>
         </div>
 
+        {/* Mobile Card View - visible only on mobile */}
+        <div className="block md:hidden">
+          {loading ? (
+            <div className="flex justify-center py-8">
+              <DataLoading />
+            </div>
+          ) : data?.length > 0 ? (
+            <div className="space-y-3">
+              {data?.map((item) => (
+                <div key={item?.user_id} className="bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                  {/* Main Content Row */}
+                  <div className="p-3">
+                    <div className="flex items-start gap-3">
+                      {/* Profile Image */}
+                      <div className="shrink-0">
+                        {item?.photo ? (
+                          <img
+                            src={`${MEDIA_URL}${item?.photo}`}
+                            alt="User"
+                            className="w-14 h-14 object-cover rounded-lg"
+                          />
+                        ) : (
+                          <div className="w-14 h-14 flex items-center justify-center rounded-lg bg-[#e1dcff]">
+                            <User className="w-7 h-7 text-[#4829f7]" />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <h3 className="font-semibold text-gray-900 text-sm">{item?.full_name}</h3>
+                            <p className="text-xs text-gray-500 mt-0.5">ID: {item?.user_id}</p>
+                          </div>
+                          <div className="flex flex-col items-end gap-1">
+                            <span className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-medium ${
+                              item?.is_verified === "A"
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                            }`}>
+                              {item?.is_verified === "A" ? "Active" : "Inactive"}
+                            </span>
+                            <span className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-medium ${
+                              item?.isorganizer === "Y"
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                            }`}>
+                              {item?.isorganizer === "Y" ? "Organizer" : "Not Organizer"}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Phone */}
+                        <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                          <svg className="w-3 h-3 shrink-0 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                          </svg>
+                          <a href={`tel:${item?.phone}`} className="text-blue-600 hover:underline truncate">
+                            {item?.phone}
+                          </a>
+                        </p>
+
+                        {/* Email */}
+                        <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                          <svg className="w-3 h-3 shrink-0 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                          <a href={`mailto:${item?.email}`} className="text-blue-600 hover:underline truncate">
+                            {item?.email}
+                          </a>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons - Compact */}
+                    <div className="flex items-center justify-end gap-1 mt-3 pt-2 border-t border-gray-50">
+                      <button
+                        type="button"
+                        onClick={() => handleView(item)}
+                        className="inline-flex items-center p-1.5 text-sm font-medium text-gray-900 bg-green-50 rounded-lg hover:bg-green-200 transition-all duration-200 cursor-pointer"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" color="green" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye-icon lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" /><circle cx="12" cy="12" r="3" /></svg>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleEdit(item)}
+                        className="inline-flex items-center p-1.5 text-sm font-medium text-gray-900 bg-blue-50 rounded-lg hover:bg-blue-200 transition-all duration-200 cursor-pointer"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" color="#0047B3" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-pencil-line-icon lucide-pencil-line"><path d="M13 21h8" /><path d="m15 5 4 4" /><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /></svg>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeactivateUser(item)}
+                        className="p-1.5 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                        title={item?.is_verified === "A" ? "Deactivate" : "Activate"}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="M4.929 4.929 19.07 19.071" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-indigo-600 bg-white rounded-lg border border-gray-100">
+              No Records Found
+            </div>
+          )}
+        </div>
+
+        {/* Pagination */}
         <div className="mt-2">
           <CustomPagination
             itemPerPage={itemsPerPage}
@@ -367,7 +481,6 @@ const UsersView = () => {
             currentPage={currentPage}
           />
         </div>
-
       </div>
       {showEdit && (<UserEdit Data={selectedUser} show={showEdit} setShow={setShowEdit} fetchData={fetchData} isEdit={true} />)}
       {showView && (<UserEdit Data={selectedUser} show={showView} setShow={setShowView} fetchData={fetchData} isEdit={false} />)}

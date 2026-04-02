@@ -145,7 +145,7 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ currentDate, Data, Loading, o
                   {isToday(day) && (<div className="absolute inset-0 border border-purple-500 pointer-events-none"></div>)}
 
                   {/* Date Number */}
-                  <div className="relative z-10 flex justify-between items-start">
+                  <div className="relative flex justify-between items-start">{/* z-10 */}
                     <div
                       className={`flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full text-sm sm:text-base cursor-pointer
                           ${isToday(day) ? "bg-indigo-600 text-white" :

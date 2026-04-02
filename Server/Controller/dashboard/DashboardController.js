@@ -912,11 +912,13 @@ export const getMemberDetailsForDashboard = (req, res) => {
 
 export const getNotifyActivity = async (req, res) => {
   const sql = `
-    SELECT id, date, title, occasion_id, campaign_id, start_date, end_date, vehicle_type, notes, status 
-    FROM activities
-    WHERE status = 'P'
-    AND end_date >= CURDATE()
-  `;
+              SELECT a.id, a.date, a.title, a.occasion_id, a.campaign_id, a.start_date, a.end_date, a.vehicle_type, a.notes, a.status , a.c_at, a.c_by,
+                CONCAT(b.first_name ," ",b.middle_name," ",b.last_name) AS organizer_name
+                FROM activities As a 
+                LEFT JOIN users AS b ON a.c_by = b.id
+                WHERE status = 'P'
+                AND end_date >= CURDATE()
+                ORDER BY end_date ASC, c_at DESC`;
 
   db.query(sql, (err, results) => {
     if (err) {
@@ -1116,7 +1118,7 @@ export const ApproveRejectStock = async (req, res) => {
       }
 
       // 👉 If APPROVE → calculate stock
-      const currentStock = await getCurrentStock(request.edition , request.c_by);
+      const currentStock = await getCurrentStock(request.edition, request.c_by);
 
       let newStock = currentStock;
 

@@ -91,12 +91,12 @@ const TaskView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white p-2 sm:p-6 border border-indigo-300 rounded-md m-1">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen bg-white border border-indigo-300 m-1 rounded-md p-2 sm:p-6">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-indigo-600">Tasks List.</h1>
+            <h1 className="text-lg sm:text-xl font-bold text-indigo-600">Tasks List</h1>
           </div>
         </div>
 
@@ -115,8 +115,11 @@ const TaskView = () => {
                 value={searchTerm}
                 onChange={handleSearchChange}
               />
-              <button className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-indigo-600 cursor-pointer font-bold" onClick={() => setSearchTerm("")}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+              <button 
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-indigo-600 cursor-pointer font-bold" 
+                onClick={() => setSearchTerm("")}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x-icon lucide-x h-4 w-4 sm:h-5 sm:w-5"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
               </button>
             </div>
 
@@ -160,53 +163,54 @@ const TaskView = () => {
           </div>
         </div>
 
-        {/* Tasks Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        {/* Desktop Table View - hidden on mobile */}
+        <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[500px] divide-y divide-gray-200 p-4">
+            <table className="w-full min-w-[500px]">
               <thead className="bg-linear-to-r from-purple-50 to-indigo-50">
                 <tr>
-                  <th className="px-3 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-center text-xs font-semibold text-gray-900 uppercase tracking-wider">
                     ID
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Name
+                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
+                    Task Name
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
                     Parent Step
                   </th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden">
-                    Description
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
                     Status
                   </th>
-                   <th className="px-2 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                      Action
-                    </th>
+                  <th className="px-2 py-3 text-center text-xs font-semibold text-gray-900 uppercase tracking-wider">
+                    Action
+                  </th>
                 </tr>
               </thead>
-
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="py-6 text-gray-500">
+                    <td colSpan={5} className="text-center py-4">
                       <DataLoading />
                     </td>
                   </tr>
                 ) : data.length > 0 ? (
                   data.map((task: Task) => (
                     <tr key={task.id} className="hover:bg-indigo-50 transition-colors duration-150">
-                      <td className="px-3 py-3 text-center text-sm text-gray-900 whitespace-nowrap">{task.id}</td>
-                      <td className="px-3 py-3 text-left text-sm text-gray-900">{task.task_name}</td>
-                      <td className="px-3 py-3 text-left text-sm text-gray-900">{task.step_name}</td>
-                      <td className="px-3 py-3 text-left text-sm text-gray-900 hidden">
-                        {task.task_desc}
+                      <td className="px-2 py-2 text-center whitespace-nowrap text-sm text-black">{task.id}</td>
+                      <td className="px-2 py-2 text-left text-sm text-black">
+                        <span className="text-sm leading-snug font-medium">
+                          {task.task_name}
+                        </span>
                       </td>
-                      <td className="px-3 py-3 text-left text-sm text-gray-900 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${task.status === 'A' ? 'bg-green-100 text-green-800' : task.status === 'I' ? 'bg-red-100 text-red-800' :
-                          'bg-gray-100 text-gray-800'
-                          }`}>
+                      <td className="px-2 py-2 text-left whitespace-nowrap text-sm text-black">{task.step_name}</td>
+                      <td className="px-2 py-2 text-left whitespace-nowrap">
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${
+                            task.status === 'A' 
+                              ? "bg-green-100 text-green-800 border-green-200" 
+                              : "bg-red-100 text-red-800 border-red-200"
+                          }`}
+                        >
                           {task.status === 'A' ? "Active" : "Inactive"}
                         </span>
                       </td>
@@ -249,6 +253,95 @@ const TaskView = () => {
           </div>
         </div>
 
+        {/* Mobile Card View - visible only on mobile */}
+        <div className="block md:hidden">
+          {loading ? (
+            <div className="flex justify-center py-8">
+              <DataLoading />
+            </div>
+          ) : data.length > 0 ? (
+            <div className="space-y-3">
+              {data.map((task: Task) => (
+                <div key={task.id} className="bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                  {/* Main Content Row */}
+                  <div className="p-3">
+                    <div className="flex items-start gap-3">
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <h3 className="font-semibold text-gray-900 text-sm">{task.task_name}</h3>
+                            <p className="text-xs text-gray-500 mt-0.5">ID: {task.id}</p>
+                          </div>
+                          <span className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-medium ${
+                            task.status === 'A'
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-700"
+                          }`}>
+                            {task.status === 'A' ? "Active" : "Inactive"}
+                          </span>
+                        </div>
+
+                        {/* Parent Step */}
+                        <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                          <svg className="w-3 h-3 shrink-0 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                          </svg>
+                          <span>Step: {task.step_name}</span>
+                        </p>
+
+                        {/* Description */}
+                        {task.task_desc && (
+                          <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                            <svg className="w-3 h-3 shrink-0 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
+                            </svg>
+                            <span className="truncate">{task.task_desc}</span>
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Action Buttons - Compact */}
+                    <div className="flex items-center justify-end gap-1 mt-3 pt-2 border-t border-gray-50">
+                      <button
+                        type="button"
+                        className="inline-flex items-center p-1.5 text-sm font-medium text-gray-900 bg-green-50 rounded-lg hover:bg-green-200 transition-all duration-200 cursor-pointer"
+                        onClick={() => handleView(task)}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" color="green" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye-icon lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" /><circle cx="12" cy="12" r="3" /></svg>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleEdit(task)}
+                        className="inline-flex items-center p-1.5 text-sm font-medium text-gray-900 bg-blue-50 rounded-lg hover:bg-blue-200 transition-all duration-200 cursor-pointer"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" color="#0047B3" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-pencil-line-icon lucide-pencil-line"><path d="M13 21h8" /><path d="m15 5 4 4" /><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /></svg>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeactive(task)}
+                        className="p-1.5 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                        title={task.status === 'A' ? "Deactivate" : "Activate"}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="M4.929 4.929 19.07 19.071" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-indigo-600 bg-white rounded-lg border border-gray-100">
+              No Records Found
+            </div>
+          )}
+        </div>
+
+        {/* Pagination */}
         <div className="mt-2">
           <CustomPagination
             itemPerPage={itemsPerPage}
@@ -257,7 +350,6 @@ const TaskView = () => {
             currentPage={currentPage}
           />
         </div>
-
       </div>
       {showAdd && (
         <AddTask

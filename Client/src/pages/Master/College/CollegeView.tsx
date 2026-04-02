@@ -7,7 +7,6 @@ import { MEDIA_URL } from "../../../constant/Baseurl";
 import CustomPagination from "../../../helper/CustomPagination";
 import { deactivateCollege, getAllColleges } from "../../../services/master/masterApi";
 
-
 export interface College {
   clg_id: number;
   university_id: number;
@@ -78,7 +77,7 @@ const CollegeView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white  border border-indigo-300 m-1 rounded-md p-2 sm:p-6">
+    <div className="min-h-screen bg-white border border-indigo-300 m-1 rounded-md p-2 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
@@ -149,8 +148,8 @@ const CollegeView = () => {
           </div>
         </div>
 
-        {/* Colleges Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        {/* Desktop Table View - hidden on mobile */}
+        <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[500px]">
               <thead className="bg-linear-to-r from-purple-50 to-indigo-50">
@@ -230,7 +229,7 @@ const CollegeView = () => {
                       <td className="px-3 py-2 text-left whitespace-nowrap">
                         <div className="flex justify-center items-center gap-1">
                           <Link
-                          to={`/master/edit-college/${item?.clg_id}?isEdit=false`}
+                            to={`/master/edit-college/${item?.clg_id}?isEdit=false`}
                             className="inline-flex items-center p-1.5 text-sm font-medium text-gray-900 bg-green-50 rounded-lg hover:bg-green-200 transition-all duration-200 cursor-pointer"
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" color="green" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye-icon lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" /><circle cx="12" cy="12" r="3" /></svg>
@@ -262,6 +261,95 @@ const CollegeView = () => {
             </table>
           </div>
         </div>
+
+        {/* Mobile Card View - visible only on mobile */}
+        <div className="block md:hidden">
+          {loading ? (
+            <div className="flex justify-center py-8">
+              <DataLoading />
+            </div>
+          ) : data?.length > 0 ? (
+            <div className="space-y-3">
+              {data?.map((item) => (
+                <div key={item?.clg_id} className="bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                  {/* Main Content Row */}
+                  <div className="p-3">
+                    <div className="flex items-start gap-3">
+                      {/* Image */}
+                      <div
+                        className="shrink-0 w-14 h-14 rounded-lg bg-gray-100 overflow-hidden cursor-pointer"
+                        onClick={() => handleImageShow(item)}
+                      >
+                        <img
+                          src={`${MEDIA_URL}${item?.photo}`}
+                          alt={item?.photo || "College"}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <h3 className="font-semibold text-gray-900 text-xs">{item?.name}</h3>
+                            <p className="text-xs text-gray-500 mt-0.5">ID: {item?.clg_id}</p>
+                            <p className="text-xs text-gray-500 mt-0.5">{item?.university_name}</p>
+                          </div>
+                          <span className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-medium ${item?.status === "A"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                            }`}>
+                            {item?.status === "A" ? "Active" : "Inactive"}
+                          </span>
+                        </div>
+
+                        {/* Address - single line with truncation */}
+                        <p className="text-xs text-gray-500 mt-1.5 flex items-center gap-1 truncate">
+                          <svg className="w-3 h-3 shrink-0 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          <span className="truncate">{item?.clg_address}</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons - Compact */}
+                    <div className="flex items-center justify-end gap-1 mt-3 pt-2 border-t border-gray-50">
+                      <Link
+                        to={`/master/edit-college/${item?.clg_id}?isEdit=false`}
+                        className="inline-flex items-center p-1.5 text-sm font-medium text-gray-900 bg-green-50 rounded-lg hover:bg-green-200 transition-all duration-200 cursor-pointer"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" color="green" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye-icon lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" /><circle cx="12" cy="12" r="3" /></svg>
+                      </Link>
+                      <Link
+                        to={`/master/edit-college/${item?.clg_id}?isEdit=true`}
+                        className="inline-flex items-center p-1.5 text-sm font-medium text-gray-900 bg-blue-50 rounded-lg hover:bg-blue-200 transition-all duration-200 cursor-pointer"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" color="#0047B3" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-pencil-line-icon lucide-pencil-line"><path d="M13 21h8" /><path d="m15 5 4 4" /><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /></svg>
+                      </Link>
+                      <button
+                        onClick={() => handleDeactivateCollege(item)}
+                        className="p-1.5 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                        title={item?.status === "A" ? "Deactivate" : "Activate"}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="M4.929 4.929 19.07 19.071" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-indigo-600 bg-white rounded-lg border border-gray-100">
+              No Records Found
+            </div>
+          )}
+        </div>
+
         {/* Pagination */}
         <div className="mt-2">
           <CustomPagination
@@ -280,4 +368,3 @@ const CollegeView = () => {
 }
 
 export default CollegeView
-

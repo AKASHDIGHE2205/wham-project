@@ -82,6 +82,7 @@ const CollegeEdit = () => {
       status: "",
       count: 0,
     });
+    dispatch(handleSelectUniversity({ id: 0, name: "" }));
     setSelectedLocations([]);
     navigate("/master/view-colleges")
   }

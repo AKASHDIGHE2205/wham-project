@@ -23,6 +23,8 @@ export interface Activity {
   vehicle_type: string;
   notes: string;
   status: 'P' | 'A' | 'C' | 'R' | 'I';
+  c_by: number;
+  organizer_name: string;
 }
 
 export interface Order {
@@ -31,7 +33,7 @@ export interface Order {
   quantity: number;
   status: string;
   full_name: string;
-  c_at : string;
+  c_at: string;
 }
 
 const Navbar = ({ onMobileMenuToggle, isMobileMenuOpen }: NavbarProps) => {
@@ -154,11 +156,11 @@ const Navbar = ({ onMobileMenuToggle, isMobileMenuOpen }: NavbarProps) => {
                             <div
                               key={`${item?.id}-${item?.date}`}
                               className={`group relative p-3 cursor-pointer transition-all duration-200 hover:shadow-md rounded-lg
-                ${item?.status === 'P' ? 'bg-amber-50/30 hover:bg-amber-50/60'
-                                  : item?.status === 'A' ? 'bg-emerald-50/30 hover:bg-emerald-50/60'
-                                    : item?.status === 'R' ? 'bg-rose-50/30 hover:bg-rose-50/60'
-                                      : item?.status === 'C' ? 'bg-sky-50/30 hover:bg-sky-50/60'
-                                        : 'bg-slate-50/30 hover:bg-slate-50/60'
+                                  ${item?.status === 'P' ? 'bg-amber-50 hover:bg-amber-100'
+                                  : item?.status === 'A' ? 'bg-emerald-50 hover:bg-emerald-100'
+                                    : item?.status === 'R' ? 'bg-rose-50 hover:bg-rose-100'
+                                      : item?.status === 'C' ? 'bg-sky-50 hover:bg-sky-100'
+                                        : 'bg-slate-50 hover:bg-slate-100'
                                 }`}
                               onClick={() => handleEventClick(item)}
                             >
@@ -166,6 +168,10 @@ const Navbar = ({ onMobileMenuToggle, isMobileMenuOpen }: NavbarProps) => {
                                 <p className={`text-sm font-medium leading-snug ${item?.status === 'P' ? 'text-amber-800' : 'text-slate-700'
                                   }`}>
                                   {item?.title}
+                                </p>
+
+                                <p className="text-xs text-indigo-600 mt-1">
+                                  Organized by - {item?.organizer_name}
                                 </p>
 
                                 {/* Optional date range - hidden by default */}
@@ -210,12 +216,11 @@ const Navbar = ({ onMobileMenuToggle, isMobileMenuOpen }: NavbarProps) => {
                             <div
                               key={item?.id}
                               className={`group relative p-3 cursor-pointer transition-all duration-200 hover:shadow-md rounded-lg
-                ${item?.status === 'P' ? 'bg-amber-50/30 hover:bg-amber-50/60'
+                                           ${item?.status === 'P' ? 'bg-amber-50/30 hover:bg-amber-50/60'
                                   : item?.status === 'A' ? 'bg-emerald-50/30 hover:bg-emerald-50/60'
                                     : item?.status === 'R' ? 'bg-rose-50/30 hover:bg-rose-50/60'
                                       : item?.status === 'C' ? 'bg-sky-50/30 hover:bg-sky-50/60'
-                                        : 'bg-slate-50/30 hover:bg-slate-50/60'
-                                }`}
+                                        : 'bg-slate-50/30 hover:bg-slate-50/60'}`}
                               onClick={() => handleOpenApproveStockModal(item)}
                             >
                               <div className="pr-20">
@@ -226,12 +231,15 @@ const Navbar = ({ onMobileMenuToggle, isMobileMenuOpen }: NavbarProps) => {
                                 <p className="text-xs text-slate-500 mt-1">
                                   {item?.edition} • {item?.quantity} Cans
                                 </p>
+                                  <p className="text-xs text-indigo-600 mt-1">
+                                    Ordered on {moment(item?.c_at).format("MMM DD, YYYY")}
+                                  </p>
                               </div>
 
                               {/* Status Badge */}
                               <span
                                 className={`absolute right-3 top-3 text-[10px] font-medium px-2.5 py-0.5 rounded-full
-                  ${item?.status === 'P' ? 'bg-amber-100 text-amber-700'
+                                      ${item?.status === 'P' ? 'bg-amber-100 text-amber-700'
                                     : item?.status === 'A' ? 'bg-emerald-100 text-emerald-700'
                                       : item?.status === 'R' ? 'bg-rose-100 text-rose-700'
                                         : item?.status === 'C' ? 'bg-sky-100 text-sky-700'
@@ -314,7 +322,7 @@ const Navbar = ({ onMobileMenuToggle, isMobileMenuOpen }: NavbarProps) => {
             >
               <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/50">
                 <p className="text-sm font-medium text-slate-900 truncate">
-                 {user?.firstName} {user?.lastName}
+                  {user?.firstName} {user?.lastName}
                 </p>
                 <p className="text-xs text-indigo-600 truncate mt-0.5">
                   {user?.email}
@@ -362,7 +370,12 @@ const Navbar = ({ onMobileMenuToggle, isMobileMenuOpen }: NavbarProps) => {
 
           {/* Spacer for pushing right-side items */}
           <div className="flex-1" />
-
+          {/* <Link
+            to={'/add-activity'}
+            className="px-8 py-2 bg-linear-to-r from-[#5441ff] to-[#4531ff] text-white font-semibold rounded-md transition-colors"
+          >
+            Add activity
+          </Link> */}
           {/* Desktop / tablet user menu */}
           {(user?.role === "Master" || user?.role === "Manager") && (
             <div className=" items-center">
@@ -394,7 +407,7 @@ const Navbar = ({ onMobileMenuToggle, isMobileMenuOpen }: NavbarProps) => {
           show={showApproveStockModal}
           setShow={setShowApproveStockModal}
           selectedStock={selectedStock}
-          getNotification ={getNotification}
+          getNotification={getNotification}
           getNotifyStocks={getNotifyStocks}
         />
       )}

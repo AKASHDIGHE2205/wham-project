@@ -143,7 +143,7 @@ export default function CreateActivityPage() {
                   className={`flex-1 flex items-center justify-center py-3 px-4 relative transition-all cursor-pointer duration-300 ${isActive ? 'bg-blue-600 text-white' : 'text-gray-600'}`}
                    onClick={() => handleClick(step?.id)}
                 >
-                  <div className="flex items-center space-x-2 z-10">
+                  <div className="flex items-center space-x-2">{/* z-10 */}
                     {isCompleted ? (
                       <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
                         <Check className="w-3 h-3 text-white" />
