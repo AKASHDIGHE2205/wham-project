@@ -8,7 +8,7 @@ export default function Home() {
   const currentTime = moment().format("HH:mm:ss");
 
   return (
-    <div className="min-h-screen relative overflow-hidden text-slate-800 bg-linear-to-r from-purple-50 to-indigo-50">
+    <div className="min-h-screen relative overflow-hidden text-slate-800 bg-white">
 
       {/* Content Container */}
       <div className="relative max-w-7xl mx-auto px-6 py-4 lg:px-8 flex flex-col gap-6">

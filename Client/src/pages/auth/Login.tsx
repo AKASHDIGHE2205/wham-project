@@ -104,7 +104,7 @@ const Login: React.FC = () => {
                   onChange={handleChange}
                   required
                   placeholder="Enter your username (Email/Mobile)"
-                  className="w-full text-sm bg-white border border-slate-200 rounded-xl py-4 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
+                  className="w-full text-sm bg-white border border-slate-200 rounded-lg py-2 h-12 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
                 />
               </div>
             </div>
@@ -113,7 +113,7 @@ const Login: React.FC = () => {
               <label className="text-sm font-semibold text-slate-700 ml-1">Password</label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                  <Lock className="w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                  <Lock className="w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                 </div>
                 <input 
                   type={showPassword ? "text" : "password"}
@@ -122,7 +122,7 @@ const Login: React.FC = () => {
                   onChange={handleChange}
                   required
                   placeholder="••••••••"
-                  className="w-full bg-white border border-slate-200 rounded-xl py-4 pl-12 pr-12 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
+                  className="w-full bg-white border border-slate-200 rounded-lg py-2 h-12 pl-12 pr-12 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
                 />
                 <button 
                   type="button"

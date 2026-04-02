@@ -95,12 +95,7 @@ export const masterSlice = createSlice({
     },
   },
 });
-export const {
-  handleSelectMember,
-  handleSelectUser,
-  handleSelectStep,
-  handleSelectUniversity,
-  handleSelectCollege,
-  handleSelectDepartment,
+
+export const { handleSelectMember, handleSelectUser, handleSelectStep, handleSelectUniversity, handleSelectCollege, handleSelectDepartment,
 } = masterSlice.actions;
 export default masterSlice.reducer;

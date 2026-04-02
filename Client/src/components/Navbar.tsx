@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MEDIA_URL } from "../constant/Baseurl";
 import { getUserFromStorage } from "../helper/cryptoUser";
-import { getNotifyActivity } from "../services/dashboard/DashboardApi";
+import { getNotifyActivity, getNotifyStock } from "../services/dashboard/DashboardApi";
+import ApproveStockModal from "./ApproveStockModal";
 
 interface NavbarProps {
   onMobileMenuToggle?: () => void;
@@ -21,20 +22,39 @@ export interface Activity {
   end_date: string;
   vehicle_type: string;
   notes: string;
-  status: 'P' | 'A' | 'I';
+  status: 'P' | 'A' | 'C' | 'R' | 'I';
+}
+
+export interface Order {
+  id: number;
+  edition: string;
+  quantity: number;
+  status: string;
+  full_name: string;
+  c_at : string;
 }
 
 const Navbar = ({ onMobileMenuToggle, isMobileMenuOpen }: NavbarProps) => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [imgError, setImgError] = useState(false);
   const [notification, setNotification] = useState<Activity[]>([]);
+  const [orderNotification, setOrderNotification] = useState<Order[]>([]);
   const user = getUserFromStorage();
   const navigate = useNavigate();
+  const [showApproveStockModal, setShowApproveStockModal] = useState(false);
+  const [selectedStock, setSelectedStock] = useState<Order | null>(null);
 
   const getNotification = async () => {
     const response = await getNotifyActivity();
     if (response) {
       setNotification(response);
+    }
+  }
+
+  const getNotifyStocks = async () => {
+    const response = await getNotifyStock();
+    if (response) {
+      setOrderNotification(response);
     }
   }
 
@@ -46,6 +66,7 @@ const Navbar = ({ onMobileMenuToggle, isMobileMenuOpen }: NavbarProps) => {
       }
     };
     getNotification();
+    getNotifyStocks();
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -58,6 +79,13 @@ const Navbar = ({ onMobileMenuToggle, isMobileMenuOpen }: NavbarProps) => {
   const handleClickNotification = (isOpen: boolean) => {
     setActiveDropdown(isOpen ? null : "notification");
     getNotification();
+    getNotifyStocks();
+  }
+
+  const handleOpenApproveStockModal = (stock: Order) => {
+    setSelectedStock(stock);
+    setShowApproveStockModal(true);
+    setActiveDropdown(null);
   }
 
   const renderNotification = () => {
@@ -68,22 +96,20 @@ const Navbar = ({ onMobileMenuToggle, isMobileMenuOpen }: NavbarProps) => {
         {/* Bell Button with enhanced styling */}
         <button
           onClick={() => handleClickNotification(isOpen)}
-          className={`
-          relative p-2.5 rounded-xl 
-          transition-all duration-200 ease-in-out
+          className={`relative p-2.5 rounded-full transition-all duration-200 ease-in-out
           ${isOpen ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}
           cursor-pointer group`}
         >
-          <Bell className="w-5 h-5 transition-transform group-hover:scale-110 text-[#2c07ff]" />
+          <Bell className="w-6 h-6 transition-transform group-hover:scale-110 text-[#2c07ff]" />
 
           {/* Enhanced Unread Badge with animation */}
-          {notification?.length > 0 && (
+          {(notification?.length || orderNotification?.length) > 0 && (
             <motion.span
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="absolute -top-1 -right-1 bg-linear-to-r from-red-500 to-rose-500 text-white text-[10px] font-medium px-1.5 py-0.5 rounded-full shadow-sm border-2 border-white"
             >
-              {notification?.length > 9 ? '9+' : notification?.length}
+              {(notification?.length + orderNotification?.length) > 9 ? '9+' : (notification?.length + orderNotification?.length)}
             </motion.span>
           )}
         </button>
@@ -102,56 +128,128 @@ const Navbar = ({ onMobileMenuToggle, isMobileMenuOpen }: NavbarProps) => {
               <div className="px-5 py-4 bg-linear-to-r from-indigo-600 to-indigo-700">
                 <div className="flex justify-between items-center">
                   <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-                    <Bell className="w-4 h-4" />
+                    <Bell className="w-5 h-5" />
                     Notifications
                   </h3>
                   {notification?.length > 0 && (
                     <span className="text-xs bg-white/20 text-white px-2 py-1 rounded-full backdrop-blur-sm">
-                      {notification?.length} Pending
+                      {(notification?.length + orderNotification?.length) > 9 ? '9+' : (notification?.length + orderNotification?.length)} Pending Approvals
                     </span>
                   )}
                 </div>
               </div>
 
               {/* Notification List with smooth scrolling */}
-              <div className="max-h-96 overflow-y-auto divide-y divide-slate-100">
-                {notification?.length > 0 ? (
-                  notification?.map((item, index) => (
-                    <motion.div
-                      key={item?.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className={`group relative p-4 cursor-pointer transition-all duration-200 hover:shadow-md
-                      ${item?.status === 'P' ? 'bg-amber-50/80 hover:bg-amber-100' : 'hover:bg-slate-50'} `}
-                      onClick={() => handleEventClick(item)}
-                    >
-                      {/* Status indicator dot */}
-                      {item?.status === 'P' && (
-                        <span className="absolute left-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-amber-500 rounded-full" />
-                      )}
+              <div className="max-h-96 overflow-y-auto divide-y divide-slate-100 m-2 rounded-lg border border-slate-200">
+                {(notification?.length || orderNotification?.length) > 0 ? (
+                  <div className="divide-y divide-slate-100">
+                    {/* Activity Notifications Section */}
+                    {notification?.length > 0 && (
+                      <div className="py-2">
+                        <h3 className="px-2 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                          Activity Notifications
+                        </h3>
+                        <div className="space-y-1.5">
+                          {notification?.map((item) => (
+                            <div
+                              key={`${item?.id}-${item?.date}`}
+                              className={`group relative p-3 cursor-pointer transition-all duration-200 hover:shadow-md rounded-lg
+                ${item?.status === 'P' ? 'bg-amber-50/30 hover:bg-amber-50/60'
+                                  : item?.status === 'A' ? 'bg-emerald-50/30 hover:bg-emerald-50/60'
+                                    : item?.status === 'R' ? 'bg-rose-50/30 hover:bg-rose-50/60'
+                                      : item?.status === 'C' ? 'bg-sky-50/30 hover:bg-sky-50/60'
+                                        : 'bg-slate-50/30 hover:bg-slate-50/60'
+                                }`}
+                              onClick={() => handleEventClick(item)}
+                            >
+                              <div className="pr-20">
+                                <p className={`text-sm font-medium leading-snug ${item?.status === 'P' ? 'text-amber-800' : 'text-slate-700'
+                                  }`}>
+                                  {item?.title}
+                                </p>
 
-                      <div className="pl-4">
-                        <p className={`text-sm font-medium leading-snug ${item?.status === 'P' ? 'text-amber-900' : 'text-slate-800'}`}>
-                          {item?.title}
-                        </p>
+                                {/* Optional date range - hidden by default */}
+                                <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
+                                  <Calendar size={12} className="stroke-current" />
+                                  <span>
+                                    {moment(item?.start_date).format("MMM DD, YYYY")} - {moment(item?.end_date).format("MMM DD, YYYY")}
+                                  </span>
+                                </div>
+                              </div>
 
-                        <div className="flex items-center gap-3 text-xs">
-                          <span className="flex items-center gap-1 text-slate-500">
-                            <Calendar size={12} className="stroke-current" />
-                            <span>{moment(item?.start_date).format("MMM DD, YYYY")} - {moment(item?.end_date).format("MMM DD, YYYY")}</span>
-                          </span>
+                              {/* Status Badge */}
+                              <span
+                                className={`absolute right-3 top-3 text-[10px] font-medium px-2.5 py-0.5 rounded-full
+                  ${item?.status === 'P' ? 'bg-amber-100 text-amber-700'
+                                    : item?.status === 'A' ? 'bg-emerald-100 text-emerald-700'
+                                      : item?.status === 'R' ? 'bg-rose-100 text-rose-700'
+                                        : item?.status === 'C' ? 'bg-sky-100 text-sky-700'
+                                          : 'bg-slate-100 text-slate-600'
+                                  }`}
+                              >
+                                {item?.status === 'P' ? 'Pending'
+                                  : item?.status === 'A' ? 'Approved'
+                                    : item?.status === "R" ? 'Rejected'
+                                      : item?.status === "C" ? 'Completed'
+                                        : 'Inactive'}
+                              </span>
+                            </div>
+                          ))}
                         </div>
-
-                        {/* Status badge for pending items */}
-                        {item?.status === 'P' && (
-                          <span className="absolute right-4 top-4 text-[10px] font-medium text-amber-600 bg-amber-200/50 px-2 py-0.5 rounded-full">
-                            Pending
-                          </span>
-                        )}
                       </div>
-                    </motion.div>
-                  ))
+                    )}
+
+                    {/* Order Notifications Section */}
+                    {orderNotification?.length > 0 && (
+                      <div className="pt-3 pb-2">
+                        <h3 className="px-2 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                          Order Notifications
+                        </h3>
+                        <div className="space-y-1.5">
+                          {orderNotification?.map((item) => (
+                            <div
+                              key={item?.id}
+                              className={`group relative p-3 cursor-pointer transition-all duration-200 hover:shadow-md rounded-lg
+                ${item?.status === 'P' ? 'bg-amber-50/30 hover:bg-amber-50/60'
+                                  : item?.status === 'A' ? 'bg-emerald-50/30 hover:bg-emerald-50/60'
+                                    : item?.status === 'R' ? 'bg-rose-50/30 hover:bg-rose-50/60'
+                                      : item?.status === 'C' ? 'bg-sky-50/30 hover:bg-sky-50/60'
+                                        : 'bg-slate-50/30 hover:bg-slate-50/60'
+                                }`}
+                              onClick={() => handleOpenApproveStockModal(item)}
+                            >
+                              <div className="pr-20">
+                                <p className={`text-sm font-medium leading-snug ${item?.status === 'P' ? 'text-amber-800' : 'text-slate-700'
+                                  }`}>
+                                  {item?.full_name}
+                                </p>
+                                <p className="text-xs text-slate-500 mt-1">
+                                  {item?.edition} • {item?.quantity} Cans
+                                </p>
+                              </div>
+
+                              {/* Status Badge */}
+                              <span
+                                className={`absolute right-3 top-3 text-[10px] font-medium px-2.5 py-0.5 rounded-full
+                  ${item?.status === 'P' ? 'bg-amber-100 text-amber-700'
+                                    : item?.status === 'A' ? 'bg-emerald-100 text-emerald-700'
+                                      : item?.status === 'R' ? 'bg-rose-100 text-rose-700'
+                                        : item?.status === 'C' ? 'bg-sky-100 text-sky-700'
+                                          : 'bg-slate-100 text-slate-600'
+                                  }`}
+                              >
+                                {item?.status === 'P' ? 'Pending'
+                                  : item?.status === 'A' ? 'Approved'
+                                    : item?.status === 'R' ? 'Rejected'
+                                      : item?.status === 'C' ? 'Completed'
+                                        : 'Inactive'}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 ) : (
                   <motion.div
                     initial={{ opacity: 0 }}
@@ -191,11 +289,11 @@ const Navbar = ({ onMobileMenuToggle, isMobileMenuOpen }: NavbarProps) => {
             <img
               src={`${MEDIA_URL}${user.photo}`}
               alt={user.firstName || "User"}
-              className="w-11 h-11 rounded-full object-cover border border-slate-200"
+              className="w-12 h-12 rounded-full object-cover border border-slate-200"
               onError={() => setImgError(true)}
             />
           ) : (
-            <div className="w-11 h-11 rounded-full bg-linear-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white text-sm font-semibold shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-linear-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white text-sm font-semibold shadow-sm">
               {user?.firstName?.[0] || ""}
               {user?.lastName?.[0] || ""}
               {!user?.firstName && !user?.lastName && (
@@ -216,9 +314,9 @@ const Navbar = ({ onMobileMenuToggle, isMobileMenuOpen }: NavbarProps) => {
             >
               <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/50">
                 <p className="text-sm font-medium text-slate-900 truncate">
-                  {user?.firstName} {user?.lastName}
+                 {user?.firstName} {user?.lastName}
                 </p>
-                <p className="text-xs text-slate-500 truncate mt-0.5">
+                <p className="text-xs text-indigo-600 truncate mt-0.5">
                   {user?.email}
                 </p>
                 <div className="mt-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">
@@ -291,6 +389,15 @@ const Navbar = ({ onMobileMenuToggle, isMobileMenuOpen }: NavbarProps) => {
           </div>
         </div>
       </div>
+      {showApproveStockModal && (
+        <ApproveStockModal
+          show={showApproveStockModal}
+          setShow={setShowApproveStockModal}
+          selectedStock={selectedStock}
+          getNotification ={getNotification}
+          getNotifyStocks={getNotifyStocks}
+        />
+      )}
     </nav>
   );
 };

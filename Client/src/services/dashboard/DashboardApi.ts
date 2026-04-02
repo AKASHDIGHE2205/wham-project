@@ -180,3 +180,73 @@ export const getNotifyActivity = async () => {
     return null;
   }
 };
+
+export const AddStock = async (data: any) => {
+  try {
+    const response: any = await axios.post(`${BASE_URL}/dashboard/purchaseStock`, data, { ...getHeaders(), });
+    if (response.status === 200) {
+      toast.success(response?.message || "Stock added successfully!");
+      return response.data;
+    }
+  } catch (error) {
+    toast.error("Failed to add Stock");
+    console.error(error);
+  }
+}
+export const SaleStock = async (data: any) => {
+  try {
+    const response: any = await axios.post(`${BASE_URL}/dashboard/saleStock`, data, { ...getHeaders(), });
+    if (response.status === 200) {
+      toast.success(response?.message || "Stock sold successfully!");
+      return response.data;
+    }
+  } catch (error) {
+    toast.error("Failed to sell Stock");
+    console.error(error);
+  }
+}
+export const GetAllStockLatest = async (userId: number) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/dashboard/getAllStockLatest/${userId}`, { ...getHeaders(), });
+    return response.data;
+  } catch (error) {
+    toast.error("Failed to fetch Stock");
+    console.error(error);
+  }
+}
+export const GetMyRequests = async (userId: number) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/dashboard/getMyRequests/${userId}`, { ...getHeaders(), });
+    return response.data;
+  } catch (error) {
+    toast.error("Failed to fetch Stock");
+    console.error(error);
+  }
+}
+export const ApproveRejectStock = async (data: any) => {
+  try {
+    const response: any = await axios.post(`${BASE_URL}/dashboard/approveRejectStock`, data, { ...getHeaders(), });
+    if (response.status === 200) {
+      toast.success(response?.message || "Stock status updated successfully!");
+      return response.data;
+    }
+  } catch (error) {
+    toast.error("Failed to update Stock status");
+    console.error(error);
+  }
+}
+export const getNotifyStock = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/dashboard/getNotifyStock`, { ...getHeaders(), });
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      toast.error(error.response?.data?.message || "Failed to fetch Stock");
+      console.error(error);
+    } else {
+      toast.error("An unexpected error occurred");
+      console.error(error);
+    }
+    return null;
+  }
+};

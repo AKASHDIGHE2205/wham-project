@@ -158,7 +158,7 @@ const Register: React.FC = () => {
               <div className="flex flex-col space-y-2">
                 <div className="flex space-x-2">
                   <label className="cursor-pointer">
-                    <div className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 inline-flex items-center gap-2">
+                    <div className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 inline-flex items-center gap-2">
                       <Image className="w-4 h-4" />
                       Upload Photo
                     </div>
@@ -192,9 +192,9 @@ const Register: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700 ml-1">First Name <span className='text-red-500'>*</span></label>
-                <div className="relative group">
+                <div className="relative group mt-1">
                   <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                    <User className="w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                    <User className="w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                   </div>
                   <input
                     type="text"
@@ -203,16 +203,16 @@ const Register: React.FC = () => {
                     value={inputs.firstName}
                     required
                     placeholder="First Name"
-                    className="w-full text-sm bg-white border border-slate-200 rounded-xl py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
+                    className="w-full text-sm bg-white border border-slate-200 rounded-lg h-10 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700 ml-1">Middle Name</label>
-                <div className="relative group">
+                <div className="relative group mt-1">
                   <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                    <User className="w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                    <User className="w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                   </div>
                   <input
                     type="text"
@@ -220,16 +220,16 @@ const Register: React.FC = () => {
                     onChange={handleChange}
                     value={inputs.middleName}
                     placeholder="Middle Name"
-                    className="w-full text-sm bg-white border border-slate-200 rounded-xl py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
+                    className="w-full text-sm bg-white border border-slate-200 rounded-lg h-10 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700 ml-1">Last Name <span className='text-red-500'>*</span></label>
-                <div className="relative group">
+                <div className="relative group mt-1">
                   <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                    <User className="w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                    <User className="w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                   </div>
                   <input
                     type="text"
@@ -238,18 +238,18 @@ const Register: React.FC = () => {
                     onChange={handleChange}
                     value={inputs.lastName}
                     placeholder="Last Name"
-                    className="w-full text-sm bg-white border border-slate-200 rounded-xl py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
+                    className="w-full text-sm bg-white border border-slate-200 rounded-lg h-10 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
                   />
                 </div>
               </div>
             </div>
 
             {/* Email Field */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label className="text-sm font-semibold text-slate-700 ml-1">Email <span className='text-red-500'>*</span></label>
-              <div className="relative group">
+              <div className="relative group mt-1">
                 <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                  <Mail className="w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                  <Mail className="w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                 </div>
                 <input
                   type="email"
@@ -258,7 +258,7 @@ const Register: React.FC = () => {
                   value={inputs.email}
                   required
                   placeholder="Enter your email"
-                  className="w-full text-sm bg-white border border-slate-200 rounded-xl py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
+                  className="w-full text-sm bg-white border border-slate-200 rounded-lg py-2 h-10 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
                 />
               </div>
             </div>
@@ -266,9 +266,9 @@ const Register: React.FC = () => {
             {/* Mobile Number Field */}
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-700 ml-1">Mobile Number <span className='text-red-500'>*</span></label>
-              <div className="relative group">
+              <div className="relative group mt-1">
                 <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                  <Phone className="w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                  <Phone className="w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                 </div>
                 <input
                   type="tel"
@@ -279,7 +279,7 @@ const Register: React.FC = () => {
                   pattern="[0-9]{10}"
                   required
                   placeholder="Enter mobile number"
-                  className="w-full text-sm bg-white border border-slate-200 rounded-xl py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
+                  className="w-full text-sm bg-white border border-slate-200 rounded-lg py-2 h-10 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
                 />
               </div>
             </div>
@@ -287,9 +287,9 @@ const Register: React.FC = () => {
             {/* Password Fields */}
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-700 ml-1">Password <span className='text-red-500'>*</span></label>
-              <div className="relative group">
+              <div className="relative group mt-1">
                 <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                  <Lock className="w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                  <Lock className="w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
@@ -298,23 +298,23 @@ const Register: React.FC = () => {
                   onChange={handleChange}
                   value={inputs.password}
                   placeholder="Create a strong password"
-                  className="w-full text-sm bg-white border border-slate-200 rounded-xl py-3 pl-12 pr-12 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
+                  className="w-full text-sm bg-white border border-slate-200 rounded-lg py-2 h-10 pl-12 pr-12 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-700 ml-1">Confirm Password <span className='text-red-500'>*</span></label>
-              <div className="relative group">
+              <div className="relative group mt-1">
                 <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                  <Shield className="w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                  <Shield className="w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                 </div>
                 <input
                   type="password"
@@ -323,7 +323,7 @@ const Register: React.FC = () => {
                   onChange={handleChange}
                   value={inputs.confirmPassword}
                   placeholder="Confirm your password"
-                  className="w-full text-sm bg-white border border-slate-200 rounded-xl py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
+                  className="w-full text-sm bg-white border border-slate-200 rounded-lg py-2 h-10 pl-12 pr-4 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 shadow-sm"
                 />
               </div>
             </div>
@@ -332,7 +332,7 @@ const Register: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-500/25 transform active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-2 rounded-lg shadow-lg shadow-blue-500/25 transform active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -345,7 +345,7 @@ const Register: React.FC = () => {
               ) : (
                 <>
                   Register
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>

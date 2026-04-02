@@ -505,7 +505,7 @@ export default function Library() {
 
   if (!userData) {
     return (
-      <div className="min-h-screen bg-slate-50 p-4 md:p-8 flex justify-center items-center">
+      <div className="min-h-screen bg-white p-4 md:p-8 flex justify-center items-center">
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 text-center max-w-md">
           <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Folder className="w-10 h-10 text-slate-400" />

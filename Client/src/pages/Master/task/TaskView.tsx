@@ -91,7 +91,7 @@ const TaskView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-indigo-50 p-2 sm:p-6 border border-indigo-300 rounded-md m-1">
+    <div className="min-h-screen bg-white p-2 sm:p-6 border border-indigo-300 rounded-md m-1">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">

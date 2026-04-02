@@ -129,7 +129,7 @@ export default function Profile() {
 
   if (!userData) {
     return (
-      <div className="min-h-screen bg-slate-50 p-4 md:p-8 flex justify-center items-center font-sans text-slate-900">
+      <div className="min-h-screen bg-white p-4 md:p-8 flex justify-center items-center font-sans text-slate-900">
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 text-center max-w-md">
           <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <User className="w-10 h-10 text-slate-400" />
@@ -250,15 +250,15 @@ export default function Profile() {
     acc[date].push(activity);
     return acc;
   }, {});
-  
+
   const sortedDates = Object.keys(groupedActivities).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-8 flex justify-center items-start font-sans text-slate-900">
-      <div className="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="min-h-screen bg-slate-50 p-4 flex justify-center items-start font-sans text-slate-900">
+      <div className="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-5 gap-6">
 
         {/* Left Column */}
-        <div className="lg:col-span-2 space-y-6" data-aos="fade-left">
+        <div className="lg:col-span-3 space-y-6" data-aos="fade-down">
           {/* Main Profile Card */}
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-100">
             {/* Banner */}
@@ -405,9 +405,9 @@ export default function Profile() {
         </div>
 
         {/* Right Column */}
-        <div className="space-y-6 flex flex-col">
+        <div className="lg:col-span-2 space-y-6">
           {/* Activities Card - Replacing Task List */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col flex-1 min-h-80">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col flex-1 h-full">
             <div className="p-5 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <CalendarIcon className="text-[#4f3fe0]" size={20} />
@@ -421,7 +421,7 @@ export default function Profile() {
               </Link>
             </div>
 
-            <div className="p-5 flex-1 overflow-y-auto max-h-96">
+            <div className="p-5 flex-1 overflow-y-auto">
               {activitiesLoading ? (
                 <div className="text-center py-8">
                   <div className="w-8 h-8 border-4 border-[#4f3fe0] border-t-transparent rounded-full animate-spin mx-auto"></div>
@@ -497,41 +497,6 @@ export default function Profile() {
               )}
             </div>
           </div>
-
-          {/* Performance Score Card */}
-          <div className="bg-linear-to-br from-[#4f3fe0] to-[#4f3fe0] rounded-2xl shadow-sm p-6 text-white shrink-0 hidden">
-            <h2 className="text-lg font-bold mb-2">Activity Summary</h2>
-            <div className="flex items-baseline gap-1 mb-4">
-              <span className="text-5xl font-bold tracking-tight">{activities.length}</span>
-              <span className="text-indigo-200 text-lg font-medium">activities</span>
-            </div>
-
-            {/* Status Breakdown */}
-            <div className="space-y-2 mb-4">
-              <div className="flex justify-between text-xs">
-                <span>Approved</span>
-                <span className="font-medium">{activities.filter(a => a.status === 'A').length}</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span>Pending</span>
-                <span className="font-medium">{activities.filter(a => a.status === 'p').length}</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span>Rejected</span>
-                <span className="font-medium">{activities.filter(a => a.status === 'R').length}</span>
-              </div>
-            </div>
-
-            <p className="text-indigo-200 text-xs font-medium">
-              Member ID: #{userProfile?.user?.mem_id || userData?.id} • Role: {getRole()}
-            </p>
-            {userProfile?.user?.isorganizer === 'Y' && (
-              <p className="text-indigo-200 text-xs font-medium mt-1">
-                Organizer Account • Additional privileges
-              </p>
-            )}
-          </div>
-
         </div>
 
       </div>

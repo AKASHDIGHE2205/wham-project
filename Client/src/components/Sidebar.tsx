@@ -208,7 +208,7 @@ const Sidebar = ({ onCloseMobile }: SidebarProps) => {
 
   const renderUserProfile = () => {
     return (
-      <div className="border-t border-gray-100 pt-4 px-3 pb-28 sm:pb-4">
+      <div className="border-t border-gray-100 pt-4 px-3 mb-22 sm:pb-4">
 
         {/* Top Row */}
         <div className="flex items-center gap-3">
@@ -325,7 +325,7 @@ const Sidebar = ({ onCloseMobile }: SidebarProps) => {
       </div>
       {/* User Profile Section */}
       {user && (user?.role === "Master" || user?.role === "Admin" || user?.role === "Manager" || user?.role === "User") && (
-        <div className="px-3 pb-4">
+        <div className="px-3 pb-4 sm:hidden block border-t border-gray-100">
           {renderUserProfile()}
         </div>
       )}

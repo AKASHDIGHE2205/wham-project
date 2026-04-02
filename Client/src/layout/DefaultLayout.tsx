@@ -28,11 +28,8 @@ const DefaultLayout = () => {
 
       {/* Sidebar - Desktop: always visible, Mobile: conditional */}
       <div
-        className={`
-          fixed lg:static inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out
-          ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-          lg:block bg-white border-r border-orange-300 h-screen overflow-hidden w-70
-        `}
+        className={`fixed lg:static inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out
+          ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} lg:block bg-white border-r border-purple-300 h-screen overflow-hidden w-70`}
       >
         <Sidebar onCloseMobile={closeMobileSidebar} />
       </div>
@@ -47,7 +44,7 @@ const DefaultLayout = () => {
         </div>
 
         {/* Main Content */}
-        <main className="flex-1 bg-orange-50 overflow-auto">
+        <main className="flex-1 bg-white overflow-auto">
           <div className="h-full w-full">
             <Outlet />
           </div>

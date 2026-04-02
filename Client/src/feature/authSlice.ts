@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import CryptoJS from "crypto-js";
-import { secretKey } from "../constant/Baseurl";
 import Cookies from "js-cookie";
+import { secretKey } from "../constant/Baseurl";
 import { verifyTokenApi } from "../services/auth/authApi";
 
 const initialState = {

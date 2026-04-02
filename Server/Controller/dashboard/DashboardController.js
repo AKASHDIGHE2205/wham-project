@@ -925,3 +925,245 @@ export const getNotifyActivity = async (req, res) => {
     return res.status(200).json(results);
   });
 };
+
+const getCurrentStock = (edition, userId) => {
+  return new Promise((resolve, reject) => {
+    const sql = `
+      SELECT balance_qty 
+      FROM stock_tran 
+      WHERE edition = ? 
+      AND c_by = ?
+      AND status = 'A'
+      ORDER BY id DESC 
+      LIMIT 1
+    `;
+
+    db.query(sql, [edition, userId], (err, result) => {
+      if (err) return reject(err);
+      if (result.length === 0) return resolve(0);
+      resolve(result[0].balance_qty);
+    });
+  });
+};
+
+export const PurchaseStock = async (req, res) => {
+  try {
+    const { edition, quantity, userId } = req.body;
+
+    if (!edition || !quantity || !userId) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // ✅ Get previous balance
+    const currentStock = await getCurrentStock(edition, userId);
+
+    const sql = `
+      INSERT INTO stock_tran
+      (edition, quantity, tran_type, balance_qty, status, c_by, c_at) 
+      VALUES (?, ?, 'PURCHASE', ?, 'P', ?, NOW())
+    `;
+
+    db.query(sql, [edition, quantity, currentStock, userId], (err, result) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Error creating request" });
+      }
+
+      return res.status(200).json({
+        message: "Purchase request created",
+        previousBalance: currentStock,
+        requestId: result.insertId
+      });
+    });
+
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+export const SaleStock = async (req, res) => {
+  try {
+    const { edition, quantity, userId } = req.body;
+
+    if (!edition || !quantity || !userId) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const currentStock = await getCurrentStock(edition, userId);
+
+    if (quantity > currentStock) {
+      return res.status(400).json({
+        message: "Insufficient stock",
+        available: currentStock
+      });
+    }
+
+    const newStock = currentStock - quantity;
+
+    const sql = `
+      INSERT INTO stock_tran 
+      (edition, tran_type, quantity, balance_qty, c_by, c_at)
+      VALUES (?, 'SALE', ?, ?, ?, NOW())
+    `;
+
+    db.query(sql, [edition, quantity, newStock, userId], (err, result) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Error processing sale" });
+      }
+
+      return res.status(200).json({
+        message: "Sale successful",
+        balance: newStock
+      });
+    });
+
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+export const GetAllStockLatest = (req, res) => {
+  const userID = req.params.userId;
+
+  const sql = `
+    SELECT t.*
+    FROM stock_tran t
+    INNER JOIN (
+        SELECT edition, MAX(id) AS max_id
+        FROM stock_tran
+        WHERE c_by = ? AND tran_type = 'PURCHASE'
+        GROUP BY edition
+    ) latest 
+    ON t.id = latest.max_id
+    WHERE t.c_by = ?
+  `;
+
+  db.query(sql, [userID, userID], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Error fetching stock" });
+    }
+
+    return res.status(200).json(result);
+  });
+};
+
+export const getMyRequests = (req, res) => {
+  const userId = req.params.userId;
+
+  const sql = `
+    SELECT *
+    FROM stock_tran
+    WHERE c_by = ?
+      AND c_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+      AND tran_type = 'PURCHASE'
+    ORDER BY c_at DESC
+  `;
+
+  db.query(sql, [userId], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Error fetching transactions" });
+    }
+
+    return res.status(200).json(result);
+  });
+};
+
+export const ApproveRejectStock = async (req, res) => {
+  try {
+    const { requestId, status, userId } = req.body;
+
+    if (!requestId || !status || !userId) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    if (!['A', 'R'].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    // 1. Get request details
+    const getSql = `SELECT * FROM stock_tran WHERE id = ?`;
+
+    db.query(getSql, [requestId], async (err, result) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Error fetching request" });
+      }
+
+      if (result.length === 0) {
+        return res.status(404).json({ message: "Request not found" });
+      }
+
+      const request = result[0];
+
+      if (request.status !== 'P') {
+        return res.status(400).json({ message: "Already processed" });
+      }
+
+      // 👉 If REJECT → only update status
+      if (status === 'R') {
+        const rejectSql = `UPDATE stock_tran  SET status = 'R', u_by = ?, u_at = NOW() WHERE id = ?`;
+
+        return db.query(rejectSql, [userId, requestId], (err) => {
+          if (err) {
+            console.error(err);
+            return res.status(500).json({ message: "Error rejecting request" });
+          }
+          return res.status(200).json({ message: "Request rejected successfully" });
+        });
+      }
+
+      // 👉 If APPROVE → calculate stock
+      const currentStock = await getCurrentStock(request.edition , request.c_by);
+
+      let newStock = currentStock;
+
+      if (request.tran_type === 'PURCHASE') {
+        newStock = currentStock + request.quantity;
+      } else if (request.tran_type === 'SALE') {
+        if (request.quantity > currentStock) {
+          return res.status(400).json({ message: "Insufficient stock at approval time", available: currentStock });
+        }
+        newStock = currentStock - request.quantity;
+      }
+
+      // 2. Update record with approval + balance
+      const approveSql = `UPDATE stock_tran  SET status = 'A',  balance_qty = ?,  u_by = ?,  u_at = NOW() WHERE id = ?`;
+
+      db.query(approveSql, [newStock, userId, requestId], (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ message: "Error approving request" });
+        }
+
+        return res.status(200).json({ message: "Request approved successfully", balance: newStock });
+      });
+    });
+
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+export const GetNotifyStock = (req, res) => {
+  const sql = `
+                SELECT a.id,a.edition,a.quantity,status, CONCAT(b.first_name ," ",b.middle_name," ",b.last_name) AS full_name,c_at
+                FROM stock_tran AS a
+                LEFT JOIN users AS b on a.c_by = b.id
+                WHERE a.status = 'P'
+                AND a.tran_type = 'PURCHASE'
+                AND a.c_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+                ORDER BY a.c_at DESC
+              `;
+
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Error fetching stock" });
+    }
+
+    return res.status(200).json(result);
+  });
+};

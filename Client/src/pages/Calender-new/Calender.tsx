@@ -161,7 +161,7 @@ const Calendar = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 sm:p-6 border-b border-gray-200 bg-white">
         {/* HEADER SECTION */}
         <div className="flex items-center justify-between sm:justify-start space-x-4 sm:space-x-6">
-          <div className="flex items-center space-x-2 sm:space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3" hidden>
             <div className="w-8 h-8 sm:w-10 sm:h-10 bg-linear-to-r from-[#5441ff] to-[#4531ff] rounded-lg flex items-center justify-center shadow-sm">
               <svg
                 className="w-4 h-4 sm:w-6 sm:h-6 text-white"

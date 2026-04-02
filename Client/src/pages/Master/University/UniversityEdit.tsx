@@ -110,7 +110,7 @@ const UniversityEdit = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-linear-to-br from-indigo-50 via-purple-50 to-pink-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-white py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto">
           {/* Header Card */}
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-2 mb-2 transform hover:shadow-2xl transition-all duration-300">

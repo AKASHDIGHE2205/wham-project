@@ -250,7 +250,7 @@ import { ActivityStep5 } from './ActivityStep5';
 
           {/* Stepper Navigation */}
           {currentStep <= 4 && (
-            <nav className="mb-8 bg-gray-100 rounded-lg overflow-hidden flex shadow-sm overflow-x-auto sm:overflow-x-visible">
+            <nav className="mb-8 rounded-lg overflow-hidden flex shadow-sm overflow-x-auto sm:overflow-x-visible">
               {steps?.map((step, index) => {
                 const isActive = currentStep === step?.id;
                 const isCompleted = currentStep > step?.id;

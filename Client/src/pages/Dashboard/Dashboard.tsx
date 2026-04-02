@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import DataLoading from "../../components/DataLoading";
 import { getUserFromStorage } from "../../helper/cryptoUser";
 import { getActiveTeams, getActivities } from "../../services/calender/calenderApi";
+import { AddStock, GetAllStockLatest, GetMyRequests } from '../../services/dashboard/DashboardApi';
 import type { Activities } from "../Calender-new/Calender";
 import WeeklyViewUI from './WeeklyViewUI';
 
@@ -17,6 +18,17 @@ interface Teams {
   status: string;
 }
 
+export interface StockTran {
+  id: number;
+  edition: string;
+  quantity: number;
+  c_at: string;
+  c_by: number;
+  tran_type: 'PURCHASE' | 'SALE';
+  balance_qty: number;
+  status: 'A' | 'P' | 'R';
+}
+
 export default function Dashboard() {
   const user = getUserFromStorage();
   const [currentWeekStart, setCurrentWeekStart] = useState(moment().startOf("week"));
@@ -25,6 +37,64 @@ export default function Dashboard() {
   const [teamsLoading, setTeamsLoading] = useState(true);
   const [showAddStock, setshowAddStock] = useState(false);
   const [teams, setTeams] = useState<Teams[]>([]);
+  const [stock, setStock] = useState({
+    edition: "",
+    quantity: 0
+  });
+  const [stockData, setStockData] = useState<StockTran[] | null>(null);
+  const [requestData, setRequestData] = useState<StockTran[] | null>(null);
+
+  const handleStockChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setStock({ ...stock, [name]: name === "quantity" ? parseInt(value) || 0 : value });
+  };
+
+  const handleAddStock = async () => {
+    try {
+      const body = {
+        edition: stock?.edition,
+        quantity: stock?.quantity,
+        userId: user?.id || 0
+      }
+      const response = await AddStock(body);
+      if (response) {
+        setshowAddStock(false);
+        setStock({
+          edition: "",
+          quantity: 0
+        });
+        fetchAllStock();
+        getRequests();
+      }
+    } catch (error) {
+      console.log(error);
+
+    }
+  }
+
+  const fetchAllStock = async () => {
+    try {
+      const userID = user?.id || 0;
+      const response = await GetAllStockLatest(userID);
+      if (response) {
+        setStockData(response || []);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getRequests = async () => {
+    try {
+      const userID = user?.id || 0;
+      const response = await GetMyRequests(userID);
+      if (response) {
+        setRequestData(response || []);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   // Get week date range for API
   const getWeekDateRange = useCallback(() => {
@@ -65,6 +135,8 @@ export default function Dashboard() {
   // Fetch teams on mount
   useEffect(() => {
     fetchTeams();
+    fetchAllStock();
+    getRequests();
   }, []);
 
   const handleWeekChange = (direction: "prev" | "next") => {
@@ -86,8 +158,6 @@ export default function Dashboard() {
     return `${year}-${month}`;
   };
 
-  const currentTime = moment().format("HH:mm:ss");
-
   if (loading && teamsLoading) {
     return (
       <div className="flex justify-center items-center h-screen w-full">
@@ -97,26 +167,11 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-slate-800">
+    <div className="min-h-screen bg-white p-4 md:p-8 font-sans text-slate-800">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900" hidden>
-              {(() => {
-                const hour = parseInt(currentTime.split(":")[0]);
-                if (hour >= 5 && hour < 12) return "Good Morning";
-                if (hour >= 12 && hour < 17) return "Good Afternoon";
-                if (hour >= 17 && hour < 21) return "Good Evening";
-                return "Good Night";
-              })()}
-              , <span className="text-[#3636fa]">{user.firstName}!</span>
-            </h1>
-            <p className="text-gray-600" hidden>Ready to plan your next mission? 🚀</p>
-            <p className="text-slate-700 text-lg font-bold mt-1">
-              Here is your weekly overview.
-            </p>
-          </div>
+
           <div className="text-sm font-semibold text-slate-700">
             {moment().format("dddd, MMMM D, YYYY")}
           </div>
@@ -125,19 +180,19 @@ export default function Dashboard() {
         {(user?.role === 'Master' || user?.role === 'Manager') && (
           <section className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
             {/* Team Analytics */}
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
               <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
                 <BarChart2 className="w-5 h-5 text-indigo-600" /> Team Analytics
               </h2>
-              <div className="flex gap-3">
+              <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
                 <input
                   type="month"
                   defaultValue={getCurrentMonth()}
                   className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 bg-white outline-none focus:ring-2 focus:ring-indigo-500/20"
                 />
-                <select className="border border-slate-200 sm:w-40 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 bg-white outline-none focus:ring-2 focus:ring-indigo-500/20">
+                <select className="border border-slate-200 w-full md:w-40 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 bg-white outline-none focus:ring-2 focus:ring-indigo-500/20">
                   {teams?.map((item) => (
-                    <option key={item.id} value={item?.id}>{item?.name}</option>
+                    <option key={item?.id} value={item?.id}>{item?.name}</option>
                   ))}
                 </select>
               </div>
@@ -145,36 +200,18 @@ export default function Dashboard() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Total Samples */}
-              <div className="bg-[#f0f4ff] rounded-2xl p-8 flex flex-col items-center justify-center text-center">
-                <h3 className="text-indigo-600 font-bold text-sm tracking-wider mb-4">TOTAL SAMPLES (CANS)</h3>
-                <div className="text-6xl font-bold text-indigo-900 mb-2">0.0</div>
-                <p className="text-indigo-400 text-sm font-medium">Based on 0 pouches</p>
+              <div className="bg-[#f0f4ff] rounded-2xl p-8 flex flex-col items-center justify-center text-center h-64">
+                Total Samples
               </div>
 
               {/* Samples by Occasion */}
-              <div className="border border-slate-100 rounded-2xl p-5 flex flex-col">
-                <h3 className="text-xs font-bold text-slate-500 tracking-wider mb-4 uppercase">Samples by Occasion</h3>
-                <div className="flex-1 min-h-40 -ml-4 border border-gray-600">
-                  Here is Graph
-                </div>
+              <div className="bg-[#f0f4ff] rounded-2xl p-8 flex flex-col items-center justify-center text-center h-64">
+                Samples by Occasion
               </div>
 
               {/* Demographics */}
-              <div className="border border-slate-100 rounded-2xl p-5 flex flex-col">
-                <h3 className="text-xs font-bold text-slate-500 tracking-wider mb-4 uppercase">Demographics (Gender)</h3>
-                <div className="flex-1 min-h-40 -ml-4 border border-gray-600">
-                  Here is Graph
-                </div>
-                <div className="flex gap-6 text-xs font-medium">
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 bg-pink-400 rounded-sm"></div>
-                    <span className="text-pink-400">Female</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 bg-blue-500 rounded-sm"></div>
-                    <span className="text-blue-500">Male</span>
-                  </div>
-                </div>
+              <div className="bg-[#f0f4ff] rounded-2xl p-8 flex flex-col items-center justify-center text-center h-64">
+                Demographics
               </div>
             </div>
           </section>
@@ -207,6 +244,7 @@ export default function Dashboard() {
                   <Link
                     className='text-blue-500 underline hover:text-blue-600'
                     to={'/calender'}
+                    hidden
                   >
                     View full Calendar
                   </Link>
@@ -253,20 +291,14 @@ export default function Dashboard() {
             {/* Bottom Charts */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Activity by Occasion */}
-              <section className="bg-white rounded-2xl shadow-sm border border-slate-600 p-6">
-                <h2 className="text-base font-bold text-slate-800 mb-6">Activity by Occasion</h2>
-                <div className="flex flex-col items-center">
-                  Here is Graph
-                </div>
-              </section>
+              <div className="bg-[#f0f4ff] rounded-2xl p-8 flex flex-col items-center justify-center text-center h-64">
+                Activity by Occasion
+              </div>
 
               {/* Performance */}
-              <section className="bg-white rounded-2xl shadow-sm border border-slate-600 p-6">
-                <h2 className="text-base font-bold text-slate-800 mb-6">Performance</h2>
-                <div className="-ml-4">
-                  {/* Placeholder for graph */}
-                </div>
-              </section>
+              <div className="bg-[#f0f4ff] rounded-2xl p-8 flex flex-col items-center justify-center text-center h-64">
+                Performance
+              </div>
             </div>
           </div>
 
@@ -301,11 +333,17 @@ export default function Dashboard() {
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Edition
                       </label>
-                      <select className="w-full h-6 px-3 border border-gray-300 rounded-md bg-white text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option>Cool Mint</option>
-                        <option>Bubblegum</option>
-                        <option>Red Bull</option>
-                        <option>Coffee</option>
+                      <select
+                        className="w-full h-6 px-3 border border-gray-300 rounded-md bg-white text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        defaultValue={stock?.edition}
+                        name="edition"
+                        onChange={handleStockChange}
+                      >
+                        <option value="">Select Edition</option>
+                        <option value={"Cool Mint"}>Cool Mint</option>
+                        <option value={"Bubblegum"}>Bubblegum</option>
+                        <option value={"Red Bull"}>Red Bull</option>
+                        <option value={"Coffee"}>Coffee</option>
                       </select>
                     </div>
 
@@ -315,6 +353,9 @@ export default function Dashboard() {
                       </label>
                       <input
                         type="number"
+                        name="quantity"
+                        defaultValue={stock?.quantity}
+                        onChange={handleStockChange}
                         className="w-full h-6 px-3 border border-gray-300 rounded-md bg-white text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       />
                     </div>
@@ -324,12 +365,13 @@ export default function Dashboard() {
                     <button
                       type="button"
                       onClick={() => setshowAddStock(false)}
-                      className="text-sm text-gray-500 hover:text-gray-700 cursor-pointer h-6"
+                      className="text-sm text-gray-600 hover:text-gray-700 cursor-pointer h-6 bg-gray-200 px-3 rounded-md py-1"
                     >
                       Cancel
                     </button>
                     <button
                       type="button"
+                      onClick={handleAddStock}
                       className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-5 h-6 rounded-md cursor-pointer"
                     >
                       Submit
@@ -337,65 +379,48 @@ export default function Dashboard() {
                   </div>
                 </div>
               )}
-
+              {stockData?.length === 0 && (
+                <div className="text-sm text-slate-500 italic">No stock available. Please submit a new request to obtain stock.</div>
+              )}
               {/* Stock Cards */}
               <div className="grid grid-cols-2 gap-4">
-                <StockCard
-                  title="Cool Mint"
-                  balance="50.0"
-                  inVal="50"
-                  outVal="0.0"
-                  badgeBg="bg-emerald-50"
-                  badgeColor="text-emerald-600"
-                />
-                <StockCard
-                  title="Bubblegum"
-                  balance="30.0"
-                  inVal="30"
-                  outVal="0.0"
-                  badgeBg="bg-pink-50"
-                  badgeColor="text-pink-600"
-                />
-                <StockCard
-                  title="Rage Bull"
-                  balance="0.0"
-                  inVal="0"
-                  outVal="0.0"
-                  badgeBg="bg-rose-50"
-                  badgeColor="text-rose-600"
-                />
-                <StockCard
-                  title="Coffee"
-                  balance="0.0"
-                  inVal="0"
-                  outVal="0.0"
-                  badgeBg="bg-amber-50"
-                  badgeColor="text-amber-700"
-                />
+                {stockData?.map((stock) => (
+                  <StockCard
+                    key={stock?.id}
+                    title={stock?.edition}
+                    balance={stock?.balance_qty?.toString()}
+                  />
+                ))}
               </div>
             </section>
 
             {/* Pending Requests */}
             <section className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
               <h2 className="text-xs font-bold text-slate-500 tracking-wider mb-4 flex items-center gap-2 uppercase">
-                <Clock className="w-4 h-4" /> My Requests
+                <Clock className="w-4 h-4" /> My Recent 7 days Requests
               </h2>
-              <div className="border-l-2 border-rose-200 pl-4 py-1 flex justify-between items-center">
-                <div>
-                  <div className="text-sm font-medium text-slate-800">
-                    Sarah Teammate <span className="font-bold">40</span> Rage Bull
+              {requestData?.length === 0 && (
+                <div className="text-sm text-slate-500 italic">No pending requests</div>
+              )}
+              {requestData?.map((item: StockTran) => (
+                <div key={item?.id} className={`border-l-2 border-rose-200 m-1 rounded-lg pl-4 py-1 flex justify-between items-center 
+                  ${item?.status === "P" ? "bg-amber-50 text-amber-700 border border-amber-200" :
+                    item?.status === "A" ? "bg-green-50 text-green-700 border border-green-200" :
+                      "bg-red-50 text-red-700 border border-red-200"
+                  }`}>
+                  <div>
+                    <div className="text-sm text-slate-800">
+                      {item?.edition} ({item?.quantity} cans)
+                    </div>
+                    <div className="text-xs text-slate-500 mt-1">Requested On - {moment(item?.c_at).format("MMM DD, YYYY")}</div>
                   </div>
-                  <div className="text-xs text-slate-400 mt-1">10/2/2024</div>
+                  <span className="text-xs font-semibold px-3 py-1 rounded-full flex justify-center items-center gap-0.5">
+                    {item?.status === "P" ? (<Clock size={12} />) : item?.status === "A" ? (<Check size={12} />) : (<X size={12} />)}
+                    {item?.status === "P" ? "Pending" : item?.status === "A" ? "Approved" : "Rejected"}
+                  </span>
                 </div>
-                <div className="flex gap-2">
-                  <button className="w-6 h-6 rounded bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-100 transition-colors">
-                    <Check className="w-4 h-4" />
-                  </button>
-                  <button className="w-6 h-6 rounded bg-rose-50 text-rose-600 flex items-center justify-center hover:bg-rose-100 transition-colors">
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+              ))}
+
             </section>
 
             {/* Action Items */}
@@ -449,29 +474,72 @@ function StatCard({ icon, bg, title, value }: { icon: React.ReactNode, bg: strin
   );
 }
 
-function StockCard({ title, balance, inVal, outVal, badgeBg, badgeColor }: { title: string, balance: string, inVal: string, outVal: string, badgeBg: string, badgeColor: string }) {
+function StockCard({ title, balance }: { title: string, balance: string }) {
+  const balanceNum = parseFloat(balance);
+
+  const getStyles = () => {
+    if (balanceNum === 0) {
+      return {
+        cardBg: "bg-red-50",
+        cardBorder: "border-red-200",
+        badgeBg: "bg-red-100",
+        badgeColor: "text-red-700",
+        label: "Out of Stock",
+        labelBg: "bg-red-100",
+        labelColor: "text-red-700"
+      };
+    } else if (balanceNum < 50) {
+      return {
+        cardBg: "bg-amber-50",
+        cardBorder: "border-amber-200",
+        badgeBg: "bg-amber-100",
+        badgeColor: "text-amber-700",
+        label: "Low Stock",
+        labelBg: "bg-amber-100",
+        labelColor: "text-amber-700"
+      };
+    } else if (balanceNum < 200) {
+      return {
+        cardBg: "bg-emerald-50",
+        cardBorder: "border-emerald-200",
+        badgeBg: "bg-emerald-100",
+        badgeColor: "text-emerald-700",
+        label: "In Stock",
+        labelBg: "bg-emerald-100",
+        labelColor: "text-emerald-700"
+      };
+    } else {
+      return {
+        cardBg: "bg-blue-50",
+        cardBorder: "border-blue-200",
+        badgeBg: "bg-blue-100",
+        badgeColor: "text-blue-700",
+        label: "Well Stocked",
+        labelBg: "bg-blue-100",
+        labelColor: "text-blue-700"
+      };
+    }
+  };
+
+  const styles = getStyles();
+
   return (
-    <div className="border border-slate-100 rounded-xl p-4 flex flex-col">
-      <div className="flex justify-end mb-2">
-        <span className={`text-[10px] px-2 py-0.5 rounded font-bold tracking-wide ${badgeBg} ${badgeColor}`}>
+    <div className={`border h-20 rounded-xl p-2 flex flex-col justify-between transition-all ${styles.cardBg} ${styles.cardBorder}`}>
+      <div className="flex justify-between items-start">
+        <div className="flex-1">
+          <div className="text-[10px] text-slate-500 font-bold tracking-wider mb-0.5">BALANCE</div>
+          <div className="text-xl font-bold text-slate-800 flex items-baseline gap-1">
+            {balance} <span className="text-[10px] text-slate-500 font-medium">Cans</span>
+          </div>
+        </div>
+        <span className={`text-[10px] px-2 py-0.5 rounded font-bold tracking-wide whitespace-nowrap ${styles.badgeBg} ${styles.badgeColor}`}>
           {title}
         </span>
       </div>
-      <div className="mb-4">
-        <div className="text-[10px] text-slate-400 font-bold tracking-wider mb-0.5">BALANCE</div>
-        <div className="text-xl font-bold text-slate-800 flex items-baseline gap-1">
-          {balance} <span className="text-[10px] text-slate-400 font-medium">Cans</span>
-        </div>
-      </div>
-      <div className="flex justify-between text-xs border-t border-slate-50 pt-3 mt-auto">
-        <div>
-          <div className="text-slate-400 text-[10px] font-medium mb-0.5">In</div>
-          <div className="text-emerald-500 font-semibold">+{inVal}</div>
-        </div>
-        <div className="text-right">
-          <div className="text-slate-400 text-[10px] font-medium mb-0.5">Out</div>
-          <div className="text-rose-500 font-semibold">-{outVal}</div>
-        </div>
+      <div className="flex justify-end">
+        <span className={`text-[10px] px-2 py-0.5 rounded font-medium ${styles.labelColor}`}>
+          {styles.label}
+        </span>
       </div>
     </div>
   );
